@@ -18,11 +18,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { sessionId } = req.query;
+    // Get sessionId from URL path
+    const sessionId = req.url.split('/').pop();
 
-    if (!sessionId) {
+    if (!sessionId || sessionId === 'checkout-session') {
       return res.status(400).json({ error: 'Session ID is required' });
     }
+
+    console.log('Retrieving session:', sessionId);
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['customer', 'subscription']

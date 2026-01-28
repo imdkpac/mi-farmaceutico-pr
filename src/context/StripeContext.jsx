@@ -19,25 +19,18 @@ export const StripeProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Detect API URL - works for both local dev and Vercel deployment
+  // Get API URL - in production on Vercel, API routes are at the same origin
   const getApiUrl = () => {
-    // If explicit API URL is set, use it
-    if (import.meta.env.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL;
-    }
-    
-    // For Vercel deployment, use the same origin
+    // If we're in the browser
     if (typeof window !== 'undefined') {
-      const origin = window.location.origin;
-      // If we're on localhost, use the dev server
-      if (origin.includes('localhost')) {
-        return 'http://localhost:3001';
+      // In production (not localhost), use the same origin for API routes
+      if (!window.location.hostname.includes('localhost')) {
+        return window.location.origin;
       }
-      // Otherwise use the same origin (Vercel deployment)
-      return origin;
     }
     
-    return 'http://localhost:3001';
+    // Local development - use env variable or default to localhost:3001
+    return import.meta.env.VITE_API_URL || 'http://localhost:3001';
   };
 
   const API_URL = getApiUrl();
@@ -50,7 +43,13 @@ export const StripeProvider = ({ children }) => {
     setError(null);
 
     try {
-      console.log('Creating checkout session...', { API_URL, priceId, customerEmail });
+      console.log('=== CHECKOUT DEBUG ===');
+      console.log('API_URL:', API_URL);
+      console.log('Full URL:', `${API_URL}/api/create-checkout-session`);
+      console.log('Price ID:', priceId);
+      console.log('Email:', customerEmail);
+      console.log('Metadata:', metadata);
+      console.log('====================');
 
       const response = await fetch(`${API_URL}/api/create-checkout-session`, {
         method: 'POST',
@@ -65,10 +64,19 @@ export const StripeProvider = ({ children }) => {
       });
 
       console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('API Error:', errorData);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: errorText || `HTTP error ${response.status}` };
+        }
+        
         throw new Error(errorData.error || `HTTP error ${response.status}`);
       }
 
@@ -101,7 +109,12 @@ export const StripeProvider = ({ children }) => {
     setError(null);
 
     try {
-      console.log('Creating payment session...', { API_URL, priceId, customerEmail });
+      console.log('=== PAYMENT SESSION DEBUG ===');
+      console.log('API_URL:', API_URL);
+      console.log('Full URL:', `${API_URL}/api/create-payment-session`);
+      console.log('Price ID:', priceId);
+      console.log('Email:', customerEmail);
+      console.log('============================');
 
       const response = await fetch(`${API_URL}/api/create-payment-session`, {
         method: 'POST',
@@ -118,8 +131,16 @@ export const StripeProvider = ({ children }) => {
       console.log('Response status:', response.status);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('API Error:', errorData);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: errorText || `HTTP error ${response.status}` };
+        }
+        
         throw new Error(errorData.error || `HTTP error ${response.status}`);
       }
 
@@ -145,86 +166,6 @@ export const StripeProvider = ({ children }) => {
   };
 
   /**
-   * Get subscription details
-   */
-  const getSubscription = async (subscriptionId) => {
-    try {
-      const response = await fetch(`${API_URL}/api/subscription/${subscriptionId}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get subscription');
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Error getting subscription:', err);
-      throw err;
-    }
-  };
-
-  /**
-   * Cancel a subscription
-   */
-  const cancelSubscription = async (subscriptionId, cancelAtPeriodEnd = true) => {
-    try {
-      const response = await fetch(`${API_URL}/api/cancel-subscription`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subscriptionId,
-          cancelAtPeriodEnd,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to cancel subscription');
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Error canceling subscription:', err);
-      throw err;
-    }
-  };
-
-  /**
-   * Create customer portal session
-   */
-  const createPortalSession = async (customerId) => {
-    try {
-      const response = await fetch(`${API_URL}/api/create-portal-session`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create portal session');
-      }
-
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      }
-      
-      return data;
-    } catch (err) {
-      console.error('Error creating portal session:', err);
-      throw err;
-    }
-  };
-
-  /**
    * Get checkout session details
    */
   const getCheckoutSession = async (sessionId) => {
@@ -232,7 +173,7 @@ export const StripeProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/api/checkout-session/${sessionId}`);
       
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to get checkout session');
       }
 
@@ -243,72 +184,12 @@ export const StripeProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Add subscription item (for add-ons)
-   */
-  const addSubscriptionItem = async (subscriptionId, priceId) => {
-    try {
-      const response = await fetch(`${API_URL}/api/add-subscription-item`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subscriptionId,
-          priceId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add subscription item');
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Error adding subscription item:', err);
-      throw err;
-    }
-  };
-
-  /**
-   * Remove subscription item
-   */
-  const removeSubscriptionItem = async (subscriptionItemId) => {
-    try {
-      const response = await fetch(`${API_URL}/api/remove-subscription-item`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subscriptionItemId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to remove subscription item');
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error('Error removing subscription item:', err);
-      throw err;
-    }
-  };
-
   const value = {
     loading,
     error,
     createCheckoutSession,
     createPaymentSession,
-    getSubscription,
-    cancelSubscription,
-    createPortalSession,
     getCheckoutSession,
-    addSubscriptionItem,
-    removeSubscriptionItem,
   };
 
   return (
