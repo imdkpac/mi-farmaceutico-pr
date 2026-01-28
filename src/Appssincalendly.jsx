@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun, Globe, Check, Heart, Shield, AlertTriangle, Home, Phone, Mail, ChevronRight, Award, X } from 'lucide-react';
 import CheckoutModal from './components/CheckoutModal';
-import CalendlyModal from './components/CalendlyModal';
 import { STRIPE_PRICES } from './config/stripeConfig';
 
 const d = {
@@ -64,7 +63,6 @@ export default function LP() {
   const [l, setL] = useState('en');
   const [s, setS] = useState(false);
   const [checkoutModal, setCheckoutModal] = useState({ isOpen: false, plan: null, type: null });
-  const [calendlyModal, setCalendlyModal] = useState(false);
   const [showFoundationOptions, setShowFoundationOptions] = useState(false);
   const t = d[l];
 
@@ -114,7 +112,7 @@ export default function LP() {
                 <button onClick={() => setK(!k)} className="p-2 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800">
                   {k ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
-                <button onClick={() => setCalendlyModal(true)} className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-xl font-semibold">{t.nav.cta}</button>
+                <button onClick={() => go('services')} className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2 rounded-xl font-semibold">{t.nav.cta}</button>
               </div>
             </div>
           </div>
@@ -125,10 +123,7 @@ export default function LP() {
             <h1 className="text-5xl font-bold text-slate-900 dark:text-white mb-6">{t.hero.h}</h1>
             <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">{t.hero.sh}</p>
             <div className="flex gap-4 justify-center">
-              <button 
-                onClick={() => setCalendlyModal(true)}
-                className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2"
-              >
+              <button onClick={() => go('services')} className="bg-sky-500 hover:bg-sky-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2">
                 <span>{t.hero.cta}</span>
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -412,11 +407,6 @@ export default function LP() {
           type={checkoutModal.type}
         />
       )}
-
-      <CalendlyModal
-        isOpen={calendlyModal}
-        onClose={() => setCalendlyModal(false)}
-      />
     </div>
   );
 }
