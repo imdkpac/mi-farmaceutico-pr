@@ -118,3 +118,5 @@ export const trackInHomeVisit = () => {
 export const trackSafetyAudit = () => {
   trackEvent('book_service', 'one_time', 'safety_audit');
 };
+export const trackTierSelection = trackSelectTier;
+export const trackOneTimeService = trackBookService;
