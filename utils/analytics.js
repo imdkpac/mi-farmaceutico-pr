@@ -1,47 +1,15 @@
 /**
- * Google Analytics 4 Tracking Utility
- * 
- * Initialize GA4 tracking and track key conversion events
+ * Google Analytics 4 Event Tracking
+ * GA4 Measurement ID: G-S9RFJRJXFG
  */
-
-/**
- * Initialize Google Analytics
- * Call this once in your App.jsx or main.jsx
- * 
- * @param {string} measurementId - Your GA4 Measurement ID (G-XXXXXXXXXX)
- */
-export const initGA = (measurementId = 'G-XXXXXXXXXX') => {
-  if (typeof window === 'undefined') return;
-
-  // Create and append GA script
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
-
-  // Initialize dataLayer
-  window.dataLayer = window.dataLayer || [];
-  function gtag() {
-    window.dataLayer.push(arguments);
-  }
-  gtag('js', new Date());
-  gtag('config', measurementId);
-
-  // Make gtag globally available
-  window.gtag = gtag;
-
-  console.log('Google Analytics initialized:', measurementId);
-};
 
 /**
  * Track a custom event
- * 
- * @param {string} action - The event action (e.g., 'schedule_click', 'select_tier')
- * @param {string} category - The event category (e.g., 'engagement', 'pricing')
- * @param {string} label - Optional event label (e.g., 'hero_cta', 'foundation')
- * @param {number} value - Optional numeric value
+ * @param {string} action - The event action
+ * @param {string} category - The event category
+ * @param {string} label - Optional event label
  */
-export const trackEvent = (action, category, label = '', value = null) => {
+export const trackEvent = (action, category, label = '') => {
   if (typeof window === 'undefined' || !window.gtag) {
     console.warn('Google Analytics not initialized');
     return;
@@ -55,30 +23,44 @@ export const trackEvent = (action, category, label = '', value = null) => {
     eventParams.event_label = label;
   }
 
-  if (value !== null) {
-    eventParams.value = value;
-  }
-
   window.gtag('event', action, eventParams);
-
-  console.log('GA Event tracked:', { action, category, label, value });
+  console.log('GA Event:', { action, category, label });
 };
 
 /**
- * Pre-defined event trackers for common actions
+ * Pre-configured event trackers
  */
+
+// Schedule consultation clicks
 export const trackScheduleClick = (location = 'unknown') => {
   trackEvent('schedule_click', 'engagement', location);
 };
 
-export const trackTierSelection = (tierName, price) => {
-  trackEvent('select_tier', 'pricing', tierName.toLowerCase(), price);
+// Navigation/scroll events
+export const trackScrollTo = (section) => {
+  trackEvent('scroll_to', 'navigation', section);
 };
 
-export const trackOneTimeService = (serviceName, price) => {
-  trackEvent('select_service', 'one_time', serviceName.toLowerCase(), price);
+// Pricing tier selections
+export const trackSelectTier = (tierName) => {
+  trackEvent('select_tier', 'pricing', tierName.toLowerCase());
 };
 
+// One-time service bookings
+export const trackBookService = (serviceName) => {
+  trackEvent('book_service', 'one_time', serviceName.toLowerCase().replace(/\s+/g, '_'));
+};
+
+// Phone and email clicks
+export const trackPhoneClick = () => {
+  trackEvent('phone_click', 'engagement', 'contact');
+};
+
+export const trackEmailClick = () => {
+  trackEvent('email_click', 'engagement', 'contact');
+};
+
+// Checkout events
 export const trackCheckoutStart = (planName, amount) => {
   trackEvent('begin_checkout', 'ecommerce', planName, amount);
 };
@@ -98,28 +80,41 @@ export const trackCheckoutComplete = (planName, amount, transactionId) => {
   }
 };
 
-export const trackPhoneClick = () => {
-  trackEvent('phone_click', 'engagement', 'contact');
-};
-
-export const trackEmailClick = () => {
-  trackEvent('email_click', 'engagement', 'contact');
-};
-
 /**
- * Example usage in components:
- * 
- * import { trackScheduleClick, trackTierSelection } from './utils/analytics';
- * 
- * // In button onClick:
- * onClick={() => {
- *   trackScheduleClick('hero_section');
- *   setCalendlyModal(true);
- * }}
- * 
- * // For tier selection:
- * onClick={() => {
- *   trackTierSelection('Enhanced', 195);
- *   handlePlanSelect(...);
- * }}
+ * Specific event trackers as requested
  */
+
+// Hero section
+export const trackHeroCTA = () => {
+  trackEvent('schedule_click', 'engagement', 'hero_cta');
+};
+
+export const trackSeeHowItWorks = () => {
+  trackEvent('scroll_to', 'navigation', 'how_it_works');
+};
+
+// Tier selections
+export const trackFoundationTier = () => {
+  trackEvent('select_tier', 'pricing', 'foundation');
+};
+
+export const trackEnhancedTier = () => {
+  trackEvent('select_tier', 'pricing', 'enhanced');
+};
+
+export const trackConciergeTier = () => {
+  trackEvent('select_tier', 'pricing', 'concierge');
+};
+
+// One-time services
+export const trackTransitionOfCare = () => {
+  trackEvent('book_service', 'one_time', 'transition_of_care');
+};
+
+export const trackInHomeVisit = () => {
+  trackEvent('book_service', 'one_time', 'in_home_visit');
+};
+
+export const trackSafetyAudit = () => {
+  trackEvent('book_service', 'one_time', 'safety_audit');
+};
