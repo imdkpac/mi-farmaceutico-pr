@@ -225,8 +225,8 @@ export default function LandingPage() {
                   <p>✓ Puerto Rico & Florida Licensed Pharmacist</p>
                   <p>✓ Nuclear Pharmacy Certified</p>
                   <p>✓ Nova Southeastern University Pharm.D. (2020)</p>
-                  <p>✓ Clinical Staff Pharmacist at CPS TELEpharmacy</p>
                   <p>✓ Former Nuclear Pharmacist at Cardinal Health PR</p>
+                  <p>✓ Specialized training in medication therapy management</p>
                 </div>
               </div>
             </div>
@@ -351,9 +351,9 @@ export default function LandingPage() {
 
             {/* Enhanced Tier - RECOMMENDED */}
             <div className="bg-white rounded-2xl shadow-2xl p-8 border-4 border-teal-600 relative transform lg:scale-105">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
                 <span className="bg-gradient-to-r from-teal-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                  ⭐ Most Popular • Best for Most Families
+                  ⭐ Most Popular
                 </span>
               </div>
               <div className="inline-block bg-teal-100 text-teal-700 px-4 py-1 rounded-full text-sm font-semibold mb-4 mt-6">
@@ -595,7 +595,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-slate-900 mb-4">Licensed & Experienced</h3>
               <p className="text-slate-700">
-                Christian Portalatín is a Puerto Rico-licensed pharmacist with specialized training in medication therapy management, HIV care, and nuclear pharmacy. Former Clinical Staff Tele-Pharmacist at CPS and Nuclear Pharmacist at Cardinal Health.
+                Christian Portalatín is a Puerto Rico-licensed pharmacist with specialized training in medication therapy management, HIV care, and nuclear pharmacy. Former Nuclear Pharmacist at Cardinal Health PR with clinical pharmacy experience.
               </p>
             </div>
 
@@ -756,9 +756,9 @@ export default function LandingPage() {
                   <Phone className="w-4 h-4" />
                   (787) 457-0388
                 </a>
-                <a href="mailto:tufarmaceuticopr@gmail.com" className="flex items-center gap-2 hover:text-teal-400 transition">
+                <a href="mailto:BoticaRxPR@outlook.com" className="flex items-center gap-2 hover:text-teal-400 transition">
                   <Mail className="w-4 h-4" />
-                  tufarmaceuticopr@gmail.com
+                  BoticaRxPR@outlook.com
                 </a>
               </div>
             </div>
