@@ -65,18 +65,18 @@ export default function Canceled() {
           </p>
           <div className="space-y-2 text-sm">
             <a 
-              href="mailto:info@mifarmaceuticopr.com" 
+              href="mailto:boticarxpr@outlook.com" 
               className="flex items-center gap-2 text-teal-600 dark:text-teal-400 hover:underline"
             >
               <span>📧</span>
-              <span>info@mifarmaceuticopr.com</span>
+              <span>boticarxpr@outlook.com</span>
             </a>
             <a 
-              href="tel:+17875551234" 
+              href="tel:+17874570388" 
               className="flex items-center gap-2 text-teal-600 dark:text-teal-400 hover:underline"
             >
               <span>📞</span>
-              <span>+1 (787) 555-1234</span>
+              <span>+1 (787) 457-0388</span>
             </a>
           </div>
         </div>
