@@ -223,10 +223,10 @@ export default function LandingPage() {
                 <p className="text-teal-600 font-semibold mb-4">Clinical Pharmacist</p>
                 <div className="text-left space-y-2 text-sm text-slate-600">
                   <p>✓ Puerto Rico & Florida Licensed Pharmacist</p>
-                  <p>✓ Nuclear Pharmacy Certified</p>
+                  <p>✓ Community and Hospital Pharmacy Experience</p>
                   <p>✓ Nova Southeastern University Pharm.D. (2020)</p>
+                  <p>✓ Former Clinical Staff Pharmacist at CPS</p>
                   <p>✓ Former Nuclear Pharmacist at Cardinal Health PR</p>
-                  <p>✓ Specialized training in medication therapy management</p>
                 </div>
               </div>
             </div>
