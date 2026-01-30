@@ -7,6 +7,7 @@ import {
 import CheckoutModal from '../components/CheckoutModal';
 import CalendlyModal from '../components/CalendlyModal';
 import { STRIPE_PRICES } from '../config/stripeConfig';
+import { trackScheduleClick, trackTierSelection, trackOneTimeService, trackPhoneClick } from '../utils/analytics';
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,7 +20,20 @@ export default function LandingPage() {
     setMobileMenuOpen(false);
   };
 
+  const handleScheduleClick = (location) => {
+    trackScheduleClick(location);
+    setCalendlyModal(true);
+  };
+
   const handlePlanSelect = (plan, priceId, type = 'subscription') => {
+    // Track tier selection
+    const priceNum = parseInt(plan.price.replace(/[^0-9]/g, ''));
+    if (type === 'subscription') {
+      trackTierSelection(plan.name, priceNum);
+    } else {
+      trackOneTimeService(plan.name, priceNum);
+    }
+    
     setCheckoutModal({
       isOpen: true,
       plan: { ...plan, priceId },
@@ -77,12 +91,16 @@ export default function LandingPage() {
               <button onClick={() => scrollToSection('about')} className="text-slate-700 hover:text-teal-600 font-medium transition">
                 About
               </button>
-              <a href="tel:7874570388" className="text-teal-600 hover:text-teal-700 font-semibold flex items-center gap-2">
+              <a 
+                href="tel:7874570388" 
+                onClick={() => trackPhoneClick()}
+                className="text-teal-600 hover:text-teal-700 font-semibold flex items-center gap-2"
+              >
                 <Phone className="w-4 h-4" />
                 (787) 457-0388
               </a>
               <button 
-                onClick={() => setCalendlyModal(true)}
+                onClick={() => handleScheduleClick('header')}
                 className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-lg font-semibold transition shadow-lg hover:shadow-xl"
               >
                 Schedule Consultation
@@ -112,12 +130,16 @@ export default function LandingPage() {
               <button onClick={() => scrollToSection('about')} className="block w-full text-left px-4 py-2 text-slate-700 hover:bg-slate-50 rounded">
                 About
               </button>
-              <a href="tel:7874570388" className="block w-full text-left px-4 py-2 text-teal-600 hover:bg-slate-50 rounded font-semibold">
+              <a 
+                href="tel:7874570388" 
+                onClick={() => trackPhoneClick()}
+                className="block w-full text-left px-4 py-2 text-teal-600 hover:bg-slate-50 rounded font-semibold"
+              >
                 <Phone className="w-4 h-4 inline mr-2" />
                 (787) 457-0388
               </a>
               <button 
-                onClick={() => setCalendlyModal(true)}
+                onClick={() => handleScheduleClick('mobile_menu')}
                 className="w-full bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-semibold"
               >
                 Schedule Consultation
@@ -163,7 +185,7 @@ export default function LandingPage() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
-                  onClick={() => setCalendlyModal(true)}
+                  onClick={() => handleScheduleClick('hero')}
                   className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition"
                 >
                   Schedule Free Consultation
@@ -180,8 +202,19 @@ export default function LandingPage() {
 
             {/* Right Column - Pharmacist Photo & Info */}
             <div className="bg-white rounded-2xl shadow-2xl p-8">
-              <div className="w-48 h-48 bg-gradient-to-br from-teal-100 to-blue-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <div className="text-6xl">👨‍⚕️</div>
+              <div className="w-48 h-48 rounded-full mx-auto mb-6 overflow-hidden bg-gradient-to-br from-teal-100 to-blue-100">
+                {/* TODO: Replace with professional headshot */}
+                <img 
+                  src="/christian-portalatin.jpg" 
+                  alt="Christian Alexis Portalatín Cordero, Pharm.D., Puerto Rico Licensed Pharmacist"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to emoji if image not found
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+                <div className="w-full h-full hidden items-center justify-center text-6xl">👨‍⚕️</div>
               </div>
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-slate-900 mb-2">
@@ -232,7 +265,7 @@ export default function LandingPage() {
               <div className="text-blue-600 font-bold text-lg mb-2">Step 2</div>
               <h3 className="text-2xl font-bold text-slate-900 mb-4">We Assess</h3>
               <p className="text-slate-700">
-                We review everything, coordinate with island pharmacies, and visit if needed.
+                We review your parent's complete medication history, coordinate with their pharmacies and doctors in Puerto Rico, and conduct an in-home evaluation if clinically indicated. All findings are documented in a secure report shared with your family.
               </p>
             </div>
 
@@ -270,7 +303,7 @@ export default function LandingPage() {
             {/* Foundation Tier */}
             <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-slate-200">
               <div className="inline-block bg-slate-100 text-slate-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                Remote Only
+                Remote Monitoring Only
               </div>
               <h3 className="text-3xl font-bold text-slate-900 mb-2">Foundation</h3>
               <div className="mb-4">
@@ -404,7 +437,7 @@ export default function LandingPage() {
               </ul>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
                 <p className="text-xs text-amber-800 font-semibold text-center">
-                  ⚠️ Only 3 spots available for March 2025 intake
+                  ⚠️ Only 3 spots available for February 2025 intake
                 </p>
               </div>
               <button 
@@ -543,7 +576,7 @@ export default function LandingPage() {
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Why Families Trust Us</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {/* Independent Practice */}
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
@@ -574,6 +607,17 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold text-slate-900 mb-4">Diaspora-Focused</h3>
               <p className="text-slate-700">
                 We speak your language—literally. English for you, Spanish for island providers. We understand the 1,000-mile worry.
+              </p>
+            </div>
+
+            {/* 30-Day Guarantee - NEW */}
+            <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-green-200">
+              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                <Shield className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">30-Day Peace of Mind Guarantee</h3>
+              <p className="text-slate-700">
+                Not satisfied after your first month? We'll refund 100% of your subscription fee. No questions asked. We only succeed when your family truly benefits from our service.
               </p>
             </div>
           </div>
@@ -691,7 +735,7 @@ export default function LandingPage() {
             Schedule a free 15-minute consultation to discuss your parent's medication needs
           </p>
           <button 
-            onClick={() => setCalendlyModal(true)}
+            onClick={() => handleScheduleClick('final_cta')}
             className="bg-white text-teal-600 hover:bg-slate-100 px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center gap-2 shadow-xl transition"
           >
             Schedule Free Consultation
@@ -758,10 +802,11 @@ export default function LandingPage() {
         <div className="flex items-center justify-between">
           <span className="font-semibold">Questions?</span>
           <a 
-            href="tel:7874570388" 
+            href="tel:7874570388"
+            onClick={() => trackPhoneClick()} 
             className="bg-white text-teal-600 px-4 py-2 rounded-lg font-bold hover:bg-slate-100 transition"
           >
-            Call (787) 457-0388
+            Text or Call (787) 457-0388
           </a>
         </div>
       </div>
