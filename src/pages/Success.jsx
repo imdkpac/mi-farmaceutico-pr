@@ -142,12 +142,12 @@ export default function Success() {
         <div className="mb-8 text-center p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
           <p className="text-sm text-amber-900 dark:text-amber-200">
             <strong>Need help?</strong> Contact us at{' '}
-            <a href="mailto:info@mifarmaceuticopr.com" className="underline hover:text-amber-700">
+            <a href="mailto:boticarxpr@outlook.com" className="underline hover:text-amber-700">
               info@mifarmaceuticopr.com
             </a>
             {' '}or{' '}
-            <a href="tel:+17875551234" className="underline hover:text-amber-700">
-              +1 (787) 555-1234
+            <a href="tel:+17874570388" className="underline hover:text-amber-700">
+              +1 (787) 457-0388
             </a>
           </p>
         </div>
