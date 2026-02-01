@@ -437,7 +437,7 @@ export default function LandingPage() {
               </ul>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
                 <p className="text-xs text-amber-800 font-semibold text-center">
-                  ⚠️ Only 3 spots available for February 2025 intake
+                  ⚠️ Only 3 spots available for February 2026 intake
                 </p>
               </div>
               <button 
