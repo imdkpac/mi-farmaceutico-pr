@@ -471,7 +471,7 @@ export default function LandingPage() {
                 className="text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 font-semibold flex items-center gap-2"
               >
                 <Phone className="w-4 h-4" />
-                (787) 457-0388
+                (787) 667-6560
               </a>
               <button 
                 onClick={() => handleScheduleClick('header')}
@@ -531,7 +531,7 @@ export default function LandingPage() {
                 className="block w-full text-left px-4 py-2 text-teal-600 dark:text-teal-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded font-semibold"
               >
                 <Phone className="w-4 h-4 inline mr-2" />
-                (787) 457-0388
+                (787) 667-6560
               </a>
               <button 
                 onClick={() => handleScheduleClick('mobile_menu')}
