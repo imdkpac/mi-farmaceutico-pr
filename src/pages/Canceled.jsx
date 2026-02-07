@@ -72,7 +72,7 @@ export default function Canceled() {
               <span>boticarxpr@outlook.com</span>
             </a>
             <a 
-              href="tel:+17874570388" 
+              href="tel:+17876676560" 
               className="flex items-center gap-2 text-teal-600 dark:text-teal-400 hover:underline"
             >
               <span>📞</span>
