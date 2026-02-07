@@ -466,7 +466,7 @@ export default function LandingPage() {
                 {t.nav.about}
               </button>
               <a 
-                href="tel:7874570388" 
+                href="tel:7876676560" 
                 onClick={() => trackPhoneClick()}
                 className="text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 font-semibold flex items-center gap-2"
               >
@@ -526,7 +526,7 @@ export default function LandingPage() {
                 {t.nav.about}
               </button>
               <a 
-                href="tel:7874570388" 
+                href="tel:7876676560" 
                 onClick={() => trackPhoneClick()}
                 className="block w-full text-left px-4 py-2 text-teal-600 dark:text-teal-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded font-semibold"
               >
@@ -1117,7 +1117,7 @@ export default function LandingPage() {
             <div>
               <h4 className="text-white font-bold text-lg mb-4">{t.footer.contact}</h4>
               <div className="space-y-3">
-                <a href="tel:7874570388" className="flex items-center gap-2 hover:text-teal-400 transition">
+                <a href="tel:7876676560" className="flex items-center gap-2 hover:text-teal-400 transition">
                   <Phone className="w-4 h-4" />
                   (787) 457-0388
                 </a>
@@ -1167,7 +1167,7 @@ export default function LandingPage() {
         <div className="flex items-center justify-between">
           <span className="font-semibold">{t.mobile.questions}</span>
           <a 
-            href="tel:7874570388"
+            href="tel:7876676560"
             onClick={() => trackPhoneClick()} 
             className="bg-white text-teal-600 px-4 py-2 rounded-lg font-bold hover:bg-slate-100 transition"
           >
