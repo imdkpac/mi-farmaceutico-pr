@@ -146,7 +146,7 @@ export default function Success() {
               info@mifarmaceuticopr.com
             </a>
             {' '}or{' '}
-            <a href="tel:+17874570388" className="underline hover:text-amber-700">
+            <a href="tel:+17876676560" className="underline hover:text-amber-700">
               +1 (787) 457-0388
             </a>
           </p>
