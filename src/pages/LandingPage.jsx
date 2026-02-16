@@ -1119,7 +1119,7 @@ export default function LandingPage() {
               <div className="space-y-3">
                 <a href="tel:7876676560" className="flex items-center gap-2 hover:text-teal-400 transition">
                   <Phone className="w-4 h-4" />
-                  (787) 457-0388
+                  (787) 667-6560
                 </a>
                 <a href="mailto:BoticaRxPR@outlook.com" className="flex items-center gap-2 hover:text-teal-400 transition">
                   <Mail className="w-4 h-4" />
