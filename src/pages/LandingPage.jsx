@@ -239,7 +239,7 @@ const translations = {
         period: '/mes',
         desc: 'Abogacía de guante blanco para situaciones de alta complejidad',
         bestFor: 'Ideal para: 10+ medicamentos, múltiples especialistas, preocupaciones cognitivas',
-        spots: 'Solo 3 espacios disponibles para intake de marzo 2026',
+        spots: 'Solo 3 espacios disponibles para marzo de 2026',
         cta: 'Aplicar para Concierge'
       },
       guarantee: {
