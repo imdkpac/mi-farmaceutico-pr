@@ -82,7 +82,7 @@ const translations = {
       },
       guarantee: {
         title: '30-Day Peace of Mind Guarantee',
-        desc: "If you're not satisfied after the first month, we'll refund 100% of your subscription fee. No questions asked."
+        desc: "Not satisfied after your first month? Request a full refund in writing within 30 days of your service start date. Subsequent months are non-refundable. We only succeed when your family truly benefits."
       }
     },
     immediate: {
@@ -126,7 +126,7 @@ const translations = {
       },
       guarantee: {
         title: '30-Day Peace of Mind Guarantee',
-        desc: "Not satisfied after your first month? We'll refund 100% of your subscription fee. No questions asked. We only succeed when your family truly benefits from our service."
+        desc: "Not satisfied after your first month? Request a full refund in writing within 30 days of your service start date. Subsequent months are non-refundable. We only succeed when your family truly benefits."
       }
     },
     scope: {
@@ -244,7 +244,7 @@ const translations = {
       },
       guarantee: {
         title: 'Garantía de Tranquilidad de 30 Días',
-        desc: 'Si no estás satisfecho después del primer mes, te reembolsaremos el 100% de tu cuota de suscripción. Sin preguntas.'
+        desc: 'No está satisfecho después del primer mes? Solicite un reembolso completo por escrito dentro de 30 días de su fecha de inicio. Los meses subsiguientes no son reembolsables.'
       }
     },
     immediate: {
@@ -288,7 +288,7 @@ const translations = {
       },
       guarantee: {
         title: 'Garantía de Tranquilidad de 30 Días',
-        desc: '¿No satisfecho después de tu primer mes? Te reembolsaremos el 100% de tu cuota de suscripción. Sin preguntas. Solo tenemos éxito cuando tu familia realmente se beneficia de nuestro servicio.'
+        desc: '¿No está satisfecho después del primer mes? Solicite un reembolso completo por escrito dentro de 30 días de su fecha de inicio. Los meses subsiguientes no son reembolsables.'
       }
     },
     scope: {
@@ -403,8 +403,8 @@ export default function LandingPage() {
     {
       q: language === 'en' ? "Can I cancel anytime?" : "¿Puedo cancelar en cualquier momento?",
       a: language === 'en'
-        ? "Yes. Subscriptions are month-to-month. We also offer a 30-day money-back guarantee for your first month."
-        : "Sí. Las suscripciones son de mes a mes. También ofrecemos una garantía de reembolso de 30 días para tu primer mes."
+        ? "Yes. Subscriptions are month-to-month with 30 days written notice to cancel. Your first month is eligible for a full refund if requested in writing within 30 days of your service start date. Subsequent months are non-refundable."
+        : "Sí. Las suscripciones son mes a mes con 30 días de aviso por escrito. El primer mes es reembolsable si se solicita por escrito dentro de 30 días de la fecha de inicio."
     },
     {
       q: language === 'en' ? "Do you accept insurance?" : "¿Aceptan seguro?",
