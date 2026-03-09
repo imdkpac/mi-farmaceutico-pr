@@ -817,7 +817,11 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">{language === 'en' ? 'Up to 2 in-home visits per year' : 'Hasta 2 visitas a domicilio por año'}</span>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{language === 'en' ? '2 proactive scheduled visits/year' : 'Hasta 2 visitas programadas por año'}</span>
+                </li>
+                   <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{language === 'en' ? '+ urgent visit available as needed' : 'visita urgente disponible si surge algo'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
