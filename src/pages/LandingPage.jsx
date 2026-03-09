@@ -821,7 +821,7 @@ export default function LandingPage() {
                 </li>
                    <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">{language === 'en' ? '+ urgent visit available as needed' : 'visita urgente disponible si surge algo'}</span>
+                  <span className="text-sm text-slate-700 dark:text-slate-300">{language === 'en' ? '+ Urgent visit available as needed' : '+ Visita urgente disponible si surge algo'}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
