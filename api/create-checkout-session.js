@@ -40,6 +40,7 @@ export default async function handler(req, res) {
       },
       success_url: `${process.env.CLIENT_URL || req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL || req.headers.origin}/canceled`,
+      automatic_tax: { enabled: true },
       billing_address_collection: 'required',
       allow_promotion_codes: true,
       subscription_data: {
