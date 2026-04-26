@@ -77,7 +77,7 @@ const translations = {
         period: '/month',
         desc: 'White-glove advocacy for high-complexity situations',
         bestFor: 'Best for: 10+ medications, multiple specialists, cognitive concerns',
-        spots: 'Only 3 spots available for March 2026 intake',
+        spots: 'Only 3 spots available for May 2026 intake',
         cta: 'Apply for Concierge'
       },
       guarantee: {
@@ -239,7 +239,7 @@ const translations = {
         period: '/mes',
         desc: 'Abogacía de guante blanco para situaciones de alta complejidad',
         bestFor: 'Ideal para: 10+ medicamentos, múltiples especialistas, preocupaciones cognitivas',
-        spots: 'Solo 3 espacios disponibles para marzo de 2026',
+        spots: 'Solo 3 espacios disponibles para mayo de 2026',
         cta: 'Aplicar para Concierge'
       },
       guarantee: {
