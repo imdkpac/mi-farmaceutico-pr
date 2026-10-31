@@ -1,52 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Heart, ArrowLeft, Search, Pill, Activity, Construction } from 'lucide-react';
+import { BookOpen, Heart, ArrowLeft, Pill, Activity, Stethoscope } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import MedicationLookup from './aprende-sections/MedicationLookup';
 
-const translations = {
-  es: {
-    title: 'Aprende sobre tu salud',
-    subtitle: 'Información clara y confiable sobre enfermedades comunes y sus tratamientos',
-    back: 'Volver al inicio',
-    searchPlaceholder: 'Buscar tema... (presione / para buscar)',
-    comingSoon: 'Contenido en desarrollo',
-    description: 'Estamos preparando guías visuales sobre diabetes, presión alta, colesterol, y más — con información sobre qué hace cada medicamento, cómo tomarlo correctamente, y cuándo llamar al médico.',
-    topics: [
-      { icon: Activity, title: 'Diabetes', desc: 'Tipos, síntomas, medicamentos y cuidado diario' },
-      { icon: Heart, title: 'Presión Alta', desc: 'Cómo controlarla y qué medicamentos existen' },
-      { icon: Pill, title: 'Colesterol', desc: 'Entienda sus números y sus opciones de tratamiento' },
-      { icon: Activity, title: 'Dolor Crónico', desc: 'Manejo seguro del dolor sin riesgo de dependencia' },
-    ],
-    medListCta: {
-      title: '¿Toma varios medicamentos?',
-      desc: 'Organice todos sus medicamentos en una lista imprimible que puede llevar a sus citas.',
-      cta: 'Crear mi lista',
-    },
-  },
-  en: {
-    title: 'Learn About Your Health',
-    subtitle: 'Clear, reliable information about common conditions and their treatments',
-    back: 'Back to home',
-    searchPlaceholder: 'Search topics... (press / to search)',
-    comingSoon: 'Content in development',
-    description: 'We are preparing visual guides on diabetes, high blood pressure, cholesterol, and more — with information about what each medication does, how to take it correctly, and when to call your doctor.',
-    topics: [
-      { icon: Activity, title: 'Diabetes', desc: 'Types, symptoms, medications, and daily care' },
-      { icon: Heart, title: 'High Blood Pressure', desc: 'How to control it and what medications exist' },
-      { icon: Pill, title: 'Cholesterol', desc: 'Understand your numbers and treatment options' },
-      { icon: Activity, title: 'Chronic Pain', desc: 'Safe pain management without risk of dependence' },
-    ],
-    medListCta: {
-      title: 'Taking multiple medications?',
-      desc: 'Organize all your medications in a printable list you can bring to appointments.',
-      cta: 'Create my list',
-    },
-  },
-};
+const sections = [
+  { id: 'medicamentos', icon: Pill, label: { es: 'Mis Medicamentos', en: 'My Medications' } },
+  { id: 'condiciones', icon: Activity, label: { es: 'Condiciones Comunes', en: 'Common Conditions' } },
+];
 
 export default function AprendePage() {
   const { lang } = useLanguage();
-  const t = translations[lang];
+  const [activeTab, setActiveTab] = useState('medicamentos');
+
+  const t = {
+    es: {
+      back: 'Volver al inicio',
+      title: 'Aprende sobre tu salud',
+      subtitle: 'Información clara y confiable para entender mejor sus medicamentos y condiciones',
+      medListCta: {
+        title: '¿Toma varios medicamentos?',
+        desc: 'Organice todos sus medicamentos en una lista imprimible que puede llevar a sus citas.',
+        cta: 'Crear mi lista',
+      },
+      condiciones: {
+        title: 'Condiciones Comunes',
+        comingSoon: 'Estamos preparando guías visuales sobre diabetes, presión alta, colesterol y más. Vuelva pronto.',
+      },
+    },
+    en: {
+      back: 'Back to home',
+      title: 'Learn About Your Health',
+      subtitle: 'Clear, reliable information to better understand your medications and conditions',
+      medListCta: {
+        title: 'Taking multiple medications?',
+        desc: 'Organize all your medications in a printable list you can bring to appointments.',
+        cta: 'Create my list',
+      },
+      condiciones: {
+        title: 'Common Conditions',
+        comingSoon: 'We are preparing visual guides on diabetes, high blood pressure, cholesterol, and more. Check back soon.',
+      },
+    },
+  }[lang];
 
   return (
     <div className="bg-white min-h-screen">
@@ -59,7 +55,7 @@ export default function AprendePage() {
           {t.back}
         </Link>
 
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-sm font-bold mb-4">
             <BookOpen className="w-4 h-4" />
             {t.title}
@@ -72,38 +68,41 @@ export default function AprendePage() {
           </p>
         </div>
 
-        {/* Coming soon banner */}
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-8 text-center mb-10">
-          <Construction className="w-12 h-12 text-amber-600 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-slate-900 mb-2">{t.comingSoon}</h2>
-          <p className="text-slate-600 max-w-xl mx-auto">{t.description}</p>
-        </div>
-
-        {/* Topic previews */}
-        <div className="grid sm:grid-cols-2 gap-6 mb-12">
-          {t.topics.map((topic, i) => {
-            const Icon = topic.icon;
+        {/* Tabs */}
+        <div className="flex overflow-x-auto gap-2 mb-8 pb-1">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            const isActive = activeTab === section.id;
             return (
-              <div
-                key={i}
-                className="border-2 border-slate-200 rounded-xl p-6 bg-white opacity-70"
+              <button
+                key={section.id}
+                onClick={() => setActiveTab(section.id)}
+                className={`whitespace-nowrap flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-base transition ${
+                  isActive
+                    ? 'bg-amber-600 text-white shadow-md'
+                    : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-amber-400'
+                }`}
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
-                    <Icon className="w-6 h-6 text-slate-500" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">{topic.title}</h3>
-                    <p className="text-slate-600 text-sm">{topic.desc}</p>
-                  </div>
-                </div>
-              </div>
+                <Icon className="w-5 h-5" />
+                {section.label[lang]}
+              </button>
             );
           })}
         </div>
 
+        {/* Content */}
+        {activeTab === 'medicamentos' ? (
+          <MedicationLookup />
+        ) : (
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-8 text-center">
+            <Stethoscope className="w-12 h-12 text-amber-600 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-900 mb-2">{t.condiciones.title}</h2>
+            <p className="text-slate-600">{t.condiciones.comingSoon}</p>
+          </div>
+        )}
+
         {/* CTA to medication list */}
-        <div className="bg-gradient-to-br from-teal-50 to-blue-50 rounded-xl p-8 text-center border border-teal-200">
+        <div className="mt-12 bg-gradient-to-br from-teal-50 to-blue-50 rounded-xl p-8 text-center border border-teal-200">
           <h3 className="text-xl font-bold text-slate-900 mb-2">{t.medListCta.title}</h3>
           <p className="text-slate-600 mb-6">{t.medListCta.desc}</p>
           <Link
