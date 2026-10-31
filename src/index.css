@@ -1,98 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ---------- Utilidades de contenido ---------- */
+@layer base {
+  :root {
+    --pine: #0F2E30;
+    --deep-pine: #1E4C4D;
+    --paper: #F4EFE6;
+    --sand: #E2D6BF;
+    --sage: #A8BDA6;
+    --muted-ink: #5C6F6A;
+    --flamboyan: #E2512F;
+  }
 
-.etiqueta-campo {
-  font-weight: 600;
+  html {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--paper);
+    color: var(--pine);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+  }
 }
 
-.medicamento-entrada p {
-  margin-top: 0.15rem;
+@layer components {
+  /* Surface fills — no outline borders */
+  .surface-paper {
+    background-color: var(--paper);
+  }
+  .surface-sand {
+    background-color: var(--sand);
+  }
+  .surface-pine {
+    background-color: var(--pine);
+  }
+  .surface-deep-pine {
+    background-color: var(--deep-pine);
+  }
+  .surface-sage {
+    background-color: var(--sage);
+  }
+
+  /* Text colors */
+  .text-pine {
+    color: var(--pine);
+  }
+  .text-paper {
+    color: var(--paper);
+  }
+  .text-sand {
+    color: var(--sand);
+  }
+  .text-sage {
+    color: var(--sage);
+  }
+  .text-muted {
+    color: var(--muted-ink);
+  }
+  .text-flamboyan {
+    color: var(--flamboyan);
+  }
+
+  /* The one accent rule — flamboyan appears once per major section */
+  .accent-flamboyan {
+    color: var(--flamboyan);
+  }
+  .bg-flamboyan {
+    background-color: var(--flamboyan);
+  }
+
+  /* Radius system: 28px containers, full-rounded capsules */
+  .radius-container {
+    border-radius: 28px;
+  }
+  .radius-pill {
+    border-radius: 9999px;
+  }
+
+  /* No-outline cards: separate by fill, not border */
+  .card-sand {
+    background-color: var(--sand);
+    border-radius: 28px;
+  }
+  .card-paper {
+    background-color: var(--paper);
+    border-radius: 28px;
+  }
+  .card-deep-pine {
+    background-color: var(--deep-pine);
+    border-radius: 28px;
+  }
+
+  /* Stroke weight 3–4px to match logo */
+  .stroke-logo {
+    stroke-width: 3px;
+  }
+
+  /* Table rule: 2px sand line under header only */
+  .table-header-rule {
+    border-bottom: 2px solid var(--sand);
+  }
+
+  /* Pill capsule button */
+  .btn-capsule {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    border-radius: 9999px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-capsule-primary {
+    background-color: var(--flamboyan);
+    color: var(--paper);
+  }
+  .btn-capsule-primary:hover {
+    background-color: #c94525;
+  }
+
+  .btn-capsule-pine {
+    background-color: var(--pine);
+    color: var(--paper);
+  }
+  .btn-capsule-pine:hover {
+    background-color: var(--deep-pine);
+  }
+
+  .btn-capsule-outline {
+    background-color: transparent;
+    color: var(--pine);
+    border: 3px solid var(--pine);
+  }
+  .btn-capsule-outline:hover {
+    background-color: var(--pine);
+    color: var(--paper);
+  }
+
+  .btn-capsule-outline-paper {
+    background-color: transparent;
+    color: var(--paper);
+    border: 3px solid var(--paper);
+  }
+  .btn-capsule-outline-paper:hover {
+    background-color: var(--paper);
+    color: var(--pine);
+  }
 }
 
-.solo-imprimir {
-  display: none;
-}
-
-/* Mejora de foco para teclado */
-button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible {
-  outline: 3px solid #0f766e;
-  outline-offset: 2px;
-  border-radius: 0.375rem;
-}
-
-/* ---------- Impresión / Guardar como PDF ---------- */
-
-@media print {
-  @page {
-    margin: 1.8cm;
+@layer utilities {
+  .font-body {
+    font-family: 'DM Sans', sans-serif;
   }
-
-  html, body {
-    background: #ffffff !important;
-  }
-
-  body {
-    font-size: 12pt;
-    line-height: 1.45;
-    color: #000000;
-  }
-
-  /* Solo el documento: fuera navegación, botones, formularios y decoración */
-  .no-print {
-    display: none !important;
-  }
-
-  .solo-imprimir {
-    display: block !important;
-  }
-
-  /* Legible en color o en blanco y negro */
-  * {
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    color: #000000 !important;
-  }
-
-  .shadow-sm, .rounded-lg, .rounded-md {
-    box-shadow: none !important;
-  }
-
-  a {
-    text-decoration: none;
-  }
-
-  /* Encabezado del documento */
-  .solo-imprimir h1 {
-    font-size: 20pt;
-    border-bottom: 2px solid #000000;
-    padding-bottom: 6pt;
-    margin-bottom: 8pt;
-  }
-
-  .solo-imprimir .instrucciones-impresion {
-    margin: 8pt 0 12pt;
-    padding: 6pt 8pt;
-    border: 1px solid #000000;
-    font-size: 10pt;
-  }
-
-  /* Cada medicamento en su propia caja, sin cortes de página */
-  .medicamento-entrada {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    border: 1px solid #444444 !important;
-    border-radius: 0 !important;
-    padding: 8pt 10pt !important;
-    margin-bottom: 8pt;
-    page-break-after: auto;
-  }
-
-  .medicamento-entrada p:first-child {
-    margin-top: 0;
+  .font-display {
+    font-family: 'Fraunces', serif;
   }
 }
