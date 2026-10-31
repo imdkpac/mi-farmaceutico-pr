@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Cree su lista de medicamentos gratis y privada. Mi Farmacéutico en PR.">
+<meta property="og:title" content="Mi Lista de Medicamentos — Mi Farmacéutico en PR">
+<meta property="og:description" content="Cree su lista de medicamentos gratis y privada. Lista para imprimir o compartir.">
+<title>Mi Lista de Medicamentos — Mi Farmacéutico en PR</title>
+
+<!--
+PRIVACY NOTICE FOR DEVELOPERS:
+Do NOT add analytics, session-replay, or tracking scripts (Hotjar, FullStory, Clarity, etc.)
+to this page. They can capture typed health information.
+All user data stays in memory or optional localStorage (user opt-in only).
+Zero network requests contain user data.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+/* ─── CSS CUSTOM PROPERTIES ─── */
+:root {
+  --pine: #0F2E30;
+  --deep-pine: #1A4A4D;
+  --paper: #F4EFE6;
+  --sand: #E2D6BF;
+  --sage: #A8BDA6;
+  --muted-ink: #5C6F6A;
+  --flamboyan: #E2512F;
+  --flamboyan-light: #FCEAE7;
+  --gold: #E8A838;
+  --blue: #4A90D9;
+  --green: #7BBF8E;
+  --white: #FFFFFF;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius: 28px;
+  --radius-sm: 16px;
+  --radius-xs: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--pine);
+  color: var(--paper);
+  font-size: 18px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── TOP BAR ─── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--pine);
+  border-bottom: 2px solid var(--deep-pine);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: var(--flamboyan);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.lang-toggle {
+  display: flex;
+  background: var(--deep-pine);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.lang-toggle button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--sage);
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.lang-toggle button[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--pine);
+}
+
+.topbar-phone {
+  display: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--paper);
+  text-decoration: none;
+  background: var(--flamboyan);
+  padding: 10px 18px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .topbar-phone { display: inline-flex; }
+}
+
+/* ─── MAIN CONTAINER ─── */
+main { max-width: 720px; margin: 0 auto; padding: 0 16px 120px; }
+
+/* ─── HERO ─── */
+.hero { padding: 24px 0 32px; text-align: center; }
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--paper);
+  margin-bottom: 12px;
+}
+
+.hero-sub {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--sage);
+  margin-bottom: 24px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 20px;
+  padding: 18px 32px;
+  border-radius: 999px;
+  border: none;
+  background: var(--flamboyan);
+  color: var(--paper);
+  cursor: pointer;
+  min-height: 56px;
+  text-decoration: none;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+.hero-cta:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+}
+
+/* Preview card */
+.preview-card {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  max-width: 320px;
+  margin: 0 auto 20px;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.preview-card-header .dot {
+  width: 10px; height: 10px;
+  background: var(--flamboyan);
+  border-radius: 50%;
+}
+
+.preview-card-header span {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pine);
+}
+
+.preview-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  color: #333;
+}
+
+.preview-row:last-child { border-bottom: none; }
+
+.preview-pill {
+  width: 24px; height: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+/* Trust chips */
+.trust-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.trust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sage);
+  background: var(--deep-pine);
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
+.trust-chip svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ─── SECTION HEADERS ─── */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--paper);
+  margin: 40px 0 16px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--sage);
+  margin-bottom: 16px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--paper);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 16px;
+  color: var(--pine);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.card-actions button {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--sand);
+  background: transparent;
+  color: var(--muted-ink);
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.card-actions button.danger {
+  border-color: var(--flamboyan);
+  color: var(--flamboyan);
+}
+
+/* ─── FORM ELEMENTS ─── */
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--pine);
+  margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="tel"],
+select,
+textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-xs);
+  border: 2px solid var(--sand);
+  background: var(--white);
+  color: var(--pine);
+  min-height: 52px;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--flamboyan);
+  box-shadow: 0 0 0 3px rgba(226, 81, 47, 0.15);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%235C6F6A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 44px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.field-row {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 640px) {
+  .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ─── CHIPS ─── */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--sand);
+  background: var(--white);
+  color: var(--muted-ink);
+  cursor: pointer;
+  min-height: 48px;
+  user-select: none;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: var(--paper);
+}
+
+/* ─── ALLERGIES / DNT ─── */
+.allergy-row,
+.dnt-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: end;
+}
+
+@media (min-width: 640px) {
+  .allergy-row { grid-template-columns: 1fr 1fr auto; }
+  .dnt-row { grid-template-columns: 1fr 1fr auto; }
+}
+
+.btn-remove-row {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--flamboyan);
+  background: transparent;
+  color: var(--flamboyan);
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  border: none;
+  background: var(--green);
+  color: var(--paper);
+  cursor: pointer;
+  min-height: 52px;
+  margin-top: 8px;
+}
+
+/* ─── MEDICATION CARD ─── */
+.med-card {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--sand);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.med-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--paper);
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+}
+
+.med-card-header .med-summary {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--pine);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.med-card-header .med-summary.empty {
+  font-weight: 400;
+  color: var(--muted-ink);
+}
+
+.med-card-header .med-meta {
+  font-size: 13px;
+  color: var(--muted-ink);
+  margin-top: 2px;
+}
+
+.med-card-body {
+  padding: 20px;
+  border-top: 2px solid var(--sand);
+}
+
+.med-card-body.hidden { display: none; }
+
+/* Reorder buttons */
+.reorder-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.reorder-btns button {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--sand);
+  background: var(--white);
+  color: var(--muted-ink);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+
+.reorder-btns button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ─── HINT TEXT ─── */
+.hint {
+  font-size: 14px;
+  color: var(--muted-ink);
+  margin-top: 4px;
+}
+
+.hint-strong {
+  font-size: 14px;
+  color: var(--flamboyan);
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: var(--flamboyan-light);
+  border-radius: var(--radius-xs);
+}
+
+/* ─── NOTICE BOXES ─── */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-xs);
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.notice.privacy {
+  background: var(--deep-pine);
+  color: var(--sage);
+}
+
+.notice.info {
+  background: #E8F4FD;
+  color: #20558A;
+}
+
+.notice.warning {
+  background: var(--flamboyan-light);
+  color: var(--flamboyan);
+  border: 2px solid var(--flamboyan);
+}
+
+/* ─── PROGRESS ─── */
+.progress-bar {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--paper);
+  margin-bottom: 12px;
+}
+
+/* ─── SORT BAR ─── */
+.sort-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.sort-bar label {
+  font-size: 14px;
+  color: var(--sage);
+  margin: 0;
+}
+
+.sort-bar select {
+  width: auto;
+  min-height: 44px;
+  font-size: 16px;
+  padding: 10px 40px 10px 16px;
+}
+
+/* ─── ADD MED BUTTON ─── */
+.btn-add-med {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px;
+  border-radius: var(--radius-sm);
+  border: 3px dashed var(--sage);
+  background: transparent;
+  color: var(--sage);
+  cursor: pointer;
+  min-height: 56px;
+  margin-bottom: 16px;
+}
+
+.btn-add-med:hover {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+
+/* ─── SOFT CTA ─── */
+.soft-cta {
+  background: var(--deep-pine);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  margin: 32px 0;
+}
+
+.soft-cta p {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--paper);
+  margin-bottom: 16px;
+}
+
+.soft-cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.soft-cta-buttons a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  min-height: 52px;
+}
+
+.soft-cta-buttons .btn-primary {
+  background: var(--flamboyan);
+  color: var(--paper);
+}
+
+.soft-cta-buttons .btn-secondary {
+  background: transparent;
+  color: var(--sage);
+  border: 2px solid var(--sage);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--sage);
+  font-size: 14px;
+}
+
+footer a { color: var(--sage); }
+
+/* ─── STICKY ACTION BAR ─── */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  background: var(--pine);
+  border-top: 3px solid var(--deep-pine);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-bar button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-bar .btn-pdf { background: var(--flamboyan); color: var(--paper); }
+.action-bar .btn-share { background: var(--deep-pine); color: var(--paper); }
+.action-bar .btn-print { background: var(--deep-pine); color: var(--paper); }
+.action-bar .btn-erase { background: transparent; color: var(--flamboyan); border: 2px solid var(--flamboyan); }
+
+/* ─── SAVE TOGGLE ─── */
+.save-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.save-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--sage);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.save-toggle input[type="checkbox"] {
+  width: 22px; height: 22px;
+  accent-color: var(--flamboyan);
+  flex-shrink: 0;
+}
+
+.save-toggle .save-warning {
+  font-size: 14px;
+  color: var(--flamboyan);
+  margin-left: 32px;
+  width: 100%;
+}
+
+/* ─── DIALOG ─── */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 46, 48, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.dialog-box {
+  background: var(--paper);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  color: var(--pine);
+}
+
+.dialog-box h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.dialog-box p { margin-bottom: 20px; }
+
+.dialog-box .dialog-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dialog-box button {
+  flex: 1;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.dialog-box .btn-confirm { background: var(--flamboyan); color: var(--paper); }
+.dialog-box .btn-cancel { background: transparent; color: var(--pine); border: 2px solid var(--pine); }
+
+/* ─── UNDO TOAST ─── */
+.undo-toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 95;
+  background: var(--pine);
+  color: var(--paper);
+  padding: 14px 24px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.undo-toast button {
+  background: none;
+  border: none;
+  color: var(--flamboyan);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ─── INSTALL HINT ─── */
+.install-hint {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--deep-pine);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--sage);
+}
+
+.install-hint summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ─── PRINT ONLY ─── */
+@media print {
+  .no-print, .no-print * { display: none !important; }
+  .print-only { display: block !important; }
+}
+
+.print-only { display: none; }
+
+/* ─── HIDE/SHOW UTILS ─── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* Color swatch in select */
+.color-option {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar no-print" role="banner">
+  <a class="topbar-brand" href="/" aria-label="Mi Farmacéutico en PR">
+    <span class="logo-mark" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v20M2 12h20"/></svg>
+    </span>
+    Mi Farmacéutico en PR
+  </a>
+  <div class="lang-toggle" role="group" aria-label="Language selector">
+    <button id="btn-es" aria-pressed="true" onclick="setLang('es')">Español</button>
+    <button id="btn-en" aria-pressed="false" onclick="setLang('en')">English</button>
+  </div>
+  <a class="topbar-phone" href="tel:7876676560" aria-label="Llamar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    (787) 667-6560
+  </a>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<main>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <h1 id="hero-title" data-t="heroTitle">Su Lista de Medicamentos. Gratis. Privada. Lista para Imprimir.</h1>
+  <p class="hero-sub" data-t="heroSub">Se crea en su dispositivo. Nosotros nunca la vemos.</p>
+
+  <!-- Preview -->
+  <div class="preview-card no-print" aria-hidden="true">
+    <div class="preview-card-header">
+      <span class="dot"></span>
+      <span>Mi Lista de Medicamentos</span>
+    </div>
+    <div class="preview-row">
+      <span class="preview-pill" style="background:#F5D547;border-radius:50%;"></span>
+      <span>Metformina 500 mg — Mañana</span>
+    </div>
+    <div class="preview-row">
+      <span class="preview-pill" style="background:#6BA3D6;"></span>
+      <span>Lisinopril 10 mg — Mañana</span>
+    </div>
+    <div class="preview-row">
+      <span class="preview-pill" style="background:#fff;border:1px solid #ccc;border-radius:50%;"></span>
+      <span>Atorvastatina 20 mg — Noche</span>
+    </div>
+  </div>
+
+  <a href="#builder" class="hero-cta no-print" data-t="heroCta">Crear Mi Lista</a>
+
+  <div class="trust-chips no-print">
+    <span class="trust-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-t="chipPrivate">100% privada</span>
+    </span>
+    <span class="trust-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span data-t="chipFree">Gratis</span>
+    </span>
+    <span class="trust-chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+      <span data-t="chipPhone">Funciona en su teléfono</span>
+    </span>
+  </div>
+</section>
+
+<!-- ─── PRIVACY NOTICE ─── -->
+<div class="notice privacy no-print" role="note">
+  <span aria-hidden="true">🔒</span>
+  <span data-t="privacyNotice">Su lista se queda en su dispositivo. Nosotros nunca la vemos. Enviar un PDF por email o texto no está encriptado — comparta solo con personas de confianza.</span>
+</div>
+
+<!-- ─── BUILDER ─── -->
+<section id="builder" class="no-print" aria-label="Medication list builder">
+
+  <!-- Patient Header -->
+  <div class="card">
+    <div class="field-row cols-2">
+      <div>
+        <label for="p-name" data-t="labelName">Nombre del paciente</label>
+        <input type="text" id="p-name" autocomplete="off" autocapitalize="words" spellcheck="false" data-placeholder-t="placeholderName">
+      </div>
+      <div>
+        <label for="p-dob" data-t="labelDob">Fecha de nacimiento (opcional)</label>
+        <input type="date" id="p-dob">
+      </div>
+    </div>
+    <div class="field-row cols-2">
+      <div>
+        <label for="p-updated" data-t="labelUpdated">Última actualización</label>
+        <input type="date" id="p-updated">
+      </div>
+      <div>
+        <label for="p-pharmacy" data-t="labelPharmacy">Farmacia principal (opcional)</label>
+        <input type="text" id="p-pharmacy" autocomplete="off" data-placeholder-t="placeholderPharmacy">
+      </div>
+    </div>
+    <div class="field-row cols-2">
+      <div>
+        <label for="p-emergency-name" data-t="labelEmergencyName">Contacto de emergencia</label>
+        <input type="text" id="p-emergency-name" autocomplete="off" data-placeholder-t="placeholderEmergencyName">
+      </div>
+      <div>
+        <label for="p-emergency-phone" data-t="labelEmergencyPhone">Teléfono de emergencia</label>
+        <input type="tel" id="p-emergency-phone" autocomplete="off" data-placeholder-t="placeholderEmergencyPhone">
+      </div>
+    </div>
+  </div>
+
+  <!-- Allergies -->
+  <h2 class="section-title" data-t="titleAllergies">Alergias conocidas</h2>
+  <p class="section-sub" data-t="subAllergies">Incluya vitaminas, medicamentos de venta libre, tés y remedios naturales.</p>
+  <div class="card" id="allergies-card">
+    <div id="allergies-list"></div>
+    <button class="btn-add" onclick="addAllergy()" data-t="btnAddAllergy">+ Agregar alergia</button>
+  </div>
+
+  <!-- Do Not Take -->
+  <h2 class="section-title" data-t="titleDNT">NO TOMAR</h2>
+  <p class="section-sub" data-t="subDNT">Medicamentos o suplementos que debe evitar y por qué.</p>
+  <div class="card" id="dnt-card">
+    <div id="dnt-list"></div>
+    <button class="btn-add" onclick="addDNT()" data-t="btnAddDNT">+ Agregar medicamento a evitar</button>
+  </div>
+
+  <!-- Save Toggle -->
+  <div class="save-toggle">
+    <label>
+      <input type="checkbox" id="save-toggle" onchange="toggleSave()">
+      <span data-t="saveDevice">Guardar en este dispositivo</span>
+    </label>
+    <p class="save-warning" id="save-warning" style="display:none" data-t="saveWarning">No use en computadoras compartidas o públicas.</p>
+  </div>
+
+  <!-- Medications -->
+  <h2 class="section-title" data-t="titleMeds">Medicamentos</h2>
+  <p class="progress-bar" id="progress-bar" data-t="progressEmpty" data-t-plural="progress">Ha agregado 0 medicamentos</p>
+
+  <div class="sort-bar">
+    <label for="sort-select" data-t="labelSort">Ordenar:</label>
+    <select id="sort-select" onchange="sortMeds()">
+      <option value="entered" data-t="sortEntered">Como los ingresó</option>
+      <option value="time" data-t="sortTime">Por hora del día</option>
+      <option value="az" data-t="sortAZ">A – Z</option>
+    </select>
+  </div>
+
+  <div id="meds-container"></div>
+
+  <button class="btn-add-med" onclick="addMed()" data-t="btnAddMed">+ Agregar medicamento</button>
+
+  <!-- Polypharmacy note -->
+  <div class="notice info" id="poly-note" style="display:none">
+    <span aria-hidden="true">💡</span>
+    <span data-t="polyNote">¿Toma 5 o más medicamentos, o ve varios doctores? Una revisión con el farmacéutico puede ayudar a detectar interacciones.</span>
+  </div>
+
+  <!-- Soft CTA -->
+  <div class="soft-cta">
+    <p data-t="softCta">¿Desea que un farmacéutico mantenga esta lista al día cada mes?</p>
+    <div class="soft-cta-buttons">
+      <a class="btn-primary" href="tel:7876676560" data-t="btnCall">📞 Llamar</a>
+      <a class="btn-secondary" href="mailto:mifarmaceuticopr@gmail.com" data-t="btnEmail">✉️ Email</a>
+    </div>
+  </div>
+
+  <!-- Install hint -->
+  <details class="install-hint no-print">
+    <summary data-t="installHintTitle">📱 Instalar en pantalla de inicio</summary>
+    <p data-t="installHintText">En iPhone: toque Compartir → "Agregar a pantalla de inicio". En Android: toque el menú → "Agregar a pantalla de inicio".</p>
+  </details>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="no-print">
+  <p>Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticopr@gmail.com</p>
+  <p data-t="footerDisclaimer">Este documento es para referencia y organización. Siga siempre las instrucciones de la etiqueta de su farmacia.</p>
+</footer>
+
+<!-- ─── STICKY ACTION BAR ─── -->
+<div class="action-bar no-print" role="toolbar" aria-label="Actions">
+  <button class="btn-pdf" onclick="savePDF()" data-t="btnPDF">📄 Guardar PDF</button>
+  <button class="btn-share" onclick="shareList()" data-t="btnShare">📤 Compartir</button>
+  <button class="btn-print" onclick="doPrint()" data-t="btnPrint">🖨️ Imprimir</button>
+  <button class="btn-erase" onclick="confirmErase()" data-t="btnErase">🗑️ Borrar todo</button>
+</div>
+
+<!-- ─── DIALOGS ─── -->
+<div class="dialog-overlay" id="erase-dialog" style="display:none" role="dialog" aria-modal="true" aria-labelledby="erase-title">
+  <div class="dialog-box">
+    <h3 id="erase-title" data-t="dialogEraseTitle">¿Borrar todo?</h3>
+    <p data-t="dialogEraseText">Se borrarán todos los medicamentos y datos del formulario. Esta acción no se puede deshacer.</p>
+    <div class="dialog-actions">
+      <button class="btn-confirm" onclick="doErase()" data-t="dialogEraseConfirm">Sí, borrar todo</button>
+      <button class="btn-cancel" onclick="closeDialog()" data-t="dialogCancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── UNDO TOAST ─── -->
+<div class="undo-toast no-print" id="undo-toast" style="display:none" role="status" aria-live="polite">
+  <span data-t="undoText">Medicamento eliminado</span>
+  <button onclick="undoRemove()" data-t="undoBtn">Deshacer</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   MEDICATION LIST BUILDER — Mi Farmacéutico en PR
+   One self-contained file. No build step.
+   ═══════════════════════════════════════════════════════════════ */
+
+const { jsPDF } = window.jspdf;
+
+/* ─── TRANSLATIONS ─── */
+const T = {
+  es: {
+    heroTitle: 'Su Lista de Medicamentos. Gratis. Privada. Lista para Imprimir.',
+    heroSub: 'Se crea en su dispositivo. Nosotros nunca la vemos.',
+    heroCta: 'Crear Mi Lista',
+    chipPrivate: '100% privada',
+    chipFree: 'Gratis',
+    chipPhone: 'Funciona en su teléfono',
+    privacyNotice: 'Su lista se queda en su dispositivo. Nosotros nunca la vemos. Enviar un PDF por email o texto no está encriptado — comparta solo con personas de confianza.',
+    labelName: 'Nombre del paciente',
+    placeholderName: 'Ej: María Rivera',
+    labelDob: 'Fecha de nacimiento (opcional)',
+    labelUpdated: 'Última actualización',
+    labelPharmacy: 'Farmacia principal (opcional)',
+    placeholderPharmacy: 'Ej: Walgreens Plaza',
+    labelEmergencyName: 'Contacto de emergencia',
+    placeholderEmergencyName: 'Nombre',
+    labelEmergencyPhone: 'Teléfono de emergencia',
+    placeholderEmergencyPhone: '(787) 000-0000',
+    titleAllergies: 'Alergias conocidas',
+    subAllergies: 'Incluya vitaminas, medicamentos de venta libre, tés y remedios naturales.',
+    labelAllergy: 'Alergia',
+    placeholderAllergy: 'Ej: Penicilina',
+    labelReaction: 'Reacción',
+    placeholderReaction: 'Ej: Salpullido',
+    btnAddAllergy: '+ Agregar alergia',
+    titleDNT: 'NO TOMAR',
+    subDNT: 'Medicamentos o suplementos que debe evitar y por qué.',
+    labelDntMed: 'Medicamento o suplemento',
+    placeholderDntMed: 'Ej: Advil / Ibuprofeno',
+    labelDntReason: 'Razón para evitar',
+    placeholderDntReason: 'Ej: Malo para la presión',
+    btnAddDNT: '+ Agregar medicamento a evitar',
+    saveDevice: 'Guardar en este dispositivo',
+    saveWarning: 'No use en computadoras compartidas o públicas.',
+    titleMeds: 'Medicamentos',
+    progressEmpty: 'Sin medicamentos agregados',
+    progress: 'Ha agregado {n} medicamento',
+    progressPlural: 'Ha agregado {n} medicamentos',
+    labelSort: 'Ordenar:',
+    sortEntered: 'Como los ingresó',
+    sortTime: 'Por hora del día',
+    sortAZ: 'A – Z',
+    btnAddMed: '+ Agregar medicamento',
+    polyNote: '¿Toma 5 o más medicamentos, o ve varios doctores? Una revisión con el farmacéutico puede ayudar a detectar interacciones.',
+    softCta: '¿Desea que un farmacéutico mantenga esta lista al día cada mes?',
+    btnCall: '📞 Llamar',
+    btnEmail: '✉️ Email',
+    installHintTitle: '📱 Instalar en pantalla de inicio',
+    installHintText: 'En iPhone: toque Compartir → "Agregar a pantalla de inicio". En Android: toque el menú → "Agregar a pantalla de inicio".',
+    footerDisclaimer: 'Este documento es para referencia y organización. Siga siempre las instrucciones de la etiqueta de su farmacia.',
+    btnPDF: '📄 Guardar PDF',
+    btnShare: '📤 Compartir',
+    btnPrint: '🖨️ Imprimir',
+    btnErase: '🗑️ Borrar todo',
+    dialogEraseTitle: '¿Borrar todo?',
+    dialogEraseText: 'Se borrarán todos los medicamentos y datos del formulario. Esta acción no se puede deshacer.',
+    dialogEraseConfirm: 'Sí, borrar todo',
+    dialogCancel: 'Cancelar',
+    undoText: 'Medicamento eliminado',
+    undoBtn: 'Deshacer',
+    // Card labels
+    medName: 'Medicamento',
+    medPlaceholder: 'Ej: Metformina',
+    form: 'Forma',
+    strength: 'Dosis / fuerza',
+    strengthPlaceholder: 'Ej: 500 mg o 1 tableta',
+    frequency: 'Frecuencia',
+    when: '¿Cuándo?',
+    route: 'Vía de administración',
+    purpose: '¿Para qué?',
+    purposePlaceholder: 'Ej: Para la azúcar',
+    instructions: 'Instrucciones',
+    instructionsPlaceholder: 'Ej: Con comida, no triturar',
+    prescriber: 'Doctor que lo recetó',
+    prescriberPlaceholder: 'Nombre del doctor',
+    pharmacy: 'Farmacia',
+    pharmacyPlaceholder: 'Nombre de la farmacia',
+    shapeColor: 'Forma y color (opcional)',
+    startDate: 'Fecha de inicio (opcional)',
+    notes: 'Notas (opcional)',
+    notesPlaceholder: 'Cualquier otra información',
+    expandDetails: 'Más detalles',
+    collapseDetails: 'Menos detalles',
+    duplicate: 'Duplicar',
+    remove: 'Eliminar',
+    moveUp: '▲',
+    moveDown: '▼',
+    weeklyLabel: 'Día de la semana',
+    weeklyHint: 'Medicamento semanal. Tome solo en este día.',
+    monthlyLabel: 'Día del mes',
+    monthlyHint: 'Medicamento mensual. Tome solo en este día.',
+    // Forms
+    formTablet: 'Tableta',
+    formCapsule: 'Cápsula',
+    formLiquid: 'Líquido / Solución',
+    formCream: 'Crema / Gel / Ungüento',
+    formPatch: 'Parche',
+    formInhaler: 'Inhalador',
+    formEyeDrops: 'Gotas para los ojos',
+    formEarDrops: 'Gotas para los oídos',
+    formNasal: 'Spray nasal',
+    formInjection: 'Inyección',
+    formSuppository: 'Supositorio',
+    formOther: 'Otro',
+    // Frequencies
+    freqOnce: 'Una vez al día',
+    freqTwice: 'Dos veces al día',
+    freqThree: 'Tres veces al día',
+    freqFour: 'Cuatro veces al día',
+    freqAsNeeded: 'Según necesario',
+    freqWeekly: 'Semanal',
+    freqEveryOther: 'Cada dos días',
+    freqMonthly: 'Mensual',
+    freqOther: 'Otra',
+    // Routes
+    routeMouth: 'Por boca',
+    routeSublingual: 'Bajo la lengua',
+    routeSkin: 'Sobre la piel',
+    routeEye: 'Ojo',
+    routeEar: 'Oído',
+    routeNose: 'Nariz',
+    routeInhaled: 'Inhalado',
+    routeRectal: 'Rectal',
+    routeSubcutaneous: 'Inyección bajo la piel (subcutánea)',
+    routeIM: 'Inyección en el músculo (intramuscular)',
+    routeOther: 'Otra',
+    // Days
+    dayMon: 'Lunes', dayTue: 'Martes', dayWed: 'Miércoles', dayThu: 'Jueves', dayFri: 'Viernes', daySat: 'Sábado', daySun: 'Domingo',
+    // Colors & shapes
+    colorWhite: 'Blanco', colorYellow: 'Amarillo', colorPink: 'Rosado', colorBlue: 'Azul', colorGreen: 'Verde', colorOrange: 'Anaranjado', colorRed: 'Rojo', colorBrown: 'Marrón', colorPurple: 'Morado', colorGray: 'Gris',
+    shapeRound: 'Redonda', shapeOval: 'Ovalada', shapeOblong: 'Alargada', shapeOther: 'Otra',
+  },
+  en: {
+    heroTitle: 'Your Medication List. Free. Private. Ready to Print.',
+    heroSub: 'Built on your device. We never see it.',
+    heroCta: 'Build My List',
+    chipPrivate: '100% private',
+    chipFree: 'Free',
+    chipPhone: 'Works on your phone',
+    privacyNotice: 'Your list stays on your device. We never see it. Emailing or texting a PDF is not encrypted — share only with people you trust.',
+    labelName: 'Patient name',
+    placeholderName: 'e.g., Maria Rivera',
+    labelDob: 'Date of birth (optional)',
+    labelUpdated: 'Last updated',
+    labelPharmacy: 'Primary pharmacy (optional)',
+    placeholderPharmacy: 'e.g., Walgreens Plaza',
+    labelEmergencyName: 'Emergency contact',
+    placeholderEmergencyName: 'Name',
+    labelEmergencyPhone: 'Emergency phone',
+    placeholderEmergencyPhone: '(787) 000-0000',
+    titleAllergies: 'Known allergies',
+    subAllergies: 'Include vitamins, over-the-counter medicines, teas, and natural remedies.',
+    labelAllergy: 'Allergy',
+    placeholderAllergy: 'e.g., Penicillin',
+    labelReaction: 'Reaction',
+    placeholderReaction: 'e.g., Rash',
+    btnAddAllergy: '+ Add allergy',
+    titleDNT: 'DO NOT TAKE',
+    subDNT: 'Medicines or supplements to avoid and why.',
+    labelDntMed: 'Medicine or supplement',
+    placeholderDntMed: 'e.g., Advil / Ibuprofen',
+    labelDntReason: 'Reason to avoid',
+    placeholderDntReason: 'e.g., Bad for blood pressure',
+    btnAddDNT: '+ Add medicine to avoid',
+    saveDevice: 'Save on this device',
+    saveWarning: 'Do not use on shared or public computers.',
+    titleMeds: 'Medications',
+    progressEmpty: 'No medications added yet',
+    progress: "You've added {n} medication",
+    progressPlural: "You've added {n} medications",
+    labelSort: 'Sort:',
+    sortEntered: 'As entered',
+    sortTime: 'By time of day',
+    sortAZ: 'A – Z',
+    btnAddMed: '+ Add medication',
+    polyNote: 'Taking 5 or more medicines, or seeing several doctors? A pharmacist review can help catch interactions.',
+    softCta: 'Want a pharmacist to keep this list accurate every month?',
+    btnCall: '📞 Call',
+    btnEmail: '✉️ Email',
+    installHintTitle: '📱 Install on home screen',
+    installHintText: 'On iPhone: tap Share → "Add to Home Screen". On Android: tap menu → "Add to Home Screen".',
+    footerDisclaimer: 'This document is for reference and organization only. Always follow your pharmacy label instructions.',
+    btnPDF: '📄 Save as PDF',
+    btnShare: '📤 Share',
+    btnPrint: '🖨️ Print',
+    btnErase: '🗑️ Erase everything',
+    dialogEraseTitle: 'Erase everything?',
+    dialogEraseText: 'All medications and form data will be erased. This cannot be undone.',
+    dialogEraseConfirm: 'Yes, erase everything',
+    dialogCancel: 'Cancel',
+    undoText: 'Medication removed',
+    undoBtn: 'Undo',
+    medName: 'Medication',
+    medPlaceholder: 'e.g., Metformin',
+    form: 'Form',
+    strength: 'Strength / dose',
+    strengthPlaceholder: 'e.g., 500 mg or 1 tablet',
+    frequency: 'Frequency',
+    when: 'When?',
+    route: 'Route',
+    purpose: "What it's for",
+    purposePlaceholder: 'e.g., For blood sugar',
+    instructions: 'Instructions',
+    instructionsPlaceholder: 'e.g., With food, do not crush',
+    prescriber: 'Prescribing doctor',
+    prescriberPlaceholder: "Doctor's name",
+    pharmacy: 'Pharmacy',
+    pharmacyPlaceholder: 'Pharmacy name',
+    shapeColor: 'Shape & color (optional)',
+    startDate: 'Start date (optional)',
+    notes: 'Notes (optional)',
+    notesPlaceholder: 'Any other information',
+    expandDetails: 'More details',
+    collapseDetails: 'Less details',
+    duplicate: 'Duplicate',
+    remove: 'Remove',
+    moveUp: '▲',
+    moveDown: '▼',
+    weeklyLabel: 'Day of the week',
+    weeklyHint: 'Weekly medicine. Take only on this day.',
+    monthlyLabel: 'Day of the month',
+    monthlyHint: 'Monthly medicine. Take only on this day.',
+    formTablet: 'Tablet',
+    formCapsule: 'Capsule',
+    formLiquid: 'Liquid / Solution',
+    formCream: 'Cream / Gel / Ointment',
+    formPatch: 'Patch',
+    formInhaler: 'Inhaler',
+    formEyeDrops: 'Eye drops',
+    formEarDrops: 'Ear drops',
+    formNasal: 'Nasal spray',
+    formInjection: 'Injection',
+    formSuppository: 'Suppository',
+    formOther: 'Other',
+    freqOnce: 'Once daily',
+    freqTwice: 'Twice daily',
+    freqThree: 'Three times daily',
+    freqFour: 'Four times daily',
+    freqAsNeeded: 'As needed',
+    freqWeekly: 'Weekly',
+    freqEveryOther: 'Every other day',
+    freqMonthly: 'Monthly',
+    freqOther: 'Other',
+    routeMouth: 'By mouth',
+    routeSublingual: 'Under the tongue',
+    routeSkin: 'On the skin',
+    routeEye: 'Eye',
+    routeEar: 'Ear',
+    routeNose: 'Nose',
+    routeInhaled: 'Inhaled',
+    routeRectal: 'Rectal',
+    routeSubcutaneous: 'Injection under the skin (subcutaneous)',
+    routeIM: 'Injection into muscle (intramuscular)',
+    routeOther: 'Other',
+    dayMon: 'Monday', dayTue: 'Tuesday', dayWed: 'Wednesday', dayThu: 'Thursday', dayFri: 'Friday', daySat: 'Saturday', daySun: 'Sunday',
+    colorWhite: 'White', colorYellow: 'Yellow', colorPink: 'Pink', colorBlue: 'Blue', colorGreen: 'Green', colorOrange: 'Orange', colorRed: 'Red', colorBrown: 'Brown', colorPurple: 'Purple', colorGray: 'Gray',
+    shapeRound: 'Round', shapeOval: 'Oval', shapeOblong: 'Oblong', shapeOther: 'Other',
+  }
+};
+
+/* ─── STATE ─── */
+let lang = 'es';
+let medications = [];
+let allergies = [{ name: '', reaction: '' }];
+let dntList = [{ med: '', reason: '' }];
+let saveOnDevice = false;
+let undoItem = null;
+let undoTimer = null;
+
+/* ─── CONSTANTS ─── */
+const FORMS = [
+  { id: 'tablet', routeDefault: 'mouth' },
+  { id: 'capsule', routeDefault: 'mouth' },
+  { id: 'liquid', routeDefault: 'mouth' },
+  { id: 'cream', routeDefault: 'skin' },
+  { id: 'patch', routeDefault: 'skin' },
+  { id: 'inhaler', routeDefault: 'inhaled' },
+  { id: 'eyeDrops', routeDefault: 'eye' },
+  { id: 'earDrops', routeDefault: 'ear' },
+  { id: 'nasal', routeDefault: 'nose' },
+  { id: 'injection', routeDefault: '' },
+  { id: 'suppository', routeDefault: 'rectal' },
+  { id: 'other', routeDefault: '' },
+];
+
+const FREQUENCIES = ['once','twice','three','four','asNeeded','weekly','everyOther','monthly','other'];
+const ROUTES = ['mouth','sublingual','skin','eye','ear','nose','inhaled','rectal','subcutaneous','im','other'];
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const WHEN_OPTIONS = ['morning','noon','evening','bedtime','weekdays','weekends'];
+const COLORS = [
+  { id:'white', hex:'#FFFFFF' }, { id:'yellow', hex:'#F5D547' }, { id:'pink', hex:'#E89AAF' },
+  { id:'blue', hex:'#6BA3D6' }, { id:'green', hex:'#7BBF8E' }, { id:'orange', hex:'#E8935A' },
+  { id:'red', hex:'#D65A5A' }, { id:'brown', hex:'#A08060' }, { id:'purple', hex:'#9B7EBD' }, { id:'gray', hex:'#AAAAAA' }
+];
+const SHAPES = ['round','oval','oblong','other'];
+
+/* ─── INIT ─── */
+function init() {
+  document.getElementById('p-updated').value = new Date().toISOString().split('T')[0];
+  addMed(); // start with one empty card
+  renderAllergies();
+  renderDNT();
+  applyLang();
+}
+
+/* ─── LANGUAGE ─── */
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.getElementById('btn-es').setAttribute('aria-pressed', l === 'es');
+  document.getElementById('btn-en').setAttribute('aria-pressed', l === 'en');
+  applyLang();
+}
+
+function applyLang() {
+  const t = T[lang];
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-placeholder-t]').forEach(el => {
+    const key = el.getAttribute('data-placeholder-t');
+    if (t[key]) el.placeholder = t[key];
+  });
+  // Update progress text
+  updateProgress();
+  // Re-render meds to update labels
+  renderMeds();
+}
+
+function t(key) { return T[lang][key] || key; }
+
+/* ─── UUID ─── */
+function uuid() { return 'm-' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+/* ─── MEDICATION CRUD ─── */
+function emptyMed() {
+  return {
+    id: uuid(),
+    name: '',
+    form: '',
+    strength: '',
+    frequency: '',
+    when: { morning: false, noon: false, evening: false, bedtime: false, weekdays: false, weekends: false },
+    weeklyDay: '',
+    monthlyDay: '',
+    route: '',
+    purpose: '',
+    instructions: '',
+    prescriber: '',
+    pharmacy: '',
+    shape: '',
+    color: '',
+    startDate: '',
+    notes: '',
+    expanded: true,
+  };
+}
+
+function addMed() {
+  medications.push(emptyMed());
+  renderMeds();
+  // Scroll to new card
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.med-card');
+    if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+function removeMed(id) {
+  const idx = medications.findIndex(m => m.id === id);
+  if (idx === -1) return;
+  const removed = medications[idx];
+  medications.splice(idx, 1);
+  if (medications.length === 0) medications.push(emptyMed());
+  renderMeds();
+  // Undo
+  undoItem = { type: 'med', index: idx, data: removed };
+  showUndo();
+}
+
+function duplicateMed(id) {
+  const med = medications.find(m => m.id === id);
+  if (!med) return;
+  const copy = { ...med, id: uuid() };
+  medications.splice(medications.indexOf(med) + 1, 0, copy);
+  renderMeds();
+}
+
+function moveMed(id, direction) {
+  const idx = medications.findIndex(m => m.id === id);
+  if (idx === -1) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= medications.length) return;
+  [medications[idx], medications[newIdx]] = [medications[newIdx], medications[idx]];
+  renderMeds();
+}
+
+function sortMeds() {
+  const sort = document.getElementById('sort-select').value;
+  if (sort === 'az') {
+    medications.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sort === 'time') {
+    const order = { morning: 1, noon: 2, evening: 3, bedtime: 4 };
+    medications.sort((a, b) => {
+      const aFirst = WHEN_OPTIONS.find(w => a.when[w]) || 'bedtime';
+      const bFirst = WHEN_OPTIONS.find(w => b.when[w]) || 'bedtime';
+      return (order[aFirst] || 5) - (order[bFirst] || 5);
+    });
+  }
+  // 'entered' keeps current order (we don't track original index, so no-op)
+  renderMeds();
+}
+
+function updateMed(id, field, value) {
+  const med = medications.find(m => m.id === id);
+  if (!med) return;
+  med[field] = value;
+  // Auto-expand if any detail field gets filled
+  if (['route','purpose','instructions','prescriber','pharmacy','shape','color','startDate','notes'].includes(field) && value) {
+    med.expanded = true;
+  }
+}
+
+function updateMedWhen(id, key, checked) {
+  const med = medications.find(m => m.id === id);
+  if (med) med.when[key] = checked;
+}
+
+function toggleMedExpanded(id) {
+  const med = medications.find(m => m.id === id);
+  if (med) med.expanded = !med.expanded;
+  renderMeds();
+}
+
+function onFormChange(id, formId) {
+  const med = medications.find(m => m.id === id);
+  if (!med) return;
+  med.form = formId;
+  // Smart route default
+  const formInfo = FORMS.find(f => f.id === formId);
+  if (formInfo && formInfo.routeDefault && !med.route) {
+    med.route = formInfo.routeDefault;
+  }
+  renderMeds();
+}
+
+/* ─── UNDO ─── */
+function showUndo() {
+  const toast = document.getElementById('undo-toast');
+  toast.style.display = 'flex';
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(() => { toast.style.display = 'none'; undoItem = null; }, 5000);
+}
+
+function undoRemove() {
+  if (!undoItem) return;
+  if (undoItem.type === 'med') {
+    medications.splice(undoItem.index, 0, undoItem.data);
+  }
+  undoItem = null;
+  document.getElementById('undo-toast').style.display = 'none';
+  renderMeds();
+}
+
+/* ─── ALLERGIES ─── */
+function addAllergy() { allergies.push({ name: '', reaction: '' }); renderAllergies(); }
+function removeAllergy(i) { if (allergies.length > 1) allergies.splice(i, 1); else allergies[i] = { name: '', reaction: '' }; renderAllergies(); }
+function updateAllergy(i, field, val) { allergies[i][field] = val; }
+
+function renderAllergies() {
+  const container = document.getElementById('allergies-list');
+  container.innerHTML = allergies.map((a, i) => `
+    <div class="allergy-row">
+      <div>
+        <label>${t('labelAllergy')}</label>
+        <input type="text" value="${esc(a.name)}" autocomplete="off" placeholder="${t('placeholderAllergy')}"
+          oninput="updateAllergy(${i},'name',this.value)">
+      </div>
+      <div>
+        <label>${t('labelReaction')}</label>
+        <input type="text" value="${esc(a.reaction)}" autocomplete="off" placeholder="${t('placeholderReaction')}"
+          oninput="updateAllergy(${i},'reaction',this.value)">
+      </div>
+      <button class="btn-remove-row" onclick="removeAllergy(${i})" aria-label="Remove">×</button>
+    </div>
+  `).join('');
+}
+
+/* ─── DNT ─── */
+function addDNT() { dntList.push({ med: '', reason: '' }); renderDNT(); }
+function removeDNT(i) { if (dntList.length > 1) dntList.splice(i, 1); else dntList[i] = { med: '', reason: '' }; renderDNT(); }
+function updateDNT(i, field, val) { dntList[i][field] = val; }
+
+function renderDNT() {
+  const container = document.getElementById('dnt-list');
+  container.innerHTML = dntList.map((d, i) => `
+    <div class="dnt-row">
+      <div>
+        <label>${t('labelDntMed')}</label>
+        <input type="text" value="${esc(d.med)}" autocomplete="off" placeholder="${t('placeholderDntMed')}"
+          oninput="updateDNT(${i},'med',this.value)">
+      </div>
+      <div>
+        <label>${t('labelDntReason')}</label>
+        <input type="text" value="${esc(d.reason)}" autocomplete="off" placeholder="${t('placeholderDntReason')}"
+          oninput="updateDNT(${i},'reason',this.value)">
+      </div>
+      <button class="btn-remove-row" onclick="removeDNT(${i})" aria-label="Remove">×</button>
+    </div>
+  `).join('');
+}
+
+/* ─── RENDER MEDS ─── */
+function renderMeds() {
+  const container = document.getElementById('meds-container');
+  container.innerHTML = medications.map((med, idx) => renderMedCard(med, idx)).join('');
+  updateProgress();
+}
+
+function renderMedCard(med, idx) {
+  const hasName = med.name.trim().length > 0;
+  const summary = hasName
+    ? `${med.name}${med.strength ? ' ' + med.strength : ''}${med.form ? ', ' + t('form' + capitalize(med.form)) : ''}${med.frequency ? ', ' + t('freq' + capitalize(med.frequency)) : ''}`
+    : t('medPlaceholder');
+  const whenList = WHEN_OPTIONS.filter(w => med.when[w]).map(w => {
+    const icons = { morning: '☀️', noon: '🌤️', evening: '🌅', bedtime: '🌙', weekdays: '📅', weekends: '🏖️' };
+    return icons[w] + ' ' + t(w);
+  }).join(', ');
+  const whenSummary = whenList ? `<div class="med-meta">${whenList}</div>` : '';
+
+  // Expanded content
+  const expanded = med.expanded || !hasName ? '' : 'hidden';
+
+  return `
+  <div class="med-card" data-id="${med.id}">
+    <button type="button" class="med-card-header" onclick="toggleMedExpanded('${med.id}')" aria-expanded="${med.expanded}">
+      <div style="min-width:0">
+        <div class="med-summary ${hasName ? '' : 'empty'}">${esc(summary)}</div>
+        ${whenSummary}
+      </div>
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <div class="reorder-btns">
+          <button onclick="moveMed('${med.id}', -1)" ${idx === 0 ? 'disabled' : ''} aria-label="${t('moveUp')}">${t('moveUp')}</button>
+          <button onclick="moveMed('${med.id}', 1)" ${idx === medications.length - 1 ? 'disabled' : ''} aria-label="${t('moveDown')}">${t('moveDown')}</button>
+        </div>
+        <button onclick="duplicateMed('${med.id}')">${t('duplicate')}</button>
+        <button class="danger" onclick="removeMed('${med.id}')">${t('remove')}</button>
+      </div>
+    </button>
+    <div class="med-card-body ${expanded}">
+      <div class="field-row cols-2">
+        <div>
+          <label>${t('medName')} *</label>
+          <input type="text" value="${esc(med.name)}" autocomplete="off" placeholder="${t('medPlaceholder')}"
+            oninput="updateMed('${med.id}','name',this.value)" required>
+        </div>
+        <div>
+          <label>${t('strength')}</label>
+          <input type="text" value="${esc(med.strength)}" autocomplete="off" placeholder="${t('strengthPlaceholder')}"
+            oninput="updateMed('${med.id}','strength',this.value)">
+        </div>
+      </div>
+
+      <div class="field-row cols-3">
+        <div>
+          <label>${t('form')}</label>
+          <select onchange="onFormChange('${med.id}', this.value)">
+            <option value="">—</option>
+            ${FORMS.map(f => `<option value="${f.id}" ${med.form === f.id ? 'selected' : ''}>${t('form' + capitalize(f.id))}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>${t('frequency')}</label>
+          <select onchange="updateMed('${med.id}','frequency',this.value); renderMeds();">
+            <option value="">—</option>
+            ${FREQUENCIES.map(f => `<option value="${f}" ${med.frequency === f ? 'selected' : ''}>${t('freq' + capitalize(f))}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label>${t('route')}</label>
+          <select onchange="updateMed('${med.id}','route',this.value)">
+            <option value="">—</option>
+            ${ROUTES.map(r => `<option value="${r}" ${med.route === r ? 'selected' : ''}>${t('route' + capitalize(r))}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      ${med.frequency === 'weekly' ? `
+        <div class="field-row cols-2">
+          <div>
+            <label>${t('weeklyLabel')}</label>
+            <select onchange="updateMed('${med.id}','weeklyDay',this.value)">
+              <option value="">—</option>
+              ${DAYS.map(d => `<option value="${d}" ${med.weeklyDay === d ? 'selected' : ''}>${t('day' + d)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <p class="hint-strong">${t('weeklyHint')}</p>
+      ` : ''}
+
+      ${med.frequency === 'monthly' ? `
+        <div class="field-row cols-2">
+          <div>
+            <label>${t('monthlyLabel')}</label>
+            <input type="number" min="1" max="31" value="${esc(med.monthlyDay)}"
+              oninput="updateMed('${med.id}','monthlyDay',this.value)">
+          </div>
+        </div>
+        <p class="hint-strong">${t('monthlyHint')}</p>
+      ` : ''}
+
+      <div style="margin-bottom:16px">
+        <label>${t('when')}</label>
+        <div class="chip-group" role="group" aria-label="${t('when')}">
+          ${WHEN_OPTIONS.map(w => `
+            <button type="button" class="chip" role="checkbox" aria-checked="${med.when[w]}"
+              onclick="updateMedWhen('${med.id}','${w}',!medications.find(m=>m.id==='${med.id}').when['${w}']); renderMeds();">
+              ${{morning:'☀️',noon:'🌤️',evening:'🌅',bedtime:'🌙',weekdays:'📅',weekends:'🏖️'}[w]} ${t(w)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="field-row cols-2">
+        <div>
+          <label>${t('purpose')}</label>
+          <input type="text" value="${esc(med.purpose)}" autocomplete="off" placeholder="${t('purposePlaceholder')}"
+            oninput="updateMed('${med.id}','purpose',this.value)">
+        </div>
+        <div>
+          <label>${t('instructions')}</label>
+          <input type="text" value="${esc(med.instructions)}" autocomplete="off" placeholder="${t('instructionsPlaceholder')}"
+            oninput="updateMed('${med.id}','instructions',this.value)">
+        </div>
+      </div>
+
+      <div class="field-row cols-2">
+        <div>
+          <label>${t('prescriber')}</label>
+          <input type="text" value="${esc(med.prescriber)}" autocomplete="off" placeholder="${t('prescriberPlaceholder')}"
+            list="prescriber-list"
+            oninput="updateMed('${med.id}','prescriber',this.value)">
+        </div>
+        <div>
+          <label>${t('pharmacy')}</label>
+          <input type="text" value="${esc(med.pharmacy)}" autocomplete="off" placeholder="${t('pharmacyPlaceholder')}"
+            list="pharmacy-list"
+            oninput="updateMed('${med.id}','pharmacy',this.value)">
+        </div>
+      </div>
+
+      <div class="field-row cols-3">
+        <div>
+          <label>${t('shapeColor')}</label>
+          <div style="display:flex;gap:8px">
+            <select style="flex:1" onchange="updateMed('${med.id}','color',this.value)">
+              <option value="">Color</option>
+              ${COLORS.map(c => `<option value="${c.id}" ${med.color === c.id ? 'selected' : ''}>${t('color' + capitalize(c.id))}</option>`).join('')}
+            </select>
+            <select style="flex:1" onchange="updateMed('${med.id}','shape',this.value)">
+              <option value="">Forma</option>
+              ${SHAPES.map(s => `<option value="${s}" ${med.shape === s ? 'selected' : ''}>${t('shape' + capitalize(s))}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>${t('startDate')}</label>
+          <input type="date" value="${esc(med.startDate)}" onchange="updateMed('${med.id}','startDate',this.value)">
+        </div>
+      </div>
+
+      <div>
+        <label>${t('notes')}</label>
+        <textarea autocomplete="off" placeholder="${t('notesPlaceholder')}"
+          oninput="updateMed('${med.id}','notes',this.value)">${esc(med.notes)}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── DATALISTS ─── */
+function getPrescriberList() {
+  const list = new Set();
+  medications.forEach(m => { if (m.prescriber) list.add(m.prescriber); });
+  return Array.from(list);
+}
+function getPharmacyList() {
+  const list = new Set();
+  const main = document.getElementById('p-pharmacy')?.value;
+  if (main) list.add(main);
+  medications.forEach(m => { if (m.pharmacy) list.add(m.pharmacy); });
+  return Array.from(list);
+}
+
+/* ─── PROGRESS ─── */
+function updateProgress() {
+  const count = medications.filter(m => m.name.trim()).length;
+  const el = document.getElementById('progress-bar');
+  if (count === 0) el.textContent = t('progressEmpty');
+  else if (count === 1) el.textContent = t('progress').replace('{n}', '1');
+  else el.textContent = t('progressPlural').replace('{n}', count);
+
+  // Polypharmacy note
+  const prescribers = new Set(medications.filter(m => m.prescriber).map(m => m.prescriber)).size;
+  const pharmacies = new Set(medications.filter(m => m.pharmacy).map(m => m.pharmacy)).size;
+  const showPoly = count >= 5 || prescribers >= 3 || pharmacies >= 2;
+  document.getElementById('poly-note').style.display = showPoly ? 'flex' : 'none';
+
+  // Update datalists
+  updateDatalists();
+}
+
+function updateDatalists() {
+  // Remove old datalists
+  document.querySelectorAll('#prescriber-list, #pharmacy-list').forEach(el => el.remove());
+  const prescribers = getPrescriberList();
+  const pharmacies = getPharmacyList();
+  if (prescribers.length) {
+    const dl = document.createElement('datalist'); dl.id = 'prescriber-list';
+    dl.innerHTML = prescribers.map(p => `<option value="${esc(p)}">`).join('');
+    document.body.appendChild(dl);
+  }
+  if (pharmacies.length) {
+    const dl = document.createElement('datalist'); dl.id = 'pharmacy-list';
+    dl.innerHTML = pharmacies.map(p => `<option value="${esc(p)}">`).join('');
+    document.body.appendChild(dl);
+  }
+}
+
+/* ─── SAVE TOGGLE ─── */
+function toggleSave() {
+  saveOnDevice = document.getElementById('save-toggle').checked;
+  document.getElementById('save-warning').style.display = saveOnDevice ? 'block' : 'none';
+  if (saveOnDevice) saveToStorage();
+  else removeFromStorage();
+}
+
+const STORAGE_KEY = 'mf-builder-v1';
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      lang, medications, allergies, dntList,
+      patient: {
+        name: document.getElementById('p-name').value,
+        dob: document.getElementById('p-dob').value,
+        updated: document.getElementById('p-updated').value,
+        pharmacy: document.getElementById('p-pharmacy').value,
+        emergencyName: document.getElementById('p-emergency-name').value,
+        emergencyPhone: document.getElementById('p-emergency-phone').value,
+      }
+    }));
+  } catch (e) {}
+}
+function removeFromStorage() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+function loadFromStorage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!data) return;
+    lang = data.lang || 'es';
+    medications = data.medications || [emptyMed()];
+    allergies = data.allergies || [{ name: '', reaction: '' }];
+    dntList = data.dntList || [{ med: '', reason: '' }];
+    if (data.patient) {
+      document.getElementById('p-name').value = data.patient.name || '';
+      document.getElementById('p-dob').value = data.patient.dob || '';
+      document.getElementById('p-updated').value = data.patient.updated || new Date().toISOString().split('T')[0];
+      document.getElementById('p-pharmacy').value = data.patient.pharmacy || '';
+      document.getElementById('p-emergency-name').value = data.patient.emergencyName || '';
+      document.getElementById('p-emergency-phone').value = data.patient.emergencyPhone || '';
+    }
+    saveOnDevice = true;
+    document.getElementById('save-toggle').checked = true;
+    document.getElementById('save-warning').style.display = 'block';
+    setLang(lang);
+    renderAllergies();
+    renderDNT();
+    renderMeds();
+  } catch (e) {}
+}
+
+// Auto-save when toggle is on
+setInterval(() => { if (saveOnDevice) saveToStorage(); }, 3000);
+
+/* ─── ERASE ─── */
+function confirmErase() { document.getElementById('erase-dialog').style.display = 'flex'; }
+function closeDialog() { document.getElementById('erase-dialog').style.display = 'none'; }
+function doErase() {
+  medications = [emptyMed()];
+  allergies = [{ name: '', reaction: '' }];
+  dntList = [{ med: '', reason: '' }];
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-dob').value = '';
+  document.getElementById('p-updated').value = new Date().toISOString().split('T')[0];
+  document.getElementById('p-pharmacy').value = '';
+  document.getElementById('p-emergency-name').value = '';
+  document.getElementById('p-emergency-phone').value = '';
+  removeFromStorage();
+  saveOnDevice = false;
+  document.getElementById('save-toggle').checked = false;
+  document.getElementById('save-warning').style.display = 'none';
+  closeDialog();
+  renderAllergies();
+  renderDNT();
+  renderMeds();
+}
+
+/* ─── PRINT ─── */
+function doPrint() { window.print(); }
+
+/* ─── SHARE ─── */
+async function shareList() {
+  const name = document.getElementById('p-name').value || 'Patient';
+  const text = lang === 'es'
+    ? `Lista de medicamentos de ${name} — ${new Date().toLocaleDateString()}`
+    : `Medication list for ${name} — ${new Date().toLocaleDateString()}`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: document.title, text });
+      return;
+    } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+  }
+  // Fallback: copy to clipboard or print
+  try {
+    await navigator.clipboard.writeText(text + '\n\n' + window.location.href);
+    alert(lang === 'es' ? 'Enlace copiado al portapapeles.' : 'Link copied to clipboard.');
+  } catch (e) {
+    doPrint();
+  }
+}
+
+/* ─── PDF GENERATION ─── */
+function savePDF() {
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 36;
+  const tObj = T[lang];
+
+  const patientName = document.getElementById('p-name').value || '';
+  const dob = document.getElementById('p-dob').value || '';
+  const updated = document.getElementById('p-updated').value || '';
+  const pharmacy = document.getElementById('p-pharmacy').value || '';
+  const emergencyName = document.getElementById('p-emergency-name').value || '';
+  const emergencyPhone = document.getElementById('p-emergency-phone').value || '';
+
+  // Header band
+  doc.setFillColor(15, 46, 48); // pine
+  doc.rect(0, 0, pageW, 50, 'F');
+  doc.setTextColor(244, 239, 230); // paper
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text(tObj.titleMeds || 'Medications', margin, 32);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Mi Farmacéutico en PR | (787) 667-6560', pageW - margin, 32, { align: 'right' });
+
+  let y = 65;
+
+  // Patient info
+  doc.setTextColor(15, 46, 48);
+  doc.setFontSize(10);
+  const infoLine = [
+    patientName ? `${tObj.labelName.replace(':', '')}: ${patientName}` : '',
+    dob ? `DOB: ${dob}` : '',
+    updated ? `${tObj.labelUpdated.replace(':', '')}: ${updated}` : '',
+    pharmacy ? `${tObj.labelPharmacy.replace(':', '')}: ${pharmacy}` : ''
+  ].filter(Boolean).join('  |  ');
+  if (infoLine) { doc.text(infoLine, margin, y); y += 16; }
+
+  // Emergency contact
+  if (emergencyName || emergencyPhone) {
+    const emLine = [
+      emergencyName ? `${tObj.labelEmergencyName.replace(':', '')}: ${emergencyName}` : '',
+      emergencyPhone ? `${tObj.labelEmergencyPhone.replace(':', '')}: ${emergencyPhone}` : ''
+    ].filter(Boolean).join('  |  ');
+    doc.setTextColor(226, 81, 47); // flamboyan
+    doc.setFont('helvetica', 'bold');
+    doc.text(emLine, margin, y);
+    doc.setTextColor(15, 46, 48);
+    doc.setFont('helvetica', 'normal');
+    y += 20;
+  }
+
+  // Allergies & DNT box
+  const activeAllergies = allergies.filter(a => a.name.trim());
+  const activeDNT = dntList.filter(d => d.med.trim());
+  if (activeAllergies.length || activeDNT.length) {
+    doc.setDrawColor(226, 81, 47);
+    doc.setLineWidth(2);
+    doc.rect(margin, y, pageW - margin * 2, 14 + (activeAllergies.length + activeDNT.length) * 14);
+    doc.setTextColor(226, 81, 47);
+    doc.setFont('helvetica', 'bold');
+    let by = y + 12;
+    if (activeAllergies.length) {
+      doc.text(`${tObj.titleAllergies}: ` + activeAllergies.map(a => `${a.name}${a.reaction ? ' (' + a.reaction + ')' : ''}`).join(', '), margin + 6, by);
+      by += 14;
+    }
+    if (activeDNT.length) {
+      doc.text(`${tObj.titleDNT}: ` + activeDNT.map(d => `${d.med}${d.reason ? ' — ' + d.reason : ''}`).join(', '), margin + 6, by);
+    }
+    doc.setTextColor(15, 46, 48);
+    doc.setFont('helvetica', 'normal');
+    y += 20 + (activeAllergies.length + activeDNT.length) * 14;
+  }
+
+  // Emergency strip
+  doc.setFillColor(226, 81, 47);
+  doc.rect(margin, y, pageW - margin * 2, 22, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text(`Emergencia / Emergency: 9-1-1${emergencyPhone ? '  |  ' + tObj.labelEmergencyPhone.replace(':', '') + ': ' + emergencyPhone : ''}`, margin + 6, y + 15);
+  y += 34;
+
+  // Build table data
+  const activeMeds = medications.filter(m => m.name.trim());
+  const hasPrescriber = activeMeds.some(m => m.prescriber);
+  const hasPharmacy = activeMeds.some(m => m.pharmacy);
+  const hasShapeColor = activeMeds.some(m => m.shape || m.color);
+
+  const headers = ['#', tObj.medName, tObj.form, tObj.strength, tObj.route, tObj.frequency, 'AM', 'Noon', 'PM', 'Bed', tObj.purpose, tObj.instructions];
+  if (hasPrescriber) headers.push(tObj.prescriber);
+  if (hasPharmacy) headers.push(tObj.pharmacy);
+
+  const body = activeMeds.map((m, i) => {
+    const formLabel = m.form ? tObj['form' + capitalize(m.form)] : '';
+    const freqLabel = m.frequency ? tObj['freq' + capitalize(m.frequency)] : '';
+    const routeLabel = m.route ? tObj['route' + capitalize(m.route)] : '';
+    const weekly = m.frequency === 'weekly' && m.weeklyDay ? ` (${tObj['day' + m.weeklyDay]})` : '';
+    const monthly = m.frequency === 'monthly' && m.monthlyDay ? ` (Día ${m.monthlyDay})` : '';
+    const row = [
+      String(i + 1),
+      m.name + (m.shape || m.color ? ` [${[m.shape ? tObj['shape' + capitalize(m.shape)] : '', m.color ? tObj['color' + capitalize(m.color)] : ''].filter(Boolean).join(', ')}]` : ''),
+      formLabel,
+      m.strength,
+      routeLabel,
+      freqLabel + weekly + monthly,
+      m.when.morning ? '●' : '',
+      m.when.noon ? '●' : '',
+      m.when.evening ? '●' : '',
+      m.when.bedtime ? '●' : '',
+      m.purpose,
+      m.instructions,
+    ];
+    if (hasPrescriber) row.push(m.prescriber);
+    if (hasPharmacy) row.push(m.pharmacy);
+    return row;
+  });
+
+  if (activeMeds.length === 0) {
+    doc.setFontSize(12);
+    doc.setTextColor(150, 150, 150);
+    doc.text(tObj.progressEmpty, margin, y + 20);
+  } else {
+    doc.autoTable({
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [headers],
+      body: body,
+      headStyles: { fillColor: [15, 46, 48], textColor: [244, 239, 230], fontStyle: 'bold', fontSize: 9 },
+      bodyStyles: { fontSize: 9, textColor: [15, 46, 48] },
+      alternateRowStyles: { fillColor: [244, 239, 230] },
+      theme: 'grid',
+      styles: { cellPadding: 4, overflow: 'linebreak', valign: 'middle' },
+      columnStyles: {
+        0: { cellWidth: 20, halign: 'center' },
+        6: { cellWidth: 22, halign: 'center' },
+        7: { cellWidth: 28, halign: 'center' },
+        8: { cellWidth: 22, halign: 'center' },
+        9: { cellWidth: 28, halign: 'center' },
+      },
+      rowPageBreak: 'avoid',
+      didDrawPage: (data) => {
+        // Page number
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`, pageW - margin, pageH - 20, { align: 'right' });
+      },
+    });
+
+    // Footer text after table
+    const finalY = doc.lastAutoTable.finalY + 20;
+    doc.setFontSize(9);
+    doc.setTextColor(92, 111, 106);
+    doc.text('Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticopr@gmail.com', margin, finalY);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    const disclaimer = tObj.footerDisclaimer;
+    const split = doc.splitTextToSize(disclaimer, pageW - margin * 2);
+    doc.text(split, margin, finalY + 14);
+    doc.text('Not a prescription. Verify with your pharmacist or doctor.', margin, finalY + 14 + split.length * 10);
+
+    // CTA on last page
+    doc.setFontSize(10);
+    doc.setTextColor(15, 46, 48);
+    doc.setFont('helvetica', 'bold');
+    doc.text(tObj.softCta, margin, finalY + 14 + split.length * 10 + 20);
+  }
+
+  const fileName = `Medication-List-${patientName.replace(/[^a-zA-Z0-9]/g, '-') || 'Patient'}-${updated || new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(fileName);
+}
+
+/* ─── HELPERS ─── */
+function esc(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ─── BOOT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  loadFromStorage();
+});
+</script>
+</body>
+</html>

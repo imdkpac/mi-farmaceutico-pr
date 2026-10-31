@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
-import './index.css';
+import { BrowserRouter } from 'react-router-dom';
 import { StripeProvider } from './context/StripeContext.jsx';
+import App from './App';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <StripeProvider>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </StripeProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

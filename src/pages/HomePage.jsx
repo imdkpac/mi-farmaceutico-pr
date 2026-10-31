@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pill, BookOpen, Stethoscope, Phone, ChevronRight, Heart } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import BuilderMedicamentos from '../components/medicamentos/BuilderMedicamentos';
+
 
 const translations = {
   es: {
@@ -120,7 +120,7 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* Builder */}
+          {/* Builder CTA */}
           <div
             className="p-6 sm:p-8"
             style={{ backgroundColor: 'var(--deep-pine)', borderRadius: '28px' }}
@@ -133,11 +133,48 @@ export default function HomePage() {
                 <Pill className="w-4 h-4" strokeWidth={2.5} />
                 {t.builder.badge}
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#F4EFE6]">
+              <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#F4EFE6] mb-4">
                 {t.builder.title}
               </h2>
+              <p className="font-body text-base max-w-lg mx-auto mb-6" style={{ color: 'var(--sage)' }}>
+                {lang === 'es'
+                  ? 'Agregue sus medicamentos, alergias y horarios. Guarde como PDF o imprima. Todo se queda en su dispositivo.'
+                  : 'Add your medications, allergies, and schedules. Save as PDF or print. Everything stays on your device.'}
+              </p>
+
+              {/* Preview */}
+              <div className="max-w-xs mx-auto mb-6 p-4" style={{ backgroundColor: 'var(--white)', borderRadius: '16px' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--flamboyan)' }} />
+                  <span className="font-display text-sm font-semibold" style={{ color: 'var(--pine)' }}>
+                    {lang === 'es' ? 'Mi Lista de Medicamentos' : 'My Medication List'}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
+                    <span className="w-5 h-2.5 rounded-full border" style={{ backgroundColor: '#F5D547' }} />
+                    Metformina 500 mg — {lang === 'es' ? 'Mañana' : 'Morning'}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
+                    <span className="w-5 h-2.5 rounded border" style={{ backgroundColor: '#6BA3D6' }} />
+                    Lisinopril 10 mg — {lang === 'es' ? 'Mañana' : 'Morning'}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
+                    <span className="w-5 h-2.5 rounded-full border" style={{ backgroundColor: '#fff' }} />
+                    Atorvastatina 20 mg — {lang === 'es' ? 'Noche' : 'Bedtime'}
+                  </div>
+                </div>
+              </div>
+
+              <a
+                href="/builder.html"
+                className="inline-flex items-center justify-center gap-2 font-body font-bold text-lg px-8 py-4 rounded-full transition hover:brightness-95"
+                style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)', minHeight: '56px' }}
+              >
+                {lang === 'es' ? 'Crear Mi Lista' : 'Build My List'}
+                <ChevronRight className="w-5 h-5" />
+              </a>
             </div>
-            <BuilderMedicamentos />
           </div>
         </div>
       </section>
@@ -150,10 +187,10 @@ export default function HomePage() {
           </h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Link
-              to="/"
+            <a
+              href="/builder.html"
               className="group p-8 transition"
-              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
+              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px', textDecoration: 'none', display: 'block' }}
             >
               <div
                 className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition"
@@ -163,7 +200,7 @@ export default function HomePage() {
               </div>
               <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.features.pill.title}</h3>
               <p className="font-body text-base leading-relaxed" style={{ color: 'var(--muted-ink)' }}>{t.features.pill.desc}</p>
-            </Link>
+            </a>
 
             <Link
               to="/guia"
