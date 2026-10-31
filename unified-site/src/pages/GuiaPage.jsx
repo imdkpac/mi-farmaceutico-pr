@@ -9,7 +9,7 @@ import Checklist from './guia-sections/Checklist';
 
 const sections = [
   { id: 'hospitals', icon: MapPin, label: { es: 'Hospitales', en: 'Hospitals' }, component: Hospitals },
-  { id: 'hogares', icon: Home, label: { es: 'Hogares de Cuidado', en: 'Nursing Homes' }, component: NursingHomes },
+  { id: 'hogares', icon: Home, label: { es: 'Hogares', en: 'Nursing Homes' }, component: NursingHomes },
   { id: 'costos', icon: Calculator, label: { es: 'Costos', en: 'Costs' }, component: Costs },
   { id: 'checklist', icon: ClipboardCheck, label: { es: 'Preparación', en: 'Preparation' }, component: Checklist },
 ];
@@ -44,31 +44,35 @@ export default function GuiaPage() {
   const ActiveComponent = sections.find((s) => s.id === activeTab)?.component || Hospitals;
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--paper)' }}>
+      <div className="max-w-6xl mx-auto px-6 py-8">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-teal-700 font-semibold hover:text-teal-900 mb-6"
+          className="inline-flex items-center gap-1.5 font-body font-semibold mb-6 transition hover:underline"
+          style={{ color: 'var(--pine)' }}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" strokeWidth={2.5} />
           {t.back}
         </Link>
 
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-bold mb-4">
-            <Stethoscope className="w-4 h-4" />
+          <span
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-4"
+            style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}
+          >
+            <Stethoscope className="w-4 h-4" strokeWidth={2.5} />
             {t.title}
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+          </span>
+          <h1 className="font-display text-3xl sm:text-4xl font-medium text-[#0F2E30] mb-4">
             {t.title}
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="font-body text-lg max-w-2xl mx-auto" style={{ color: 'var(--muted-ink)' }}>
             {t.subtitle}
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex overflow-x-auto gap-2 mb-8 pb-1">
+        {/* Tabs — scrollable pills */}
+        <div className="flex overflow-x-auto gap-3 mb-10 pb-1">
           {sections.map((section) => {
             const Icon = section.icon;
             const isActive = activeTab === section.id;
@@ -76,13 +80,14 @@ export default function GuiaPage() {
               <button
                 key={section.id}
                 onClick={() => setActiveTab(section.id)}
-                className={`whitespace-nowrap flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-base transition ${
+                className="whitespace-nowrap flex items-center gap-2 px-6 py-3 rounded-full font-body font-semibold text-base transition"
+                style={
                   isActive
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-teal-400'
-                }`}
+                    ? { backgroundColor: 'var(--pine)', color: 'var(--paper)' }
+                    : { backgroundColor: 'var(--sand)', color: 'var(--pine)' }
+                }
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-5 h-5" strokeWidth={2} />
                 {section.label[lang]}
               </button>
             );
@@ -92,16 +97,16 @@ export default function GuiaPage() {
         {/* Active Section */}
         <ActiveComponent />
 
-        {/* CTA to medication list */}
-        <div className="mt-12 bg-gradient-to-br from-teal-50 to-blue-50 rounded-xl p-8 text-center border border-teal-200">
-          <h3 className="text-xl font-bold text-slate-900 mb-2">{t.medListCta.title}</h3>
-          <p className="text-slate-600 mb-6">{t.medListCta.desc}</p>
+        {/* CTA */}
+        <div className="mt-12 p-10 text-center" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+          <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.medListCta.title}</h3>
+          <p className="font-body mb-6" style={{ color: 'var(--muted-ink)' }}>{t.medListCta.desc}</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-bold transition"
+            className="btn-capsule btn-capsule-primary"
           >
             {t.medListCta.cta}
-            <ArrowLeft className="w-4 h-4 rotate-180" />
+            <ArrowLeft className="w-4 h-4 rotate-180" strokeWidth={2.5} />
           </Link>
         </div>
       </div>

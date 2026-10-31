@@ -1,16 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Pill, BookOpen, Stethoscope, Phone, Printer, ChevronRight, Heart } from 'lucide-react';
+import { Pill, BookOpen, Stethoscope, Phone, ChevronRight, Heart } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import BuilderMedicamentos from '../components/medicamentos/BuilderMedicamentos';
 
 const translations = {
   es: {
-    hero: {
-      badge: 'Herramienta #1 para pacientes en Puerto Rico',
-      title: 'Su lista de medicamentos, siempre a la mano',
-      subtitle: 'Cree, guarde e imprima su lista de medicamentos. Llévela a sus citas médicas y a la farmacia.',
-      cta: 'Empezar mi lista',
+    builder: {
+      badge: 'Gratis y privado — su información nunca sale de su dispositivo',
+      title: 'Cree su lista de medicamentos',
+      phoneCta: '¿Prefiere hablar con un farmacéutico?',
+      phoneNumber: '(787) 667-6560',
     },
     features: {
       title: 'Más herramientas para su salud',
@@ -42,11 +42,11 @@ const translations = {
     crisis: 'Línea PAS (salud mental 24/7): 1-888-672-7622',
   },
   en: {
-    hero: {
-      badge: '#1 Tool for Patients in Puerto Rico',
-      title: 'Your Medication List, Always at Hand',
-      subtitle: 'Create, save, and print your medication list. Take it to your doctor appointments and pharmacy.',
-      cta: 'Start my list',
+    builder: {
+      badge: 'Free and private — your data never leaves your device',
+      title: 'Create Your Medication List',
+      phoneCta: 'Prefer to talk to a pharmacist?',
+      phoneNumber: '(787) 667-6560',
     },
     features: {
       title: 'More Tools for Your Health',
@@ -83,162 +83,182 @@ export default function HomePage() {
   const { lang } = useLanguage();
   const t = translations[lang];
 
-  const scrollToBuilder = () => {
-    document.getElementById('medication-builder')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-teal-600 to-teal-700 text-white py-16 sm:py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-block bg-white/20 backdrop-blur rounded-full px-4 py-1.5 text-sm font-semibold mb-6">
-            {t.hero.badge}
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-bold mb-6 leading-tight">
-            {t.hero.title}
-          </h1>
-          <p className="text-lg sm:text-xl text-teal-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-            {t.hero.subtitle}
-          </p>
-          <button
-            onClick={scrollToBuilder}
-            className="bg-white text-teal-700 hover:bg-teal-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition inline-flex items-center gap-2"
-          >
-            {t.hero.cta}
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </section>
-
-      {/* Medication Builder — Front and Center */}
-      <section id="medication-builder" className="py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Pill className="w-4 h-4" />
-              {lang === 'es' ? 'Gratis y privado — su información nunca sale de su dispositivo' : 'Free and private — your data never leaves your device'}
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-              {lang === 'es' ? 'Cree su lista de medicamentos' : 'Create Your Medication List'}
-            </h2>
+    <div style={{ backgroundColor: 'var(--paper)' }}>
+      {/* Compact Header + Builder — immediately visible */}
+      <section className="pt-8 pb-12 px-6 sm:px-8" style={{ backgroundColor: 'var(--pine)' }}>
+        <div className="max-w-5xl mx-auto">
+          {/* Small tagline */}
+          <div className="text-center mb-8">
+            <span
+              className="inline-block px-5 py-2 rounded-full font-body font-semibold text-sm mb-4"
+              style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--sage)' }}
+            >
+              {lang === 'es' ? 'Herramienta #1 para pacientes en Puerto Rico' : '#1 Tool for Patients in Puerto Rico'}
+            </span>
+            <h1 className="font-display text-3xl sm:text-4xl font-medium text-[#F4EFE6] mb-3 leading-tight tracking-tight">
+              {lang === 'es' ? 'Su lista de medicamentos,' : 'Your medication list,'}
+              <br />
+              <span style={{ color: 'var(--flamboyan)' }}>{lang === 'es' ? 'siempre a la mano' : 'always at hand'}</span>
+            </h1>
+            <p className="text-base sm:text-lg max-w-xl mx-auto" style={{ color: 'var(--sage)' }}>
+              {lang === 'es'
+                ? 'Cree, guarde e imprima su lista. Llévela a sus citas médicas y a la farmacia.'
+                : 'Create, save, and print your list. Take it to your doctor appointments and pharmacy.'}
+            </p>
           </div>
-          <BuilderMedicamentos />
+
+          {/* Phone CTA */}
+          <div className="text-center mb-6">
+            <a
+              href="tel:7876676560"
+              className="inline-flex items-center gap-2 font-body font-bold text-base sm:text-lg"
+              style={{ color: 'var(--flamboyan)' }}
+            >
+              <Phone className="w-5 h-5" strokeWidth={2.5} />
+              {t.builder.phoneCta} {t.builder.phoneNumber}
+            </a>
+          </div>
+
+          {/* Builder */}
+          <div
+            className="p-6 sm:p-8"
+            style={{ backgroundColor: 'var(--deep-pine)', borderRadius: '28px' }}
+          >
+            <div className="text-center mb-6">
+              <span
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-3"
+                style={{ backgroundColor: 'var(--pine)', color: 'var(--sage)' }}
+              >
+                <Pill className="w-4 h-4" strokeWidth={2.5} />
+                {t.builder.badge}
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#F4EFE6]">
+                {t.builder.title}
+              </h2>
+            </div>
+            <BuilderMedicamentos />
+          </div>
         </div>
       </section>
 
-      {/* Quick Access Cards */}
-      <section className="py-16 px-4 sm:px-6 bg-slate-50">
+      {/* Quick Access Cards — Sand surfaces on paper */}
+      <section className="py-16 px-6 sm:px-8" style={{ backgroundColor: 'var(--sand)' }}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">
+          <h2 className="font-display text-3xl sm:text-4xl font-medium text-[#0F2E30] text-center mb-12">
             {t.features.title}
           </h2>
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Medication List */}
             <Link
               to="/"
-              onClick={scrollToBuilder}
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-teal-400 hover:shadow-md transition group"
+              className="group p-8 transition"
+              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
             >
-              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-200 transition">
-                <Pill className="w-6 h-6 text-teal-700" />
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition"
+                style={{ backgroundColor: 'var(--pine)' }}
+              >
+                <Pill className="w-7 h-7 text-[#F4EFE6]" strokeWidth={2} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{t.features.pill.title}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.features.pill.desc}</p>
+              <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.features.pill.title}</h3>
+              <p className="font-body text-base leading-relaxed" style={{ color: 'var(--muted-ink)' }}>{t.features.pill.desc}</p>
             </Link>
 
-            {/* Health Guide */}
             <Link
               to="/guia"
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-teal-400 hover:shadow-md transition group"
+              className="group p-8 transition"
+              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition">
-                <Stethoscope className="w-6 h-6 text-blue-700" />
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition"
+                style={{ backgroundColor: 'var(--deep-pine)' }}
+              >
+                <Stethoscope className="w-7 h-7 text-[#F4EFE6]" strokeWidth={2} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{t.features.guide.title}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.features.guide.desc}</p>
+              <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.features.guide.title}</h3>
+              <p className="font-body text-base leading-relaxed" style={{ color: 'var(--muted-ink)' }}>{t.features.guide.desc}</p>
             </Link>
 
-            {/* Learn */}
             <Link
               to="/aprende"
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-teal-400 hover:shadow-md transition group"
+              className="group p-8 transition"
+              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
             >
-              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-200 transition">
-                <BookOpen className="w-6 h-6 text-amber-700" />
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition"
+                style={{ backgroundColor: 'var(--sage)' }}
+              >
+                <BookOpen className="w-7 h-7 text-[#0F2E30]" strokeWidth={2} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{t.features.learn.title}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.features.learn.desc}</p>
+              <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.features.learn.title}</h3>
+              <p className="font-body text-base leading-relaxed" style={{ color: 'var(--muted-ink)' }}>{t.features.learn.desc}</p>
             </Link>
 
-            {/* Services */}
             <Link
               to="/servicios"
-              className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:border-teal-400 hover:shadow-md transition group"
+              className="group p-8 transition"
+              style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
             >
-              <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-rose-200 transition">
-                <Heart className="w-6 h-6 text-rose-700" />
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mb-5 transition"
+                style={{ backgroundColor: 'var(--flamboyan)' }}
+              >
+                <Heart className="w-7 h-7 text-[#F4EFE6]" strokeWidth={2} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{t.features.services.title}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.features.services.desc}</p>
+              <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{t.features.services.title}</h3>
+              <p className="font-body text-base leading-relaxed" style={{ color: 'var(--muted-ink)' }}>{t.features.services.desc}</p>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <section className="py-12 px-4 sm:px-6 bg-white border-t border-slate-200">
+      {/* Trust Bar — Paper bg, sand cards */}
+      <section className="py-16 px-6 sm:px-8" style={{ backgroundColor: 'var(--paper)' }}>
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-8">
+          <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#0F2E30] text-center mb-10">
             {t.trust.title}
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 bg-slate-50 rounded-lg p-4">
-              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-teal-700" />
+            {[t.trust.licensed, t.trust.independent, t.trust.bilingual, t.trust.secure].map((text, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-4 p-6"
+                style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'var(--pine)' }}
+                >
+                  <Heart className="w-5 h-5 text-[#F4EFE6]" strokeWidth={2} />
+                </div>
+                <p className="font-body font-medium text-base text-[#0F2E30] leading-relaxed pt-1">{text}</p>
               </div>
-              <p className="text-slate-700 font-medium">{t.trust.licensed}</p>
-            </div>
-            <div className="flex items-start gap-3 bg-slate-50 rounded-lg p-4">
-              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-teal-700" />
-              </div>
-              <p className="text-slate-700 font-medium">{t.trust.independent}</p>
-            </div>
-            <div className="flex items-start gap-3 bg-slate-50 rounded-lg p-4">
-              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-teal-700" />
-              </div>
-              <p className="text-slate-700 font-medium">{t.trust.bilingual}</p>
-            </div>
-            <div className="flex items-start gap-3 bg-slate-50 rounded-lg p-4">
-              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0">
-                <Heart className="w-4 h-4 text-teal-700" />
-              </div>
-              <p className="text-slate-700 font-medium">{t.trust.secure}</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Emergency Footer */}
-      <section className="bg-slate-900 text-white py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-3">
-          <p className="text-lg font-bold text-red-300">{t.emergency}</p>
-          <p className="text-slate-300">{t.crisis}</p>
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+      {/* Emergency Footer — Pine */}
+      <section className="py-12 px-6 sm:px-8" style={{ backgroundColor: 'var(--pine)' }}>
+        <div className="max-w-4xl mx-auto text-center space-y-4">
+          <p className="font-display text-xl font-medium" style={{ color: 'var(--flamboyan)' }}>{t.emergency}</p>
+          <p className="font-body text-base" style={{ color: 'var(--sage)' }}>{t.crisis}</p>
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="tel:911"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition"
+              className="btn-capsule"
+              style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)' }}
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-5 h-5" strokeWidth={2.5} />
               9-1-1
             </a>
             <a
               href="tel:18886727622"
-              className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-bold transition"
+              className="btn-capsule"
+              style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--paper)' }}
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-5 h-5" strokeWidth={2.5} />
               1-888-672-7622
             </a>
           </div>

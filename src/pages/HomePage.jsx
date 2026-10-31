@@ -6,16 +6,11 @@ import BuilderMedicamentos from '../components/medicamentos/BuilderMedicamentos'
 
 const translations = {
   es: {
-    hero: {
-      badge: 'Herramienta #1 para pacientes en Puerto Rico',
-      title: 'Su lista de medicamentos,',
-      titleAccent: 'siempre a la mano',
-      subtitle: 'Cree, guarde e imprima su lista de medicamentos. Llévela a sus citas médicas y a la farmacia.',
-      cta: 'Empezar mi lista',
-    },
     builder: {
       badge: 'Gratis y privado — su información nunca sale de su dispositivo',
       title: 'Cree su lista de medicamentos',
+      phoneCta: '¿Prefiere hablar con un farmacéutico?',
+      phoneNumber: '(787) 667-6560',
     },
     features: {
       title: 'Más herramientas para su salud',
@@ -47,16 +42,11 @@ const translations = {
     crisis: 'Línea PAS (salud mental 24/7): 1-888-672-7622',
   },
   en: {
-    hero: {
-      badge: '#1 Tool for Patients in Puerto Rico',
-      title: 'Your medication list,',
-      titleAccent: 'always at hand',
-      subtitle: 'Create, save, and print your medication list. Take it to your doctor appointments and pharmacy.',
-      cta: 'Start my list',
-    },
     builder: {
       badge: 'Free and private — your data never leaves your device',
       title: 'Create Your Medication List',
+      phoneCta: 'Prefer to talk to a pharmacist?',
+      phoneNumber: '(787) 667-6560',
     },
     features: {
       title: 'More Tools for Your Health',
@@ -93,66 +83,60 @@ export default function HomePage() {
   const { lang } = useLanguage();
   const t = translations[lang];
 
-  const scrollToBuilder = () => {
-    document.getElementById('medication-builder')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <div style={{ backgroundColor: 'var(--paper)' }}>
-      {/* Hero — Pine Dark */}
-      <section
-        className="py-20 sm:py-28 px-6 sm:px-8"
-        style={{ backgroundColor: 'var(--pine)' }}
-      >
-        <div className="max-w-4xl mx-auto">
-          <span
-            className="inline-block px-5 py-2 rounded-full font-body font-semibold text-sm mb-8"
-            style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--sage)' }}
-          >
-            {t.hero.badge}
-          </span>
-
-          <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-medium text-[#F4EFE6] mb-6 leading-[1.05] tracking-tight">
-            {t.hero.title}
-            <br />
-            <span style={{ color: 'var(--flamboyan)' }}>{t.hero.titleAccent}</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl mb-10 max-w-2xl leading-relaxed" style={{ color: 'var(--sage)' }}>
-            {t.hero.subtitle}
-          </p>
-
-          <button
-            onClick={scrollToBuilder}
-            className="btn-capsule btn-capsule-primary text-lg px-8 py-4"
-          >
-            {t.hero.cta}
-            <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
-          </button>
-        </div>
-      </section>
-
-      {/* Medication Builder — Paper bg, builder inside deep-pine card for contrast */}
-      <section id="medication-builder" className="py-16 px-6 sm:px-8">
+      {/* Compact Header + Builder — immediately visible */}
+      <section className="pt-8 pb-12 px-6 sm:px-8" style={{ backgroundColor: 'var(--pine)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
+          {/* Small tagline */}
+          <div className="text-center mb-8">
             <span
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-5"
-              style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}
+              className="inline-block px-5 py-2 rounded-full font-body font-semibold text-sm mb-4"
+              style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--sage)' }}
             >
-              <Pill className="w-4 h-4" strokeWidth={2.5} />
-              {t.builder.badge}
+              {lang === 'es' ? 'Herramienta #1 para pacientes en Puerto Rico' : '#1 Tool for Patients in Puerto Rico'}
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-medium text-[#0F2E30]">
-              {t.builder.title}
-            </h2>
+            <h1 className="font-display text-3xl sm:text-4xl font-medium text-[#F4EFE6] mb-3 leading-tight tracking-tight">
+              {lang === 'es' ? 'Su lista de medicamentos,' : 'Your medication list,'}
+              <br />
+              <span style={{ color: 'var(--flamboyan)' }}>{lang === 'es' ? 'siempre a la mano' : 'always at hand'}</span>
+            </h1>
+            <p className="text-base sm:text-lg max-w-xl mx-auto" style={{ color: 'var(--sage)' }}>
+              {lang === 'es'
+                ? 'Cree, guarde e imprima su lista. Llévela a sus citas médicas y a la farmacia.'
+                : 'Create, save, and print your list. Take it to your doctor appointments and pharmacy.'}
+            </p>
           </div>
 
-          {/* Builder wrapped in a card for contrast */}
+          {/* Phone CTA */}
+          <div className="text-center mb-6">
+            <a
+              href="tel:7876676560"
+              className="inline-flex items-center gap-2 font-body font-bold text-base sm:text-lg"
+              style={{ color: 'var(--flamboyan)' }}
+            >
+              <Phone className="w-5 h-5" strokeWidth={2.5} />
+              {t.builder.phoneCta} {t.builder.phoneNumber}
+            </a>
+          </div>
+
+          {/* Builder */}
           <div
-            className="p-6 sm:p-10"
-            style={{ backgroundColor: 'var(--pine)', borderRadius: '28px' }}
+            className="p-6 sm:p-8"
+            style={{ backgroundColor: 'var(--deep-pine)', borderRadius: '28px' }}
           >
+            <div className="text-center mb-6">
+              <span
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-3"
+                style={{ backgroundColor: 'var(--pine)', color: 'var(--sage)' }}
+              >
+                <Pill className="w-4 h-4" strokeWidth={2.5} />
+                {t.builder.badge}
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#F4EFE6]">
+                {t.builder.title}
+              </h2>
+            </div>
             <BuilderMedicamentos />
           </div>
         </div>
@@ -168,7 +152,6 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
               to="/"
-              onClick={scrollToBuilder}
               className="group p-8 transition"
               style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
             >

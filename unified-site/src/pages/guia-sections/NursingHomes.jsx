@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, MapPin, Home, Users, X, DollarSign } from 'lucide-react';
+import { Search, Phone, MapPin, Home, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { HOGARES, COSTOS, TIPOS_HOGAR, COLORES_COSTO } from '../../data/nursingHomes';
+import { NURSING_HOMES, NH_FILTERS } from '../../data/nursingHomes';
 
 export default function NursingHomes() {
   const { lang } = useLanguage();
@@ -12,173 +12,159 @@ export default function NursingHomes() {
 
   const t = {
     es: {
-      title: 'Hogares de Cuidado en Puerto Rico',
-      subtitle: 'Directorio de hogares de ancianos y centros de enfermería',
+      title: 'Hogares de Ancianos',
+      subtitle: 'Encuentre hogares de cuidado con opciones de financiamiento',
       search: 'Buscar hogar...',
       allCosts: 'Todos los costos',
       allTypes: 'Todos los tipos',
-      camas: 'camas',
-      costo: 'Costo estimado',
-      tipo: 'Tipo',
       direccion: 'Dirección',
       telefono: 'Teléfono',
+      camas: 'Camas',
+      costoLabel: 'Costo aproximado',
+      financiamiento: 'Financiamiento aceptado',
+      verMapa: 'Ver en Google Maps',
       noResults: 'No se encontraron hogares con esos filtros.',
       resultados: 'hogares encontrados',
       limpiar: 'Limpiar',
-      nota: 'Los costos son estimados. Contacte directamente para precios actualizados.',
     },
     en: {
-      title: 'Nursing Homes in Puerto Rico',
-      subtitle: 'Directory of nursing homes and skilled nursing facilities',
-      search: 'Search facility...',
+      title: 'Nursing Homes',
+      subtitle: 'Find care homes with financing options',
+      search: 'Search home...',
       allCosts: 'All costs',
       allTypes: 'All types',
-      camas: 'beds',
-      costo: 'Estimated cost',
-      tipo: 'Type',
       direccion: 'Address',
       telefono: 'Phone',
-      noResults: 'No facilities found with those filters.',
-      resultados: 'facilities found',
+      camas: 'Beds',
+      costoLabel: 'Approximate cost',
+      financiamiento: 'Accepted financing',
+      verMapa: 'View on Google Maps',
+      noResults: 'No homes found with those filters.',
+      resultados: 'homes found',
       limpiar: 'Clear',
-      nota: 'Costs are estimates. Contact directly for current pricing.',
     },
   }[lang];
 
   const filtered = useMemo(() => {
-    return HOGARES.filter((h) => {
+    return NURSING_HOMES.filter((h) => {
       const matchesSearch = !search ||
         h.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        h.direccion.toLowerCase().includes(search.toLowerCase());
+        h.ciudad.toLowerCase().includes(search.toLowerCase());
       const matchesCosto = !costoFilter || h.costo === costoFilter;
       const matchesTipo = !tipoFilter || h.tipo === tipoFilter;
       return matchesSearch && matchesCosto && matchesTipo;
     });
   }, [search, costoFilter, tipoFilter]);
 
-  const costosList = Object.keys(COSTOS[lang]);
-  const tiposList = Object.keys(TIPOS_HOGAR[lang]);
+  const costosList = Object.keys(NH_FILTERS[lang].costos);
+  const tiposList = Object.keys(NH_FILTERS[lang].tipos);
   const hasActiveFilters = search || costoFilter || tipoFilter;
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t.title}</h2>
-        <p className="text-slate-600">{t.subtitle}</p>
+        <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
+        <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
       </div>
 
-      {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+      <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.search}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base"
+            className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           />
         </div>
-
         <div className="flex flex-wrap gap-3">
           <select
             value={costoFilter}
             onChange={(e) => setCostoFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allCosts}</option>
             {costosList.map((c) => (
-              <option key={c} value={c}>{COSTOS[lang][c]}</option>
+              <option key={c} value={c}>{NH_FILTERS[lang].costos[c]}</option>
             ))}
           </select>
-
           <select
             value={tipoFilter}
             onChange={(e) => setTipoFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allTypes}</option>
             {tiposList.map((tKey) => (
-              <option key={tKey} value={tKey}>{TIPOS_HOGAR[lang][tKey]}</option>
+              <option key={tKey} value={tKey}>{NH_FILTERS[lang].tipos[tKey]}</option>
             ))}
           </select>
-
           {hasActiveFilters && (
             <button
               onClick={() => { setSearch(''); setCostoFilter(''); setTipoFilter(''); }}
-              className="px-4 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 hover:bg-slate-50 font-medium flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-full font-body font-medium flex items-center gap-1.5 transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}
             >
               <X className="w-4 h-4" />
               {t.limpiar}
             </button>
           )}
         </div>
-
-        <p className="text-sm text-slate-500">
+        <p className="font-body text-sm mt-4" style={{ color: 'var(--muted-ink)' }}>
           {filtered.length} {t.resultados}
         </p>
       </div>
 
-      {/* Results */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-slate-500">{t.noResults}</div>
+        <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
         <div className="grid gap-4">
           {filtered.map((h, i) => (
             <div
               key={i}
-              className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:border-teal-400 transition"
+              className="overflow-hidden transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}
             >
-              <button
-                onClick={() => setExpanded(expanded === i ? null : i)}
-                className="w-full text-left p-4 sm:p-5 flex items-start gap-4"
-              >
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                  <Home className="w-6 h-6 text-blue-700" />
+              <button onClick={() => setExpanded(expanded === i ? null : i)} className="w-full text-left p-5 sm:p-6 flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--deep-pine)' }}>
+                  <Home className="w-6 h-6 text-[#F4EFE6]" strokeWidth={2} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h3 className="text-lg font-bold text-slate-900">{h.nombre}</h3>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${COLORES_COSTO[h.costo]}`}>
-                      {COSTOS[lang][h.costo]}
-                    </span>
-                  </div>
-                  <p className="text-sm text-slate-500">
-                    {TIPOS_HOGAR[lang][h.tipo]} · {h.camas} {t.camas}
-                  </p>
+                  <h3 className="font-display text-lg font-medium text-[#0F2E30]">{h.nombre}</h3>
+                  <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{h.ciudad} · {NH_FILTERS[lang].tipos[h.tipo]}</p>
                 </div>
               </button>
-
               {expanded === i && (
-                <div className="px-4 sm:px-5 pb-5 pt-0 border-t border-slate-100">
-                  <div className="pt-4 space-y-3">
+                <div className="px-5 sm:px-6 pb-6 pt-0">
+                  <div className="pt-4 space-y-3 border-t-2" style={{ borderColor: 'var(--paper)' }}>
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                      <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
                       <div>
-                        <p className="text-sm font-semibold text-slate-700">{t.direccion}</p>
-                        <p className="text-sm text-slate-600">{h.direccion}</p>
+                        <p className="font-body text-sm font-semibold text-[#0F2E30]">{t.direccion}</p>
+                        <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{h.direccion}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <Phone className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
+                      <Phone className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
                       <div>
-                        <p className="text-sm font-semibold text-slate-700">{t.telefono}</p>
-                        <a
-                          href={`tel:${h.telefono.replace(/\D/g, '')}`}
-                          className="text-sm text-teal-700 font-medium hover:underline"
-                        >
-                          {h.telefono}
-                        </a>
+                        <p className="font-body text-sm font-semibold text-[#0F2E30]">{t.telefono}</p>
+                        <a href={`tel:${h.telefono.replace(/\D/g, '')}`} className="font-body text-sm font-medium hover:underline" style={{ color: 'var(--pine)' }}>{h.telefono}</a>
                       </div>
                     </div>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.nombre + ' Puerto Rico')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-teal-700 font-semibold hover:underline"
-                    >
-                      <MapPin className="w-4 h-4" />
-                      Google Maps
+                    <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
+                      <span className="font-semibold text-[#0F2E30]">{t.camas}:</span> {h.camas}
+                    </p>
+                    <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
+                      <span className="font-semibold text-[#0F2E30]">{t.costoLabel}:</span> {NH_FILTERS[lang].costos[h.costo]}
+                    </p>
+                    <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
+                      <span className="font-semibold text-[#0F2E30]">{t.financiamiento}:</span> {h.financiamiento.join(', ')}
+                    </p>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.nombre + ' Puerto Rico')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-body text-sm font-semibold hover:underline" style={{ color: 'var(--pine)' }}>
+                      <MapPin className="w-4 h-4" />{t.verMapa}
                     </a>
                   </div>
                 </div>
@@ -187,11 +173,6 @@ export default function NursingHomes() {
           ))}
         </div>
       )}
-
-      <p className="text-sm text-slate-500 bg-slate-50 rounded-lg p-3">
-        <DollarSign className="w-4 h-4 inline mr-1" />
-        {t.nota}
-      </p>
     </div>
   );
 }

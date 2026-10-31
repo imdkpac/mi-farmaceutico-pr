@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, MapPin, Heart, Filter, X } from 'lucide-react';
+import { Search, Phone, MapPin, Heart, AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { HOSPITALES, REGIONES, TIPOS } from '../../data/hospitals';
+import { HOSPITALES, HOSPITALES_CERRADOS, EMERGENCIAS, REGIONES, TIPOS } from '../../data/hospitals';
 
 export default function Hospitals() {
   const { lang } = useLanguage();
@@ -9,39 +9,48 @@ export default function Hospitals() {
   const [regionFilter, setRegionFilter] = useState('');
   const [tipoFilter, setTipoFilter] = useState('');
   const [expanded, setExpanded] = useState(null);
+  const [showEmergencias, setShowEmergencias] = useState(false);
 
   const t = {
     es: {
       title: 'Hospitales en Puerto Rico',
-      subtitle: 'Encuentre hospitales cercanos con información de contacto',
+      subtitle: 'Encuentre hospitales cercanos con información de contacto. Agrupados por región.',
       search: 'Buscar hospital...',
       allRegions: 'Todas las regiones',
       allTypes: 'Todos los tipos',
-      emergencias: 'Tiene Emergencias',
+      emergencias: 'Emergencias',
       pediatrico: 'Pediátrico',
       direccion: 'Dirección',
       telefono: 'Teléfono',
       verMapa: 'Ver en Google Maps',
       noResults: 'No se encontraron hospitales con esos filtros.',
       resultados: 'hospitales encontrados',
-      filtros: 'Filtros',
       limpiar: 'Limpiar',
+      emergenciasTitle: '¿Es una emergencia?',
+      emergenciasBtn: 'Ver señales de emergencia',
+      cerradosTitle: 'Hospitales cerrados recientemente',
+      cerradoNota: 'CERRADO —',
+      alternativa: 'Alternativa',
     },
     en: {
       title: 'Hospitals in Puerto Rico',
-      subtitle: 'Find nearby hospitals with contact information',
+      subtitle: 'Find nearby hospitals with contact information. Grouped by region.',
       search: 'Search hospital...',
       allRegions: 'All regions',
       allTypes: 'All types',
-      emergencias: 'Has Emergency Room',
+      emergencias: 'Emergency Room',
       pediatrico: 'Pediatric',
       direccion: 'Address',
       telefono: 'Phone',
       verMapa: 'View on Google Maps',
       noResults: 'No hospitals found with those filters.',
       resultados: 'hospitals found',
-      filtros: 'Filters',
       limpiar: 'Clear',
+      emergenciasTitle: 'Is this an emergency?',
+      emergenciasBtn: 'See emergency warning signs',
+      cerradosTitle: 'Recently closed hospitals',
+      cerradoNota: 'CLOSED —',
+      alternativa: 'Alternative',
     },
   }[lang];
 
@@ -56,28 +65,79 @@ export default function Hospitals() {
     });
   }, [search, regionFilter, tipoFilter]);
 
+  // Group by region
+  const grouped = useMemo(() => {
+    const groups = {};
+    filtered.forEach((h) => {
+      if (!groups[h.region]) groups[h.region] = [];
+      groups[h.region].push(h);
+    });
+    return groups;
+  }, [filtered]);
+
   const regionesList = Object.keys(REGIONES[lang]);
   const tiposList = Object.keys(TIPOS[lang]);
-
   const hasActiveFilters = search || regionFilter || tipoFilter;
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t.title}</h2>
-        <p className="text-slate-600">{t.subtitle}</p>
+        <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
+        <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
       </div>
 
+      {/* Closed hospitals notice */}
+      {HOSPITALES_CERRADOS.length > 0 && (
+        <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px', border: '2px solid var(--flamboyan)' }}>
+          <h3 className="font-display text-lg font-medium text-[#0F2E30] mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" style={{ color: 'var(--flamboyan)' }} />
+            {t.cerradosTitle}
+          </h3>
+          {HOSPITALES_CERRADOS.map((h, i) => (
+            <p key={i} className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
+              <span className="font-bold" style={{ color: 'var(--flamboyan)' }}>{t.cerradoNota} {h.nombre} ({h.cerrado})</span>
+              <br />{h.nota}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* Emergency toggle */}
+      <button
+        onClick={() => setShowEmergencias(!showEmergencias)}
+        className="w-full flex items-center justify-between p-5 text-left transition"
+        style={{ backgroundColor: 'var(--flamboyan)', borderRadius: '28px', color: 'var(--paper)' }}
+      >
+        <span className="font-display text-lg font-medium flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5" />
+          {t.emergenciasTitle}
+        </span>
+        {showEmergencias ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+      </button>
+
+      {showEmergencias && (
+        <div className="grid gap-4">
+          {EMERGENCIAS[lang].map((e, i) => (
+            <div key={i} className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px', borderLeft: '6px solid var(--flamboyan)' }}>
+              <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-2">{e.condicion}</h4>
+              <p className="font-body text-sm mb-2" style={{ color: 'var(--muted-ink)' }}><strong>Señales:</strong> {e.sintomas}</p>
+              <p className="font-body text-sm font-bold" style={{ color: 'var(--flamboyan)' }}>{e.accion}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+      <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t.search}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base"
+            className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           />
         </div>
 
@@ -85,7 +145,8 @@ export default function Hospitals() {
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allRegions}</option>
             {regionesList.map((r) => (
@@ -96,7 +157,8 @@ export default function Hospitals() {
           <select
             value={tipoFilter}
             onChange={(e) => setTipoFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allTypes}</option>
             {tiposList.map((tKey) => (
@@ -107,7 +169,8 @@ export default function Hospitals() {
           {hasActiveFilters && (
             <button
               onClick={() => { setSearch(''); setRegionFilter(''); setTipoFilter(''); }}
-              className="px-4 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 hover:bg-slate-50 font-medium flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-full font-body font-medium flex items-center gap-1.5 transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}
             >
               <X className="w-4 h-4" />
               {t.limpiar}
@@ -115,82 +178,96 @@ export default function Hospitals() {
           )}
         </div>
 
-        <p className="text-sm text-slate-500">
+        <p className="font-body text-sm mt-4" style={{ color: 'var(--muted-ink)' }}>
           {filtered.length} {t.resultados}
         </p>
       </div>
 
-      {/* Results */}
+      {/* Results grouped by region */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-slate-500">{t.noResults}</div>
+        <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
-        <div className="grid gap-4">
-          {filtered.map((h, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:border-teal-400 transition"
-            >
-              <button
-                onClick={() => setExpanded(expanded === i ? null : i)}
-                className="w-full text-left p-4 sm:p-5 flex items-start gap-4"
-              >
-                <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center shrink-0">
-                  <Heart className="w-6 h-6 text-teal-700" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <h3 className="text-lg font-bold text-slate-900">{h.nombre}</h3>
-                    {h.emergencias && (
-                      <span className="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                        {t.emergencias}
-                      </span>
-                    )}
-                    {h.especial === 'pediatrico' && (
-                      <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                        {t.pediatrico}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-slate-500">
-                    {REGIONES[lang][h.region]} · {TIPOS[lang][h.tipo]}
-                  </p>
-                </div>
-              </button>
-
-              {expanded === i && (
-                <div className="px-4 sm:px-5 pb-5 pt-0 border-t border-slate-100">
-                  <div className="pt-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-slate-700">{t.direccion}</p>
-                        <p className="text-sm text-slate-600">{h.direccion}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Phone className="w-5 h-5 text-slate-400 mt-0.5 shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-slate-700">{t.telefono}</p>
-                        <a
-                          href={`tel:${h.telefono.replace(/\D/g, '')}`}
-                          className="text-sm text-teal-700 font-medium hover:underline"
-                        >
-                          {h.telefono}
-                        </a>
-                      </div>
-                    </div>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.nombre + ' Puerto Rico')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-teal-700 font-semibold hover:underline"
+        <div className="space-y-8">
+          {Object.entries(grouped).map(([region, hospitales]) => (
+            <div key={region}>
+              <h3 className="font-display text-xl font-medium text-[#0F2E30] mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5" style={{ color: 'var(--pine)' }} />
+                {REGIONES[lang][region]}
+                <span className="text-sm font-body font-normal" style={{ color: 'var(--muted-ink)' }}>({hospitales.length})</span>
+              </h3>
+              <div className="grid gap-3">
+                {hospitales.map((h, i) => {
+                  const globalIndex = filtered.indexOf(h);
+                  return (
+                    <div
+                      key={i}
+                      className="overflow-hidden transition hover:brightness-95"
+                      style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}
                     >
-                      <MapPin className="w-4 h-4" />
-                      {t.verMapa}
-                    </a>
-                  </div>
-                </div>
-              )}
+                      <button
+                        onClick={() => setExpanded(expanded === globalIndex ? null : globalIndex)}
+                        className="w-full text-left p-5 sm:p-6 flex items-start gap-4"
+                      >
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: h.emergencias ? 'var(--flamboyan)' : 'var(--pine)' }}>
+                          <Heart className="w-6 h-6 text-[#F4EFE6]" strokeWidth={2} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 className="font-display text-lg font-medium text-[#0F2E30]">{h.nombre}</h3>
+                            {h.emergencias && (
+                              <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)' }}>
+                                {t.emergencias}
+                              </span>
+                            )}
+                            {h.especial === 'pediatrico' && (
+                              <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--paper)' }}>
+                                {t.pediatrico}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
+                            {TIPOS[lang][h.tipo]}
+                          </p>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-transform ${expanded === globalIndex ? 'rotate-180' : ''}`} style={{ color: 'var(--muted-ink)' }} />
+                      </button>
+
+                      {expanded === globalIndex && (
+                        <div className="px-5 sm:px-6 pb-6 pt-0">
+                          <div className="pt-4 space-y-3 border-t-2" style={{ borderColor: 'var(--paper)' }}>
+                            <div className="flex items-start gap-3">
+                              <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
+                              <div>
+                                <p className="font-body text-sm font-semibold text-[#0F2E30]">{t.direccion}</p>
+                                <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{h.direccion}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <Phone className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
+                              <div>
+                                <p className="font-body text-sm font-semibold text-[#0F2E30]">{t.telefono}</p>
+                                <a href={`tel:${h.telefono.replace(/\D/g, '')}`} className="font-body text-sm font-medium hover:underline" style={{ color: 'var(--pine)' }}>
+                                  {h.telefono}
+                                </a>
+                              </div>
+                            </div>
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.nombre + ' Puerto Rico')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 font-body text-sm font-semibold hover:underline"
+                              style={{ color: 'var(--pine)' }}
+                            >
+                              <MapPin className="w-4 h-4" />
+                              {t.verMapa}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>

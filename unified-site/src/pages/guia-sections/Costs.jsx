@@ -1,92 +1,100 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Pill, DollarSign, ShieldAlert, X } from 'lucide-react';
+import { Search, DollarSign, AlertCircle, Info, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { MEDICATION_COSTS, CATEGORIAS } from '../../data/medicationCosts';
+import { MEDICATION_COSTS, CATEGORIES } from '../../data/medicationCosts';
 
 export default function Costs() {
   const { lang } = useLanguage();
   const [search, setSearch] = useState('');
-  const [categoriaFilter, setCategoriaFilter] = useState('');
+  const [category, setCategory] = useState('');
+  const [insurance, setInsurance] = useState('none');
 
   const t = {
     es: {
-      title: 'Costos de Medicamentos en Puerto Rico',
-      subtitle: 'Precios estimados para medicamentos comunes. Siempre verifique en su farmacia.',
+      title: 'Costos de Medicamentos',
+      subtitle: 'Precios aproximados en Puerto Rico. Los precios varían por farmacia y seguro.',
       search: 'Buscar medicamento...',
       allCategories: 'Todas las categorías',
+      sinSeguro: 'Sin seguro',
+      conSeguro: 'Con seguro privado (copago típico)',
       medicamento: 'Medicamento',
-      sinSeguro: 'Sin seguro (aprox.)',
-      conSeguro: 'Con seguro (aprox.)',
+      categoria: 'Categoría',
+      precio: 'Precio aprox.',
+      copago: 'Copago típ.',
       nota: 'Nota',
-      noResults: 'No se encontraron medicamentos.',
-      resultados: 'medicamentos encontrados',
+      disclaimer: 'Estos precios son estimaciones basadas en datos de 2024-2026. Los precios reales varían por farmacia, seguro, y programa de asistencia.',
+      noResults: 'No se encontraron medicamentos con esos filtros.',
       limpiar: 'Limpiar',
-      disclaimer: 'Estos precios son estimados de referencia. Los costos reales varían por farmacia, seguro y programa de asistencia. Siempre consulte a su farmacéutico.',
     },
     en: {
-      title: 'Medication Costs in Puerto Rico',
-      subtitle: 'Estimated prices for common medications. Always verify at your pharmacy.',
+      title: 'Medication Costs',
+      subtitle: 'Approximate prices in Puerto Rico. Prices vary by pharmacy and insurance.',
       search: 'Search medication...',
       allCategories: 'All categories',
+      sinSeguro: 'No insurance',
+      conSeguro: 'With private insurance (typical copay)',
       medicamento: 'Medication',
-      sinSeguro: 'Without insurance (approx.)',
-      conSeguro: 'With insurance (approx.)',
+      categoria: 'Category',
+      precio: 'Approx. price',
+      copago: 'Typ. copay',
       nota: 'Note',
-      noResults: 'No medications found.',
-      resultados: 'medications found',
+      disclaimer: 'These prices are estimates based on 2024-2026 data. Actual prices vary by pharmacy, insurance, and assistance programs.',
+      noResults: 'No medications found with those filters.',
       limpiar: 'Clear',
-      disclaimer: 'These prices are reference estimates. Actual costs vary by pharmacy, insurance, and assistance programs. Always consult your pharmacist.',
     },
   }[lang];
 
   const filtered = useMemo(() => {
     return MEDICATION_COSTS.filter((m) => {
       const matchesSearch = !search ||
-        m.nombre.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = !categoriaFilter || m.categoria === categoriaFilter;
-      return matchesSearch && matchesCat;
+        m.nombre.toLowerCase().includes(search.toLowerCase()) ||
+        m.nombreEn?.toLowerCase().includes(search.toLowerCase()) ||
+        m.generico?.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = !category || m.categoria === category;
+      return matchesSearch && matchesCategory;
     });
-  }, [search, categoriaFilter]);
+  }, [search, category]);
 
-  const categoriasList = Object.keys(CATEGORIAS[lang]);
-  const hasActiveFilters = search || categoriaFilter;
+  const categoriesList = Object.keys(CATEGORIES[lang]);
+  const hasActiveFilters = search || category;
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t.title}</h2>
-        <p className="text-slate-600">{t.subtitle}</p>
+        <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
+        <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
       </div>
 
-      {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.search}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base"
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-3">
+      {/* Controls */}
+      <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t.search}
+              className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
+            />
+          </div>
           <select
-            value={categoriaFilter}
-            onChange={(e) => setCategoriaFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="px-5 py-3 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allCategories}</option>
-            {categoriasList.map((c) => (
-              <option key={c} value={c}>{CATEGORIAS[lang][c]}</option>
+            {categoriesList.map((c) => (
+              <option key={c} value={c}>{CATEGORIES[lang][c]}</option>
             ))}
           </select>
-
           {hasActiveFilters && (
             <button
-              onClick={() => { setSearch(''); setCategoriaFilter(''); }}
-              className="px-4 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 hover:bg-slate-50 font-medium flex items-center gap-1.5"
+              onClick={() => { setSearch(''); setCategory(''); }}
+              className="px-5 py-3 rounded-full font-body font-medium flex items-center gap-1.5 transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}
             >
               <X className="w-4 h-4" />
               {t.limpiar}
@@ -94,51 +102,84 @@ export default function Costs() {
           )}
         </div>
 
-        <p className="text-sm text-slate-500">
-          {filtered.length} {t.resultados}
-        </p>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 font-body cursor-pointer">
+            <input
+              type="radio"
+              name="insurance"
+              checked={insurance === 'none'}
+              onChange={() => setInsurance('none')}
+              className="w-4 h-4 accent-pine"
+            />
+            <span className="text-sm text-[#0F2E30]">{t.sinSeguro}</span>
+          </label>
+          <label className="flex items-center gap-2 font-body cursor-pointer">
+            <input
+              type="radio"
+              name="insurance"
+              checked={insurance === 'private'}
+              onChange={() => setInsurance('private')}
+              className="w-4 h-4 accent-pine"
+            />
+            <span className="text-sm text-[#0F2E30]">{t.conSeguro}</span>
+          </label>
+        </div>
       </div>
 
-      {/* Results Table */}
+      {/* Disclaimer */}
+      <div className="flex items-start gap-3 p-4" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--flamboyan)' }} />
+        <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{t.disclaimer}</p>
+      </div>
+
+      {/* Table */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-slate-500">{t.noResults}</div>
+        <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-4 py-3 text-sm font-bold text-slate-700">{t.medicamento}</th>
-                  <th className="px-4 py-3 text-sm font-bold text-slate-700">{t.sinSeguro}</th>
-                  <th className="px-4 py-3 text-sm font-bold text-slate-700">{t.conSeguro}</th>
-                  <th className="px-4 py-3 text-sm font-bold text-slate-700 hidden sm:table-cell">{t.nota}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filtered.map((m, i) => (
-                  <tr key={i} className="hover:bg-slate-50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Pill className="w-4 h-4 text-teal-600 shrink-0" />
-                        <span className="font-medium text-slate-900">{m.nombre}</span>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left" style={{ borderRadius: '28px', overflow: 'hidden' }}>
+            <thead>
+              <tr style={{ backgroundColor: 'var(--pine)' }}>
+                <th className="table-header-rule">{t.medicamento}</th>
+                <th className="table-header-rule">{t.categoria}</th>
+                <th className="table-header-rule">{insurance === 'private' ? t.copago : t.precio}</th>
+                <th className="table-header-rule">{t.nota}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((m, i) => (
+                <tr
+                  key={i}
+                  style={{ backgroundColor: i % 2 === 0 ? 'var(--sand)' : 'var(--paper)' }}
+                >
+                  <td className="p-4">
+                    <div className="font-body font-semibold text-[#0F2E30]">{m.nombre}</div>
+                    {m.generico && <div className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>({m.generico})</div>}
+                  </td>
+                  <td className="p-4">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
+                      {CATEGORIES[lang][m.categoria]}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <span className="font-display text-lg font-medium text-[#0F2E30]">
+                      {insurance === 'private' ? m.copago || m.precio : m.precio}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    {m.nota && (
+                      <div className="flex items-start gap-1.5">
+                        <Info className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--muted-ink)' }} />
+                        <span className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{m.nota}</span>
                       </div>
-                      <span className="text-xs text-slate-500 ml-6">{CATEGORIAS[lang][m.categoria]}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-rose-700 font-semibold">{m.precioSinSeguro}</td>
-                    <td className="px-4 py-3 text-sm text-green-700 font-semibold">{m.precioConSeguro}</td>
-                    <td className="px-4 py-3 text-sm text-slate-500 hidden sm:table-cell">{m.nota}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-sm text-amber-800">{t.disclaimer}</p>
-      </div>
     </div>
   );
 }

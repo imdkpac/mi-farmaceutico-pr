@@ -8,10 +8,10 @@ import Costs from './guia-sections/Costs';
 import Checklist from './guia-sections/Checklist';
 
 const sections = [
-  { id: 'hospitals', icon: MapPin, label: { es: 'Hospitales', en: 'Hospitals' } },
-  { id: 'hogares', icon: Home, label: { es: 'Hogares', en: 'Nursing Homes' } },
-  { id: 'costos', icon: Calculator, label: { es: 'Costos', en: 'Costs' } },
-  { id: 'checklist', icon: ClipboardCheck, label: { es: 'Preparación', en: 'Preparation' } },
+  { id: 'hospitals', icon: MapPin, label: { es: 'Hospitales', en: 'Hospitals' }, component: Hospitals },
+  { id: 'hogares', icon: Home, label: { es: 'Hogares', en: 'Nursing Homes' }, component: NursingHomes },
+  { id: 'costos', icon: Calculator, label: { es: 'Costos', en: 'Costs' }, component: Costs },
+  { id: 'checklist', icon: ClipboardCheck, label: { es: 'Preparación', en: 'Preparation' }, component: Checklist },
 ];
 
 export default function GuiaPage() {

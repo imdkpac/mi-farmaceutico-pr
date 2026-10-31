@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Languages, Phone, Menu, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -12,10 +12,12 @@ const navItems = [
 
 function LogoMark({ className }) {
   return (
-    <svg viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      {/* Two pills forming the logo mark */}
-      <rect x="2" y="6" width="20" height="12" rx="6" fill="currentColor" />
-      <rect x="14" y="2" width="20" height="12" rx="6" fill="currentColor" fillOpacity="0.4" />
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      {/* Background circle */}
+      <circle cx="24" cy="24" r="22" fill="#0F2E30" />
+      {/* Two pills */}
+      <rect x="10" y="18" width="20" height="12" rx="6" fill="#F4EFE6" />
+      <rect x="22" y="14" width="20" height="12" rx="6" fill="#E2512F" fillOpacity="0.9" />
     </svg>
   );
 }
@@ -31,11 +33,11 @@ export default function Navbar() {
       className="sticky top-0 z-50 border-b-2"
       style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--sand)' }}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-3 shrink-0 group">
-            <LogoMark className="w-10 h-6 text-[#0F2E30]" />
+            <LogoMark className="w-11 h-11" />
             <span className="font-display text-xl sm:text-2xl font-semibold text-[#0F2E30] tracking-tight">
               Mi Farmacéutico<span style={{ color: 'var(--flamboyan)' }}> en PR</span>
             </span>

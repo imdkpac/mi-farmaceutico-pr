@@ -1,172 +1,212 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Pill, AlertTriangle, Clock, X, Stethoscope } from 'lucide-react';
+import { Search, Pill, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { MED_LOOKUP, CATEGORIAS_LOOKUP } from '../../data/medicationLookup';
+import { MEDICATION_LOOKUP, MED_CATEGORIES } from '../../data/medicationLookup';
 
 export default function MedicationLookup() {
   const { lang } = useLanguage();
   const [search, setSearch] = useState('');
-  const [categoriaFilter, setCategoriaFilter] = useState('');
-  const [selectedMed, setSelectedMed] = useState(null);
+  const [category, setCategory] = useState('');
+  const [selected, setSelected] = useState(null);
 
   const t = {
     es: {
-      title: '¿Para qué es este medicamento?',
-      subtitle: 'Buscador simple de medicamentos comunes. Información educativa — no sustituye a su farmacéutico.',
-      search: 'Escriba el nombre del medicamento...',
+      title: 'Mis Medicamentos',
+      subtitle: 'Busque información sobre sus medicamentos: para qué sirven, cómo tomarlos, y precauciones',
+      search: 'Buscar medicamento...',
       allCategories: 'Todas las categorías',
-      noResults: 'No encontrado. Pregunte a su farmacéutico.',
-      resultados: 'medicamentos',
+      noResults: 'No se encontraron medicamentos con esos filtros.',
       limpiar: 'Limpiar',
-      paraQue: '¿Para qué es?',
+      queEs: '¿Para qué sirve?',
       comoTomar: '¿Cómo tomarlo?',
-      advertencias: 'Advertencias importantes',
-      nombresComerciales: 'Nombres comerciales',
-      disclaimer: 'Esta información es educativa y no reemplaza la consulta con su médico o farmacéutico. Siempre verifique con un profesional de salud antes de hacer cambios en sus medicamentos.',
-      emergencias: 'Emergencias: 9-1-1 · Línea PAS: 1-888-672-7622',
+      advertencias: 'Advertencias',
+      marcas: 'Nombres comunes',
+      categoria: 'Categoría',
+      close: 'Cerrar',
     },
     en: {
-      title: 'What is this medication for?',
-      subtitle: 'Simple lookup for common medications. Educational info — does not replace your pharmacist.',
-      search: 'Type the medication name...',
+      title: 'My Medications',
+      subtitle: 'Search information about your medications: what they are for, how to take them, and precautions',
+      search: 'Search medication...',
       allCategories: 'All categories',
-      noResults: 'Not found. Ask your pharmacist.',
-      resultados: 'medications',
+      noResults: 'No medications found with those filters.',
       limpiar: 'Clear',
-      paraQue: 'What is it for?',
+      queEs: 'What is it for?',
       comoTomar: 'How to take it?',
-      advertencias: 'Important warnings',
-      nombresComerciales: 'Brand names',
-      disclaimer: 'This information is educational and does not replace consultation with your doctor or pharmacist. Always verify with a healthcare professional before making medication changes.',
-      emergencias: 'Emergencies: 9-1-1 · PAS Helpline: 1-888-672-7622',
+      advertencias: 'Warnings',
+      marcas: 'Common brand names',
+      categoria: 'Category',
+      close: 'Close',
     },
   }[lang];
 
-  const data = MED_LOOKUP[lang];
-
   const filtered = useMemo(() => {
-    return data.filter((m) => {
+    return MEDICATION_LOOKUP.filter((m) => {
       const matchesSearch = !search ||
         m.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        m.nombresComerciales.toLowerCase().includes(search.toLowerCase());
-      const matchesCat = !categoriaFilter || m.categoria === categoriaFilter;
-      return matchesSearch && matchesCat;
+        m.nombreEn?.toLowerCase().includes(search.toLowerCase()) ||
+        m.marcas?.some((marca) => marca.toLowerCase().includes(search.toLowerCase()));
+      const matchesCategory = !category || m.categoria === category;
+      return matchesSearch && matchesCategory;
     });
-  }, [search, categoriaFilter, data]);
+  }, [search, category]);
 
-  const categoriasList = Object.keys(CATEGORIAS_LOOKUP[lang]);
-  const hasActiveFilters = search || categoriaFilter;
+  const categoriesList = Object.keys(MED_CATEGORIES[lang]);
+  const hasActiveFilters = search || category;
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t.title}</h2>
-        <p className="text-slate-600">{t.subtitle}</p>
+        <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
+        <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
       </div>
 
-      {/* Search & Filters */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setSelectedMed(null); }}
-            placeholder={t.search}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base"
-          />
-        </div>
-
+      {/* Search */}
+      <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
         <div className="flex flex-wrap gap-3">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t.search}
+              className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
+            />
+          </div>
           <select
-            value={categoriaFilter}
-            onChange={(e) => { setCategoriaFilter(e.target.value); setSelectedMed(null); }}
-            className="px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-teal-500 focus:outline-none text-base bg-white"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="px-5 py-3 rounded-full font-body text-base focus:outline-none"
+            style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allCategories}</option>
-            {categoriasList.map((c) => (
-              <option key={c} value={c}>{CATEGORIAS_LOOKUP[lang][c]}</option>
+            {categoriesList.map((c) => (
+              <option key={c} value={c}>{MED_CATEGORIES[lang][c]}</option>
             ))}
           </select>
-
           {hasActiveFilters && (
             <button
-              onClick={() => { setSearch(''); setCategoriaFilter(''); setSelectedMed(null); }}
-              className="px-4 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 hover:bg-slate-50 font-medium flex items-center gap-1.5"
+              onClick={() => { setSearch(''); setCategory(''); }}
+              className="px-5 py-3 rounded-full font-body font-medium flex items-center gap-1.5 transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}
             >
               <X className="w-4 h-4" />
               {t.limpiar}
             </button>
           )}
         </div>
-
-        <p className="text-sm text-slate-500">
-          {filtered.length} {t.resultados}
-        </p>
       </div>
 
-      {/* Results Grid */}
+      {/* Results */}
       {filtered.length === 0 ? (
-        <div className="text-center py-12 text-slate-500">{t.noResults}</div>
+        <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((med, i) => (
+          {filtered.map((m, i) => (
             <button
               key={i}
-              onClick={() => setSelectedMed(selectedMed === i ? null : i)}
-              className={`text-left bg-white rounded-xl border-2 p-5 transition hover:border-teal-400 ${
-                selectedMed === i ? 'border-teal-500 ring-2 ring-teal-100' : 'border-slate-200'
-              }`}
+              onClick={() => setSelected(m)}
+              className="text-left p-6 transition hover:brightness-95"
+              style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}
             >
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Pill className="w-5 h-5 text-teal-700" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--pine)' }}>
+                  <Pill className="w-5 h-5 text-[#F4EFE6]" strokeWidth={2} />
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">{med.nombre}</h3>
-                  <span className="text-xs text-slate-500">{CATEGORIAS_LOOKUP[lang][med.categoria]}</span>
+                <div className="min-w-0">
+                  <h3 className="font-display text-lg font-medium text-[#0F2E30]">{m.nombre}</h3>
+                  {m.nombreEn && <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{m.nombreEn}</p>}
                 </div>
               </div>
-
-              {selectedMed === i && (
-                <div className="mt-4 space-y-4 border-t border-slate-100 pt-4">
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{t.paraQue}</p>
-                    <p className="text-sm text-slate-700">{med.paraQue}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {t.comoTomar}
-                    </p>
-                    <p className="text-sm text-slate-700">{med.comoTomar}</p>
-                  </div>
-                  <div className="bg-amber-50 rounded-lg p-3">
-                    <p className="text-xs font-bold text-amber-700 uppercase tracking-wide mb-1 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      {t.advertencias}
-                    </p>
-                    <p className="text-sm text-amber-800">{med.advertencias}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{t.nombresComerciales}</p>
-                    <p className="text-sm text-slate-600 italic">{med.nombresComerciales}</p>
-                  </div>
-                </div>
-              )}
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
+                {MED_CATEGORIES[lang][m.categoria]}
+              </span>
+              <p className="font-body text-sm mt-3 line-clamp-2" style={{ color: 'var(--muted-ink)' }}>{m.queEs}</p>
             </button>
           ))}
         </div>
       )}
 
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-        <Stethoscope className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-        <p className="text-sm text-red-800">{t.disclaimer}</p>
-      </div>
+      {/* Detail Modal */}
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(15,46,48,0.7)' }} onClick={() => setSelected(null)}>
+          <div
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8"
+            style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="font-display text-2xl font-medium text-[#0F2E30]">{selected.nombre}</h3>
+                {selected.nombreEn && <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.nombreEn}</p>}
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="p-2 rounded-full transition hover:bg-[#E2D6BF]"
+              >
+                <X className="w-6 h-6" style={{ color: 'var(--muted-ink)' }} />
+              </button>
+            </div>
 
-      <p className="text-center text-sm text-slate-500">
-        {t.emergencias}
-      </p>
+            <span className="inline-block px-4 py-1.5 rounded-full font-body font-bold text-sm mb-6" style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}>
+              {MED_CATEGORIES[lang][selected.categoria]}
+            </span>
+
+            {selected.queEs && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info className="w-5 h-5" style={{ color: 'var(--sage)' }} />
+                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.queEs}</h4>
+                </div>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.queEs}</p>
+              </div>
+            )}
+
+            {selected.comoTomar && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <CheckCircle className="w-5 h-5" style={{ color: 'var(--sage)' }} />
+                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.comoTomar}</h4>
+                </div>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.comoTomar}</p>
+              </div>
+            )}
+
+            {selected.advertencias && (
+              <div className="mb-6 p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-5 h-5" style={{ color: 'var(--flamboyan)' }} />
+                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.advertencias}</h4>
+                </div>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.advertencias}</p>
+              </div>
+            )}
+
+            {selected.marcas && selected.marcas.length > 0 && (
+              <div>
+                <p className="font-body text-sm font-semibold text-[#0F2E30] mb-2">{t.marcas}:</p>
+                <div className="flex flex-wrap gap-2">
+                  {selected.marcas.map((marca, i) => (
+                    <span key={i} className="px-3 py-1 rounded-full font-body text-sm" style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}>
+                      {marca}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setSelected(null)}
+              className="btn-capsule w-full mt-8"
+              style={{ backgroundColor: 'var(--pine)', color: 'var(--paper)' }}
+            >
+              {t.close}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
