@@ -168,7 +168,7 @@
   }
 }
 
-/* ---------- Impresión: lista de medicamentos (conservado) ---------- */
+/* ---------- Impresión: lista de medicamentos ---------- */
 @media print {
   @page {
     margin: 1.8cm;

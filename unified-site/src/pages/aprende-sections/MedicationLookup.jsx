@@ -1,42 +1,64 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Pill, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
+import { Search, X, ExternalLink, BookOpen, Pill, AlertTriangle, Tag, Globe } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { MEDICATION_LOOKUP, MED_CATEGORIES } from '../../data/medicationLookup';
+
+function ResourceButton({ href, label, icon, color }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2.5 px-5 py-3 rounded-full font-body font-bold text-sm transition hover:brightness-95"
+      style={{ backgroundColor: color, color: 'white' }}
+    >
+      {icon}
+      <span>{label}</span>
+      <ExternalLink className="w-4 h-4 opacity-70" />
+    </a>
+  );
+}
 
 export default function MedicationLookup() {
   const { lang } = useLanguage();
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
-  const [selected, setSelected] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedMed, setSelectedMed] = useState(null);
 
   const t = {
     es: {
-      title: 'Mis Medicamentos',
-      subtitle: 'Busque información sobre sus medicamentos: para qué sirven, cómo tomarlos, y precauciones',
+      title: 'Buscador de Medicamentos',
+      subtitle: 'Encuentre información sobre sus medicamentos y cómo tomarlos correctamente',
       search: 'Buscar medicamento...',
       allCategories: 'Todas las categorías',
-      noResults: 'No se encontraron medicamentos con esos filtros.',
-      limpiar: 'Limpiar',
-      queEs: '¿Para qué sirve?',
+      queEs: '¿Qué es?',
       comoTomar: '¿Cómo tomarlo?',
-      advertencias: 'Advertencias',
-      marcas: 'Nombres comunes',
-      categoria: 'Categoría',
+      advertencias: '⚠️ Advertencias importantes',
+      marcas: 'Nombres comerciales',
+      aprendaMas: 'Aprenda más',
+      dailymed: 'DailyMed (FDA)',
+      medlineplus: 'MedlinePlus (NIH)',
+      drugscom: 'Drugs.com',
       close: 'Cerrar',
+      noResults: 'No se encontraron medicamentos.',
+      resultados: 'medicamentos',
     },
     en: {
-      title: 'My Medications',
-      subtitle: 'Search information about your medications: what they are for, how to take them, and precautions',
+      title: 'Medication Lookup',
+      subtitle: 'Find information about your medications and how to take them correctly',
       search: 'Search medication...',
       allCategories: 'All categories',
-      noResults: 'No medications found with those filters.',
-      limpiar: 'Clear',
-      queEs: 'What is it for?',
+      queEs: 'What is it?',
       comoTomar: 'How to take it?',
-      advertencias: 'Warnings',
-      marcas: 'Common brand names',
-      categoria: 'Category',
+      advertencias: '⚠️ Important warnings',
+      marcas: 'Brand names',
+      aprendaMas: 'Learn more',
+      dailymed: 'DailyMed (FDA)',
+      medlineplus: 'MedlinePlus (NIH)',
+      drugscom: 'Drugs.com',
       close: 'Close',
+      noResults: 'No medications found.',
+      resultados: 'medications',
     },
   }[lang];
 
@@ -44,15 +66,13 @@ export default function MedicationLookup() {
     return MEDICATION_LOOKUP.filter((m) => {
       const matchesSearch = !search ||
         m.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        m.nombreEn?.toLowerCase().includes(search.toLowerCase()) ||
-        m.marcas?.some((marca) => marca.toLowerCase().includes(search.toLowerCase()));
-      const matchesCategory = !category || m.categoria === category;
+        m.nombreEn.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = !selectedCategory || m.categoria === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [search, category]);
+  }, [search, selectedCategory]);
 
-  const categoriesList = Object.keys(MED_CATEGORIES[lang]);
-  const hasActiveFilters = search || category;
+  const categories = Object.keys(MED_CATEGORIES[lang]);
 
   return (
     <div className="space-y-6">
@@ -63,143 +83,156 @@ export default function MedicationLookup() {
 
       {/* Search */}
       <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
-        <div className="flex flex-wrap gap-3">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t.search}
-              className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
-              style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
-            />
-          </div>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="px-5 py-3 rounded-full font-body text-base focus:outline-none"
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t.search}
+            className="w-full pl-11 pr-4 py-3 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
-          >
-            <option value="">{t.allCategories}</option>
-            {categoriesList.map((c) => (
-              <option key={c} value={c}>{MED_CATEGORIES[lang][c]}</option>
-            ))}
-          </select>
-          {hasActiveFilters && (
-            <button
-              onClick={() => { setSearch(''); setCategory(''); }}
-              className="px-5 py-3 rounded-full font-body font-medium flex items-center gap-1.5 transition hover:brightness-95"
-              style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}
-            >
-              <X className="w-4 h-4" />
-              {t.limpiar}
-            </button>
-          )}
+          />
         </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedCategory('')}
+            className="px-5 py-2.5 rounded-full font-body text-base transition"
+            style={selectedCategory === '' ? { backgroundColor: 'var(--pine)', color: 'var(--paper)' } : { backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
+          >
+            {t.allCategories}
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className="px-5 py-2.5 rounded-full font-body text-base transition"
+              style={selectedCategory === cat ? { backgroundColor: 'var(--pine)', color: 'var(--paper)' } : { backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
+            >
+              {MED_CATEGORIES[lang][cat]}
+            </button>
+          ))}
+        </div>
+        <p className="font-body text-sm mt-4" style={{ color: 'var(--muted-ink)' }}>
+          {filtered.length} {t.resultados}
+        </p>
       </div>
 
       {/* Results */}
       {filtered.length === 0 ? (
         <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid gap-3">
           {filtered.map((m, i) => (
             <button
               key={i}
-              onClick={() => setSelected(m)}
-              className="text-left p-6 transition hover:brightness-95"
+              onClick={() => setSelectedMed(m)}
+              className="w-full text-left p-5 transition hover:brightness-95 flex items-start gap-4"
               style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}
             >
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--pine)' }}>
-                  <Pill className="w-5 h-5 text-[#F4EFE6]" strokeWidth={2} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-display text-lg font-medium text-[#0F2E30]">{m.nombre}</h3>
-                  {m.nombreEn && <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{m.nombreEn}</p>}
-                </div>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--pine)' }}>
+                <Pill className="w-6 h-6 text-[#F4EFE6]" strokeWidth={2} />
               </div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
-                {MED_CATEGORIES[lang][m.categoria]}
-              </span>
-              <p className="font-body text-sm mt-3 line-clamp-2" style={{ color: 'var(--muted-ink)' }}>{m.queEs}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display text-lg font-medium text-[#0F2E30]">{m.nombre}</h3>
+                <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{m.nombreEn}</p>
+                <span className="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
+                  {MED_CATEGORIES[lang][m.categoria]}
+                </span>
+              </div>
             </button>
           ))}
         </div>
       )}
 
-      {/* Detail Modal */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(15,46,48,0.7)' }} onClick={() => setSelected(null)}>
-          <div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8"
-            style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
+      {/* Modal */}
+      {selectedMed && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(15, 46, 48, 0.6)' }} onClick={() => setSelectedMed(null)}>
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="font-display text-2xl font-medium text-[#0F2E30]">{selected.nombre}</h3>
-                {selected.nombreEn && <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.nombreEn}</p>}
+                <h3 className="font-display text-2xl font-medium text-[#0F2E30]">{selectedMed.nombre}</h3>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selectedMed.nombreEn}</p>
+                <span className="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}>
+                  {MED_CATEGORIES[lang][selectedMed.categoria]}
+                </span>
               </div>
-              <button
-                onClick={() => setSelected(null)}
-                className="p-2 rounded-full transition hover:bg-[#E2D6BF]"
-              >
-                <X className="w-6 h-6" style={{ color: 'var(--muted-ink)' }} />
+              <button onClick={() => setSelectedMed(null)} className="p-2 rounded-full hover:brightness-95" style={{ backgroundColor: 'var(--sand)' }}>
+                <X className="w-5 h-5" style={{ color: 'var(--pine)' }} />
               </button>
             </div>
 
-            <span className="inline-block px-4 py-1.5 rounded-full font-body font-bold text-sm mb-6" style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}>
-              {MED_CATEGORIES[lang][selected.categoria]}
-            </span>
-
-            {selected.queEs && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Info className="w-5 h-5" style={{ color: 'var(--sage)' }} />
-                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.queEs}</h4>
-                </div>
-                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.queEs}</p>
+            <div className="space-y-5">
+              <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+                <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-2 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" style={{ color: 'var(--pine)' }} />
+                  {t.queEs}
+                </h4>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selectedMed.queEs}</p>
               </div>
-            )}
 
-            {selected.comoTomar && (
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5" style={{ color: 'var(--sage)' }} />
-                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.comoTomar}</h4>
-                </div>
-                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.comoTomar}</p>
+              <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+                <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-2 flex items-center gap-2">
+                  <Pill className="w-5 h-5" style={{ color: 'var(--pine)' }} />
+                  {t.comoTomar}
+                </h4>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selectedMed.comoTomar}</p>
               </div>
-            )}
 
-            {selected.advertencias && (
-              <div className="mb-6 p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
-                <div className="flex items-center gap-2 mb-2">
+              <div className="p-5" style={{ backgroundColor: '#FCEAE7', borderRadius: '28px', border: '2px solid var(--flamboyan)' }}>
+                <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-2 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5" style={{ color: 'var(--flamboyan)' }} />
-                  <h4 className="font-display text-lg font-medium text-[#0F2E30]">{t.advertencias}</h4>
-                </div>
-                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selected.advertencias}</p>
+                  {t.advertencias}
+                </h4>
+                <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{selectedMed.advertencias}</p>
               </div>
-            )}
 
-            {selected.marcas && selected.marcas.length > 0 && (
-              <div>
-                <p className="font-body text-sm font-semibold text-[#0F2E30] mb-2">{t.marcas}:</p>
+              <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+                <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-2 flex items-center gap-2">
+                  <Tag className="w-5 h-5" style={{ color: 'var(--pine)' }} />
+                  {t.marcas}
+                </h4>
                 <div className="flex flex-wrap gap-2">
-                  {selected.marcas.map((marca, i) => (
-                    <span key={i} className="px-3 py-1 rounded-full font-body text-sm" style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}>
+                  {selectedMed.marcas.map((marca, i) => (
+                    <span key={i} className="px-3 py-1.5 rounded-full font-body text-sm" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
                       {marca}
                     </span>
                   ))}
                 </div>
               </div>
-            )}
+
+              {/* Resources Section */}
+              <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
+                <h4 className="font-display text-lg font-medium text-[#0F2E30] mb-3 flex items-center gap-2">
+                  <Globe className="w-5 h-5" style={{ color: 'var(--pine)' }} />
+                  {t.aprendaMas}
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  <ResourceButton
+                    href={selectedMed.recursos.dailymed}
+                    label={t.dailymed}
+                    icon={<BookOpen className="w-4 h-4" />}
+                    color="#0F2E30"
+                  />
+                  <ResourceButton
+                    href={selectedMed.recursos.medlineplus}
+                    label={t.medlineplus}
+                    icon={<BookOpen className="w-4 h-4" />}
+                    color="#20558A"
+                  />
+                  <ResourceButton
+                    href={selectedMed.recursos.drugscom}
+                    label={t.drugscom}
+                    icon={<ExternalLink className="w-4 h-4" />}
+                    color="#7BBF8E"
+                  />
+                </div>
+              </div>
+            </div>
 
             <button
-              onClick={() => setSelected(null)}
-              className="btn-capsule w-full mt-8"
+              onClick={() => setSelectedMed(null)}
+              className="w-full mt-6 py-3 rounded-full font-body font-bold text-base transition hover:brightness-95"
               style={{ backgroundColor: 'var(--pine)', color: 'var(--paper)' }}
             >
               {t.close}

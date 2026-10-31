@@ -58,8 +58,10 @@ const T = {
     removed: 'Medicamento eliminado',
     moveTo: 'Mover a',
     shapeColor: 'Forma y Color',
-    medName: 'Medicamento y dosis',
-    medNamePlaceholder: 'Ej: Metformina 500mg',
+    medName: 'Medicamento',
+    medNamePlaceholder: 'Ej: Metformina',
+    dose: 'Dosis',
+    dosePlaceholder: 'Ej: 500mg',
     purpose: 'Para qué',
     purposePlaceholder: 'Ej: Para la azúcar',
     instructions: 'Instrucciones',
@@ -115,8 +117,10 @@ const T = {
     removed: 'Medicine removed',
     moveTo: 'Move to',
     shapeColor: 'Shape & Color',
-    medName: 'Medicine name & dose',
-    medNamePlaceholder: 'e.g., Metformin 500mg',
+    medName: 'Medicine name',
+    medNamePlaceholder: 'e.g., Metformin',
+    dose: 'Dose',
+    dosePlaceholder: 'e.g., 500mg',
     purpose: 'What it\'s for',
     purposePlaceholder: 'e.g., For blood sugar',
     instructions: 'Instructions',
@@ -431,7 +435,7 @@ export default function BuilderMedicamentos() {
                 </div>
               </div>
 
-              {/* Name & Dose */}
+              {/* Name */}
               <div>
                 <label className="block font-body text-xs font-bold mb-1 text-[#0F2E30]">{t.medName}</label>
                 <input
@@ -439,6 +443,20 @@ export default function BuilderMedicamentos() {
                   value={med.name}
                   onChange={(e) => updateMed(section.id, index, 'name', e.target.value)}
                   placeholder={t.medNamePlaceholder}
+                  autoComplete="off"
+                  className="w-full px-3 py-2 rounded-lg font-body text-base border-2 focus:outline-none focus:border-[#E2512F]"
+                  style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--paper)', color: 'var(--pine)', minHeight: '48px' }}
+                />
+              </div>
+
+              {/* Dose */}
+              <div>
+                <label className="block font-body text-xs font-bold mb-1 text-[#0F2E30]">{t.dose}</label>
+                <input
+                  type="text"
+                  value={med.dose}
+                  onChange={(e) => updateMed(section.id, index, 'dose', e.target.value)}
+                  placeholder={t.dosePlaceholder}
                   autoComplete="off"
                   className="w-full px-3 py-2 rounded-lg font-body text-base border-2 focus:outline-none focus:border-[#E2512F]"
                   style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--paper)', color: 'var(--pine)', minHeight: '48px' }}
@@ -686,6 +704,7 @@ export default function BuilderMedicamentos() {
                   <tr>
                     <th>{t.shapeColor}</th>
                     <th>{t.medName}</th>
+                    <th>{t.dose}</th>
                     <th>{t.purpose}</th>
                     <th>{t.instructions}</th>
                   </tr>
@@ -694,7 +713,8 @@ export default function BuilderMedicamentos() {
                   {sectionMeds.map((m, i) => (
                     <tr key={i}>
                       <td>{[m.shape && PILL_SHAPES.find((s) => s.id === m.shape)?.[lang === 'es' ? 'es' : 'en'], m.color && PILL_COLORS.find((c) => c.id === m.color)?.[lang === 'es' ? 'es' : 'en']].filter(Boolean).join(', ') || '—'}</td>
-                      <td><strong>{m.name}</strong>{m.dose ? ` ${m.dose}` : ''}</td>
+                      <td><strong>{m.name}</strong></td>
+                      <td>{m.dose || '—'}</td>
                       <td>{m.purpose || '—'}</td>
                       <td>{m.instructions || '—'}</td>
                     </tr>
