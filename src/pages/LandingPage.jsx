@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Phone, Mail, Shield, CheckCircle, Clipboard,
-  Award, Globe, AlertCircle, ChevronDown,
+  Award, Globe, AlertCircle, ChevronDown, ChevronRight,
   Star, Clock, MapPin, Heart, Moon, Sun
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';

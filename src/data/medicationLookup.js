@@ -403,3 +403,13 @@ export const CATEGORIAS_LOOKUP = {
     depresion: 'Depression',
   },
 };
+
+// Adaptadores para MedicationLookup.jsx (la vista mezcla ES base con nombre EN)
+export const MEDICATION_LOOKUP = MED_LOOKUP.es.map((item, i) => ({
+  ...item,
+  nombreEn: (MED_LOOKUP.en[i] && MED_LOOKUP.en[i].nombre) || '',
+  marcas: item.nombresComerciales,
+  queEs: item.paraQue,
+}))
+
+export const MED_CATEGORIES = CATEGORIAS_LOOKUP

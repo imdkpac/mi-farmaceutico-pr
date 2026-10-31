@@ -57,3 +57,17 @@ export const COLORES_COSTO = {
   media: 'bg-amber-100 text-amber-700',
   alta: 'bg-rose-100 text-rose-700',
 };
+
+/**
+ * Adaptadores con la nomenclatura que espera la sección NursingHomes.
+ * La ciudad se deriva de la dirección existente (no se añade información nueva).
+ */
+export const NURSING_HOMES = HOGARES.map((h) => ({
+  ...h,
+  ciudad: (h.direccion.split(',').slice(-2)[0] ?? '').trim(),
+}))
+
+export const NH_FILTERS = {
+  es: { costos: COSTOS.es, tipos: TIPOS_HOGAR.es },
+  en: { costos: COSTOS.en, tipos: TIPOS_HOGAR.en },
+};

@@ -4,7 +4,7 @@
  * Siempre verifique precios actuales en la farmacia.
  */
 
-export const MEDICATION_COSTS = [
+const MEDICATION_COSTS_BASE = [
   { nombre: 'Metformina 500mg', categoria: 'diabetes', precioSinSeguro: '$15–$35/mes', precioConSeguro: '$0–$10/mes', nota: 'Generico disponible' },
   { nombre: 'Metformina 1000mg', categoria: 'diabetes', precioSinSeguro: '$20–$45/mes', precioConSeguro: '$0–$10/mes', nota: 'Generico disponible' },
   { nombre: 'Glipizida 5mg', categoria: 'diabetes', precioSinSeguro: '$10–$25/mes', precioConSeguro: '$0–$5/mes', nota: 'Generico disponible' },
@@ -62,3 +62,14 @@ export const CATEGORIAS = {
     depresion: 'Depression',
   },
 };
+
+// Normalización para Costs.jsx (campos que espera el componente)
+export const MEDICATION_COSTS = MEDICATION_COSTS_BASE.map((m) => ({
+  ...m,
+  precio: m.precioSinSeguro,
+  copago: m.precioConSeguro,
+  generico: /generico/i.test(m.nota),
+}))
+
+// Alias con la nomenclatura del componente
+export const CATEGORIES = CATEGORIAS
