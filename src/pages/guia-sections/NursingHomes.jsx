@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Phone, MapPin, Home, Star, AlertTriangle, X, Calendar, MessageSquare } from 'lucide-react';
+import { Search, Phone, MapPin, Home, Star, AlertTriangle, X, Calendar, MessageSquare, Info, CheckCircle2, Accessibility } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { NURSING_HOMES, NH_FILTERS, NH_META } from '../../data/nursingHomes';
 
@@ -45,7 +45,7 @@ export default function NursingHomes() {
 
   const t = {
     es: {
-      title: 'Hogares de Ancianos',
+      title: 'Hogares de Ancianos en Puerto Rico',
       subtitle: 'Encuentre hogares de cuidado con calificaciones, inspecciones y opciones de financiamiento',
       search: 'Buscar hogar...',
       allTypes: 'Todos los tipos',
@@ -60,9 +60,10 @@ export default function NursingHomes() {
       noResults: 'No se encontraron hogares con esos filtros.',
       resultados: 'hogares encontrados',
       limpiar: 'Limpiar',
+      queEs: '¿Qué es esto?',
     },
     en: {
-      title: 'Nursing Homes',
+      title: 'Nursing Homes in Puerto Rico',
       subtitle: 'Find care homes with ratings, inspections, and financing options',
       search: 'Search home...',
       allTypes: 'All types',
@@ -77,6 +78,7 @@ export default function NursingHomes() {
       noResults: 'No homes found with those filters.',
       resultados: 'homes found',
       limpiar: 'Clear',
+      queEs: 'What is this?',
     },
   }[lang];
 
@@ -100,6 +102,22 @@ export default function NursingHomes() {
       <div>
         <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
         <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
+      </div>
+
+      {/* Explanation Banner: Short vs Long Term */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="p-4" style={{ backgroundColor: '#E8F4FD', borderRadius: '28px', border: '2px solid #6BA3D6' }}>
+          <p className="font-body text-sm" style={{ color: '#20558A' }}>
+            <Info className="w-4 h-4 inline mr-1" />
+            <strong>{meta.cortoExplicacion}</strong>
+          </p>
+        </div>
+        <div className="p-4" style={{ backgroundColor: '#F0F7ED', borderRadius: '28px', border: '2px solid #7BBF8E' }}>
+          <p className="font-body text-sm" style={{ color: '#2D5A3D' }}>
+            <Info className="w-4 h-4 inline mr-1" />
+            <strong>{meta.largoExplicacion}</strong>
+          </p>
+        </div>
       </div>
 
       {/* Disclaimer */}
@@ -199,6 +217,9 @@ export default function NursingHomes() {
                   </div>
                 </div>
 
+                {/* Description */}
+                <p className="font-body text-sm mb-3" style={{ color: 'var(--muted-ink)' }}>{h.descripcion}</p>
+
                 {/* Rating row */}
                 <div className="flex items-center justify-between mb-3">
                   <StarRating rating={h.rating} />
@@ -218,6 +239,18 @@ export default function NursingHomes() {
                   </span>
                 </div>
 
+                {/* Services preview (first 2) */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {h.servicios.slice(0, 3).map((s, si) => (
+                    <span key={si} className="text-xs px-2 py-0.5 rounded-full font-body flex items-center gap-1" style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}>
+                      <CheckCircle2 className="w-3 h-3" style={{ color: '#7BBF8E' }} /> {s}
+                    </span>
+                  ))}
+                  {h.servicios.length > 3 && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-body" style={{ backgroundColor: 'var(--paper)', color: 'var(--muted-ink)' }}>+{h.servicios.length - 3}</span>
+                  )}
+                </div>
+
                 {/* Inspection & Complaints preview */}
                 <div className="flex items-center gap-4 text-xs font-body" style={{ color: 'var(--muted-ink)' }}>
                   <span className="flex items-center gap-1">
@@ -231,7 +264,8 @@ export default function NursingHomes() {
 
               {expanded === i && (
                 <div className="px-5 sm:px-6 pb-6 pt-0">
-                  <div className="pt-4 space-y-3 border-t-2" style={{ borderColor: 'var(--paper)' }}>
+                  <div className="pt-4 space-y-4 border-t-2" style={{ borderColor: 'var(--paper)' }}>
+                    {/* Address */}
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
                       <div>
@@ -239,6 +273,8 @@ export default function NursingHomes() {
                         <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{h.direccion}</p>
                       </div>
                     </div>
+
+                    {/* Phone */}
                     <div className="flex items-start gap-3">
                       <Phone className="w-5 h-5 mt-0.5 shrink-0" style={{ color: 'var(--muted-ink)' }} />
                       <div>
@@ -246,12 +282,44 @@ export default function NursingHomes() {
                         <a href={`tel:${h.telefono.replace(/\D/g, '')}`} className="font-body text-sm font-medium hover:underline" style={{ color: 'var(--pine)' }}>{h.telefono}</a>
                       </div>
                     </div>
+
+                    {/* Cost & Financing */}
                     <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
                       <span className="font-semibold text-[#0F2E30]">{t.costoLabel}:</span> {NH_FILTERS[lang].costos[h.costo]}
                     </p>
                     <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
                       <span className="font-semibold text-[#0F2E30]">{t.financiamiento}:</span> {h.financiamiento.join(', ')}
                     </p>
+
+                    {/* All Services */}
+                    <div>
+                      <p className="font-body text-sm font-semibold text-[#0F2E30] mb-2 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" style={{ color: '#7BBF8E' }} /> {meta.servicios}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {h.servicios.map((s, si) => (
+                          <span key={si} className="text-xs px-3 py-1 rounded-full font-body" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Accessibility */}
+                    <div>
+                      <p className="font-body text-sm font-semibold text-[#0F2E30] mb-2 flex items-center gap-1">
+                        <Accessibility className="w-4 h-4" style={{ color: '#6BA3D6' }} /> {meta.accesibilidad}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {h.accesibilidad.map((a, ai) => (
+                          <span key={ai} className="text-xs px-3 py-1 rounded-full font-body" style={{ backgroundColor: '#E8F4FD', color: '#20558A' }}>
+                            {a}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Inspection & Complaints */}
                     <div className="flex items-center gap-4 text-sm">
                       <span className="flex items-center gap-1 font-body" style={{ color: 'var(--muted-ink)' }}>
                         <Calendar className="w-4 h-4" /> {meta.inspeccionLabel}: {h.inspeccion}
@@ -260,6 +328,8 @@ export default function NursingHomes() {
                         <MessageSquare className="w-4 h-4" /> {meta.quejasLabel}: {h.quejas}
                       </span>
                     </div>
+
+                    {/* Map Link */}
                     <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.nombre + ' Puerto Rico')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-body text-sm font-semibold hover:underline" style={{ color: 'var(--pine)' }}>
                       <MapPin className="w-4 h-4" />{t.verMapa}
                     </a>

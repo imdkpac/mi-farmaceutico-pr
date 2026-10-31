@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Phone, MapPin, Heart, AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { HOSPITALES, HOSPITALES_CERRADOS, EMERGENCIAS, REGIONES, TIPOS, ESPECIALIDADES } from '../../data/hospitals';
+import { HOSPITALES, EMERGENCIAS, REGIONES, TIPOS, ESPECIALIDADES } from '../../data/hospitals';
 
 export default function Hospitals() {
   const { lang } = useLanguage();
@@ -33,9 +33,6 @@ export default function Hospitals() {
       limpiar: 'Limpiar',
       emergenciasTitle: '¿Es una emergencia?',
       emergenciasBtn: 'Ver señales de emergencia',
-      cerradosTitle: 'Hospitales cerrados recientemente',
-      cerradoNota: 'CERRADO —',
-      alternativa: 'Alternativa',
       hospCount: (n) => `${n} hospital${n !== 1 ? 'es' : ''}`,
     },
     en: {
@@ -57,9 +54,6 @@ export default function Hospitals() {
       limpiar: 'Clear',
       emergenciasTitle: 'Is this an emergency?',
       emergenciasBtn: 'See emergency warning signs',
-      cerradosTitle: 'Recently closed hospitals',
-      cerradoNota: 'CLOSED —',
-      alternativa: 'Alternative',
       hospCount: (n) => `${n} hospital${n !== 1 ? 's' : ''}`,
     },
   }[lang];
@@ -116,22 +110,6 @@ export default function Hospitals() {
         <h2 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.title}</h2>
         <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.subtitle}</p>
       </div>
-
-      {/* Closed hospitals notice */}
-      {HOSPITALES_CERRADOS.length > 0 && (
-        <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px', border: '2px solid var(--flamboyan)' }}>
-          <h3 className="font-display text-lg font-medium text-[#0F2E30] mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" style={{ color: 'var(--flamboyan)' }} />
-            {t.cerradosTitle}
-          </h3>
-          {HOSPITALES_CERRADOS.map((h, i) => (
-            <p key={i} className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>
-              <span className="font-bold" style={{ color: 'var(--flamboyan)' }}>{t.cerradoNota} {h.nombre} ({h.cerrado})</span>
-              <br />{h.nota}
-            </p>
-          ))}
-        </div>
-      )}
 
       {/* Emergency toggle */}
       <button
