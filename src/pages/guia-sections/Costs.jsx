@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, DollarSign, AlertCircle, Info, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { MEDICATION_COSTS, CATEGORIES } from '../../data/medicationCosts';
+import { MEDICATION_COSTS, CATEGORIAS as CATEGORIES } from '../../data/medicationCosts';
 
 export default function Costs() {
   const { lang } = useLanguage();

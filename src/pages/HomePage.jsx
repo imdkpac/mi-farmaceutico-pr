@@ -90,6 +90,14 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto">
           {/* Small tagline */}
           <div className="text-center mb-8">
+            <img
+              src="/logo.png"
+              alt=""
+              className="mx-auto mb-4"
+              width={72}
+              height={72}
+              style={{ borderRadius: '50%', objectFit: 'cover' }}
+            />
             <span
               className="inline-block px-5 py-2 rounded-full font-body font-semibold text-sm mb-4"
               style={{ backgroundColor: 'var(--deep-pine)', color: 'var(--sage)' }}
@@ -120,60 +128,53 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* Builder CTA */}
+          {/* Giant Builder CTA */}
           <div
-            className="p-6 sm:p-8"
+            className="p-6 sm:p-10"
             style={{ backgroundColor: 'var(--deep-pine)', borderRadius: '28px' }}
           >
-            <div className="text-center mb-6">
+            <div className="text-center">
+              {/* Trust badge */}
               <span
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-3"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full font-body font-bold text-sm mb-6"
                 style={{ backgroundColor: 'var(--pine)', color: 'var(--sage)' }}
               >
                 <Pill className="w-4 h-4" strokeWidth={2.5} />
                 {t.builder.badge}
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl font-medium text-[#F4EFE6] mb-4">
-                {t.builder.title}
-              </h2>
-              <p className="font-body text-base max-w-lg mx-auto mb-6" style={{ color: 'var(--sage)' }}>
-                {lang === 'es'
-                  ? 'Agregue sus medicamentos, alergias y horarios. Guarde como PDF o imprima. Todo se queda en su dispositivo.'
-                  : 'Add your medications, allergies, and schedules. Save as PDF or print. Everything stays on your device.'}
-              </p>
 
-              {/* Preview */}
-              <div className="max-w-xs mx-auto mb-6 p-4" style={{ backgroundColor: 'var(--white)', borderRadius: '16px' }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: 'var(--flamboyan)' }} />
-                  <span className="font-display text-sm font-semibold" style={{ color: 'var(--pine)' }}>
-                    {lang === 'es' ? 'Mi Lista de Medicamentos' : 'My Medication List'}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
-                    <span className="w-5 h-2.5 rounded-full border" style={{ backgroundColor: '#F5D547' }} />
-                    Metformina 500 mg — {lang === 'es' ? 'Mañana' : 'Morning'}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
-                    <span className="w-5 h-2.5 rounded border" style={{ backgroundColor: '#6BA3D6' }} />
-                    Lisinopril 10 mg — {lang === 'es' ? 'Mañana' : 'Morning'}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm" style={{ color: '#333' }}>
-                    <span className="w-5 h-2.5 rounded-full border" style={{ backgroundColor: '#fff' }} />
-                    Atorvastatina 20 mg — {lang === 'es' ? 'Noche' : 'Bedtime'}
-                  </div>
-                </div>
-              </div>
-
+              {/* Giant touch button */}
               <a
                 href="/builder.html"
-                className="inline-flex items-center justify-center gap-2 font-body font-bold text-lg px-8 py-4 rounded-full transition hover:brightness-95"
-                style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)', minHeight: '56px' }}
+                className="group relative block w-full max-w-lg mx-auto text-center font-body font-bold rounded-3xl transition-all duration-200 hover:brightness-105 active:scale-[0.98]"
+                style={{
+                  backgroundColor: 'var(--flamboyan)',
+                  color: 'var(--paper)',
+                  padding: '32px 24px',
+                  fontSize: 'clamp(22px, 4vw, 30px)',
+                  lineHeight: 1.2,
+                  boxShadow: '0 8px 0 rgba(0,0,0,0.25), 0 12px 32px rgba(226,81,47,0.35)',
+                  textDecoration: 'none',
+                }}
               >
-                {lang === 'es' ? 'Crear Mi Lista' : 'Build My List'}
-                <ChevronRight className="w-5 h-5" />
+                <span className="block mb-2" role="img" aria-hidden="true" style={{ fontSize: '40px' }}>👆</span>
+                <span className="block">
+                  {lang === 'es' ? 'Toque aquí para empezar' : 'Tap here to start'}
+                </span>
+                <span className="block mt-2 font-body font-medium" style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', opacity: 0.9 }}>
+                  {lang === 'es'
+                    ? 'Cree su lista de medicamentos paso a paso'
+                    : 'Build your medication list step by step'}
+                </span>
+                {/* Pulse ring */}
+                <span className="absolute inset-0 rounded-3xl animate-ping opacity-20" style={{ backgroundColor: 'var(--flamboyan)' }} />
               </a>
+
+              <p className="font-body text-base mt-6" style={{ color: 'var(--sage)' }}>
+                {lang === 'es'
+                  ? 'Gratis, privada y lista para imprimir. Todo se queda en su dispositivo.'
+                  : 'Free, private, and ready to print. Everything stays on your device.'}
+              </p>
             </div>
           </div>
         </div>

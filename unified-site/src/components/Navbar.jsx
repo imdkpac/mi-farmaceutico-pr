@@ -12,13 +12,14 @@ const navItems = [
 
 function LogoMark({ className }) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      {/* Background circle */}
-      <circle cx="24" cy="24" r="22" fill="#0F2E30" />
-      {/* Two pills */}
-      <rect x="10" y="18" width="20" height="12" rx="6" fill="#F4EFE6" />
-      <rect x="22" y="14" width="20" height="12" rx="6" fill="#E2512F" fillOpacity="0.9" />
-    </svg>
+    <img
+      src="/logo.png"
+      alt=""
+      className={className}
+      style={{ objectFit: 'cover', borderRadius: '50%' }}
+      width={44}
+      height={44}
+    />
   );
 }
 
