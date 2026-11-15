@@ -135,7 +135,7 @@ const translations = {
         subtitle: 'Enterprise pricing for healthcare facilities',
         transition10: {
           name: '10-Patient Transition Program', price: '$3,000', period: '/mo',
-          desc: 'Dedicated pharmacist support for up to 10 post-discharge patients per month. Reduced readmissions, improved outcomes, documented ROI.',
+          desc: 'Dedicated pharmacist support for up to 10 post-discharge patients per month: medication reconciliation, follow-ups on days 3, 7, and 14, and a monthly report for your team.',
           cta: 'Inquire Now'
         },
         review10: {
@@ -293,7 +293,7 @@ const translations = {
         subtitle: 'Precios empresariales para facilidades de salud',
         transition10: {
           name: 'Programa de Transición para 10 Pacientes', price: '$3,000', period: '/mes',
-          desc: 'Apoyo farmacéutico dedicado para hasta 10 pacientes post-alta por mes. Reducción de readmisiones, mejores resultados, ROI documentado.',
+          desc: 'Apoyo farmacéutico dedicado para hasta 10 pacientes post-alta por mes: reconciliación de medicamentos, seguimiento los días 3, 7 y 14, e informe mensual para su equipo.',
           cta: 'Consultar Ahora'
         },
         review10: {
