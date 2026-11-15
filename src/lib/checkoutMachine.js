@@ -1,20 +1,18 @@
-// Explicit state machine for the checkout modal.
-// Replaces the implicit combination of { loading, showConfirmation, error } booleans.
+// Checkout modal state. The service-agreement checkbox lives in the component.
+// This machine only tracks the request so a second click cannot start another session.
 //
-//   idle ──SUBMIT──▶ confirming ──CONFIRM──▶ submitting ──SUCCEEDED──▶ redirecting (terminal)
-//     ▲                  │                        │
-//     └──────CANCEL──────┘                        └──FAILED──▶ error ──SUBMIT──▶ confirming
+//   idle ──SUBMIT──▶ submitting ──SUCCEEDED──▶ redirecting (terminal)
+//    ▲                    │
+//    └── (reset)          └──FAILED──▶ error ──SUBMIT──▶ submitting
 //   any state ──RESET──▶ idle
 //
-// Invalid transitions are ignored (state is returned unchanged), which is what
-// prevents double-submits and charges while a request is in flight.
+// Invalid transitions are ignored.
 
 export const CHECKOUT_INITIAL = { status: 'idle', error: '' };
 
 const TRANSITIONS = {
-  idle: { SUBMIT: 'confirming' },
-  error: { SUBMIT: 'confirming' },
-  confirming: { CANCEL: 'idle', CONFIRM: 'submitting' },
+  idle: { SUBMIT: 'submitting' },
+  error: { SUBMIT: 'submitting' },
   submitting: { SUCCEEDED: 'redirecting', FAILED: 'error' },
   redirecting: {},
 };
@@ -26,6 +24,5 @@ export function checkoutReducer(state, event) {
   return { status: next, error: next === 'error' ? event.message || '' : '' };
 }
 
-// Derived flags so components never re-derive them ad hoc.
 export const isBusy = (s) => s.status === 'submitting' || s.status === 'redirecting';
 export const canClose = (s) => s.status === 'idle' || s.status === 'error';

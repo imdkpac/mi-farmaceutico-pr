@@ -2,6 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, Home, Mail, Calendar, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
+function formatAmount(cents, currency, lang) {
+  if (!Number.isFinite(cents)) return '';
+  const code = typeof currency === 'string' && currency ? currency.toUpperCase() : 'USD';
+  try {
+    return new Intl.NumberFormat(lang === 'es' ? 'es-PR' : 'en-US', {
+      style: 'currency',
+      currency: code,
+    }).format(cents / 100);
+  } catch {
+    return `$${(cents / 100).toFixed(2)}`;
+  }
+}
+
 const translations = {
   es: {
     loading: 'Cargando su confirmación...',
@@ -71,7 +84,7 @@ export default function Success() {
       .then((data) => { setSessionData(data); setStatus('ready'); })
       .catch((err) => {
         if (err.name === 'AbortError') return;
-        console.error('Error fetching session:', err);
+        console.error('Could not load checkout summary');
         setStatus('unavailable');
       });
     return () => controller.abort();
@@ -80,6 +93,9 @@ export default function Success() {
   const handleGoHome = () => {
     window.location.href = '/';
   };
+
+  const planName = sessionData?.planName || sessionData?.metadata?.planName;
+  const amountLabel = formatAmount(sessionData?.amount_total, sessionData?.currency, lang);
 
   if (loading) {
     return (
@@ -120,21 +136,21 @@ export default function Success() {
                   </div>
                 </div>
               )}
-              {sessionData.amount_total && (
+              {amountLabel && (
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-teal-600 mt-0.5" />
                   <div>
                     <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t.amountPaid}</p>
-                    <p className="text-slate-900 font-bold text-lg">${(sessionData.amount_total / 100).toFixed(2)}</p>
+                    <p className="text-slate-900 font-bold text-lg">{amountLabel}</p>
                   </div>
                 </div>
               )}
-              {sessionData.metadata?.planName && (
+              {planName && (
                 <div className="flex items-start gap-3">
                   <Calendar className="w-5 h-5 text-teal-600 mt-0.5" />
                   <div>
                     <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{t.serviceSelected}</p>
-                    <p className="text-slate-900 font-medium">{sessionData.metadata.planName}</p>
+                    <p className="text-slate-900 font-medium">{planName}</p>
                   </div>
                 </div>
               )}

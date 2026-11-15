@@ -164,6 +164,50 @@ npm run dev
 3. Verifique que no haya dos `BrowserRouter` (solo debe estar en `App.jsx`)
 4. La lista de medicamentos abre `/builder.html` (`public/builder.html`), enlazada desde `HomePage.jsx`. El componente `src/components/medicamentos/BuilderMedicamentos.jsx` se eliminó porque nada lo importaba.
 
+## Variables de entorno (Vercel)
+
+El cobro en línea es Stripe Checkout hospedado: el navegador hace POST a `/api/create-checkout-session` y redirige a `session.url`. No hace falta clave publicable ni Stripe.js.
+
+Defina estas variables en el proyecto de Vercel (Production y Preview). Los Price IDs de abajo son el respaldo en código: si la variable falta, el servidor usa ese ID vivo para que producción no se caiga antes de configurarlas. Aun así, conviene fijarlas en Vercel.
+
+| Variable | Cuándo hace falta | Qué es |
+| --- | --- | --- |
+| `STRIPE_SECRET_KEY` | Para crear sesiones | Clave secreta (`sk_live_...` o `sk_test_...`). Solo en el servidor. |
+| `STRIPE_PRICE_FOUNDATION` | Checkout de Fundación | Price ID de la suscripción Foundation a $110/mes. Respaldo: `price_1Sv7xjLm2d84XGYAGq7oO5FV`. Modo `subscription`. |
+| `STRIPE_PRICE_TRANSITION` | Checkout de Transición de Cuidado | Price ID del pago único a $650. Respaldo: `price_1Sv86TLm2d84XGYAr9vvlvuQ`. Modo `payment`. |
+| `STRIPE_WEBHOOK_SECRET` | Para aceptar webhooks | Secreto de firma (`whsec_...`) del endpoint registrado en Stripe. |
+| `CLIENT_URL` | Opcional | Origen de `/success` y `/canceled`, sin barra final. Si falta, se usa el encabezado `Origin` de la petición. |
+| `RESEND_API_KEY` | Opcional | API key de [Resend](https://resend.com). Si falta, el webhook no envía correo y responde 200. |
+| `NOTIFY_EMAIL` | Opcional | Correo del dueño que recibe el aviso de pago. Si falta, no se envía correo. |
+| `NOTIFY_FROM` | Opcional | Remitente verificado en Resend, por ejemplo `Mi Farmacéutico <avisos@su-dominio>`. Si falta, no se envía correo. |
+| `VITE_API_URL` | Solo en local | Origen del API cuando el sitio corre en localhost (por defecto `http://localhost:3001`). En Vercel no se usa. |
+
+No configure `VITE_STRIPE_PUBLISHABLE_KEY`. El cliente ya no carga Stripe.js.
+
+### Webhook en Stripe
+
+En Stripe → Developers → Webhooks, agregue el endpoint:
+
+`https://<dominio-de-produccion-en-vercel>/api/webhook`
+
+Evento mínimo: `checkout.session.completed`.
+
+Copie el signing secret a `STRIPE_WEBHOOK_SECRET`. El mismo endpoint existe en cada preview de Vercel (`https://<preview>.vercel.app/api/webhook`); para pruebas use el secreto de un endpoint de test mode.
+
+El manejador verifica la firma sobre el cuerpo crudo (`bodyParser` desactivado). No registra el evento: el cuerpo trae el correo del cliente.
+
+### Deduplicación
+
+No hay base de datos. El id del evento se recuerda solo en la memoria de esa instancia serverless. Un arranque en frío, otra instancia, o dos entregas a la vez pueden procesar el mismo `event.id` dos veces, y el correo al dueño puede duplicarse. Para que sea exacto hace falta un almacén compartido (por ejemplo Vercel KV). Si el correo está configurado y Resend falla, se olvida el id y se responde 500 para que Stripe reintente.
+
+### Lista permitida
+
+El servidor solo crea sesiones para `foundation` y `transition`. Cualquier otro `plan` o `priceId` —incluidos `foundationPlus`, `enhanced`, `concierge`, `transitionExpress`, `homeVisit` y `safetyAudit`— recibe `plan_not_allowed`. Esos IDs siguen en `src/config/stripeConfig.js` y no están conectados a ningún botón. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
+
+### Lo que todavía hay que probar en test mode
+
+Cree una sesión con las claves `sk_test_` / `whsec_` de test, pague con `4242...`, confirme que `/success` muestra solo correo, monto, moneda, nombre del plan e id, y que el webhook llega a `/api/webhook` sin error de firma. Si la cuenta no tiene Stripe Tax activo, `automatic_tax` puede hacer fallar la creación de la sesión.
+
 ## Contacto
 
 Christian Alexis Portalatín Cordero, Pharm.D.

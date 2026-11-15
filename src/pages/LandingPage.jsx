@@ -6,6 +6,7 @@ import {
   Calendar, ArrowUpRight
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import CheckoutModal from '../components/CheckoutModal';
 
 /* ─── Translations ─── */
 const translations = {
@@ -336,7 +337,26 @@ function openCalendly() {
 export default function LandingPage() {
   const { lang } = useLanguage();
   const [faqOpen, setFaqOpen] = useState(null);
+  const [checkoutPlan, setCheckoutPlan] = useState(null);
   const t = translations[lang];
+
+  const checkoutSelection = checkoutPlan === 'foundation'
+    ? {
+        key: 'foundation',
+        mode: 'subscription',
+        name: t.pricing.subscriptions.foundation.name,
+        price: t.pricing.subscriptions.foundation.promo,
+        period: t.pricing.subscriptions.foundation.period,
+      }
+    : checkoutPlan === 'transition'
+      ? {
+          key: 'transition',
+          mode: 'payment',
+          name: `${t.pricing.oneTime.transition.name} (${t.pricing.transitionDetail.standard.name})`,
+          price: t.pricing.transitionDetail.standard.price,
+          period: '',
+        }
+      : null;
 
   const renderCompareValue = (v) => {
     if (v === 'yes') return <CheckCircle className="w-5 h-5 mx-auto" style={{ color: 'var(--pine)' }} strokeWidth={2.5} />;
@@ -348,13 +368,18 @@ export default function LandingPage() {
     { q: lang === 'en' ? "Do you visit my parent's home unannounced?" : "¿Visitas la casa de mi padre/madre sin anunciar?", a: lang === 'en' ? "Never. All visits are scheduled in advance with your parent (and you, if you'd like to join virtually). We respect their privacy and independence." : "Nunca. Todas las visitas se agendan con anticipación con tu padre/madre (y contigo, si deseas unirte virtualmente). Respetamos su privacidad e independencia." },
     { q: lang === 'en' ? "How do you communicate with my parent's doctor?" : "¿Cómo te comunicas con el médico de mi padre/madre?", a: lang === 'en' ? "We use SBAR (Situation-Background-Assessment-Recommendation) format to provide clear, clinical recommendations. We don't replace the physician—we support their care plan with medication expertise." : "Usamos el formato SBAR (Situación-Antecedentes-Evaluación-Recomendación) para proveer recomendaciones clínicas claras. No reemplazamos al médico—apoyamos su plan de cuidado con experiencia en medicamentos." },
     { q: lang === 'en' ? "What if my parent lives outside San Juan?" : "¿Qué pasa si mi padre/madre vive fuera de San Juan?", a: lang === 'en' ? "We serve the greater San Juan metro area (Bayamón, Carolina, Guaynabo, Trujillo Alto) at standard rates. We can travel to Dorado, Caguas, and Arecibo with a travel surcharge. For areas outside these, we recommend starting with our Remote Foundation tier." : "Servimos el área metropolitana de San Juan (Bayamón, Carolina, Guaynabo, Trujillo Alto) a tarifas estándar. Podemos viajar a Dorado, Caguas y Arecibo con tarifa de viaje adicional. Para áreas fuera de estas, recomendamos comenzar con nuestro nivel Fundación Remoto." },
-    { q: lang === 'en' ? "Can I cancel anytime?" : "¿Puedo cancelar en cualquier momento?", a: lang === 'en' ? "Yes. Subscriptions are month-to-month with 30 days written notice to cancel. Your first month is eligible for a full refund if requested in writing within 30 days of your service start date. Subsequent months are non-refundable." : "Sí. Las suscripciones son mes a mes con 30 días de aviso por escrito. El primer mes es reembolsable si se solicita por escrito dentro de 30 días de la fecha de inicio." },
+    { q: lang === 'en' ? 'How do I cancel a subscription?' : '¿Cómo cancelo una suscripción?', a: lang === 'en' ? "Subscriptions are month-to-month. Cancellation requires 30 days' written notice. Only the first month is refundable, and only if you request the refund in writing within 30 days of your service start date. Later months are not refundable." : 'Las suscripciones son mes a mes. La cancelación requiere aviso por escrito con 30 días de anticipación. Solo el primer mes es reembolsable, y solo si lo solicita por escrito dentro de los 30 días posteriores a la fecha de inicio del servicio. Los meses siguientes no son reembolsables.' },
     { q: lang === 'en' ? "Do you accept insurance?" : "¿Aceptan seguro?", a: lang === 'en' ? "No, we operate on a cash-pay basis. This keeps us independent and ensures our clinical decisions are based solely on your parent's needs, without insurance company interference." : "No, operamos con pago en efectivo. Esto nos mantiene independientes y asegura que nuestras decisiones clínicas se basen únicamente en las necesidades de tu padre/madre, sin interferencia de compañías de seguros." },
     { q: lang === 'en' ? "How quickly can you start?" : "¿Qué tan rápido pueden empezar?", a: lang === 'en' ? "Most families can begin within 3-5 business days after the initial consultation. For urgent situations like hospital discharges, we offer expedited Transition of Care services." : "La mayoría de familias pueden comenzar dentro de 3-5 días hábiles después de la consulta inicial. Para situaciones urgentes como altas hospitalarias, ofrecemos servicios de Transición de Cuidado acelerados." }
   ];
 
   return (
     <div style={{ backgroundColor: 'var(--paper)' }}>
+      <CheckoutModal
+        isOpen={Boolean(checkoutSelection)}
+        onClose={() => setCheckoutPlan(null)}
+        plan={checkoutSelection}
+      />
 
       {/* Hero — Pine Dark */}
       <section className="py-20 px-6 sm:px-8" style={{ backgroundColor: 'var(--pine)' }}>
@@ -376,7 +401,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button onClick={openCalendly} className="btn-capsule btn-capsule-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2">
+                <button type="button" data-action="calendly" data-plan="hero-consult" onClick={openCalendly} className="btn-capsule btn-capsule-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2">
                   <Calendar className="w-5 h-5" strokeWidth={2.5} />
                   {t.hero.ctaPrimary}
                 </button>
@@ -438,7 +463,7 @@ export default function LandingPage() {
                       </a>
                     )}
                     {item.action === 'calendly' && (
-                      <button onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full inline-flex items-center justify-center gap-2 text-base px-6 py-3">
+                      <button type="button" data-action="calendly" data-plan="step2-consult" onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full inline-flex items-center justify-center gap-2 text-base px-6 py-3">
                         <Calendar className="w-4 h-4 flex-shrink-0" strokeWidth={2.5} />
                         {item.t.cta}
                       </button>
@@ -492,7 +517,7 @@ export default function LandingPage() {
                 <span className="font-display text-6xl font-medium" style={{ color: 'var(--flamboyan)' }}>{t.pricing.freeConsult.price}</span>
               </div>
               <p className="font-body mb-8 max-w-md mx-auto" style={{ color: 'var(--sage)' }}>{t.pricing.freeConsult.desc}</p>
-              <button onClick={openCalendly} className="btn-capsule inline-flex items-center gap-2 text-lg px-8 py-4" style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)' }}>
+              <button type="button" data-action="calendly" data-plan="free-consult" onClick={openCalendly} className="btn-capsule inline-flex items-center gap-2 text-lg px-8 py-4" style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)' }}>
                 <Calendar className="w-5 h-5" strokeWidth={2.5} />
                 {t.pricing.freeConsult.cta}
               </button>
@@ -509,8 +534,8 @@ export default function LandingPage() {
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {[
-                { icon: Stethoscope, bg: 'var(--sage)', data: t.pricing.oneTime.consultation },
-                { icon: Clipboard, bg: 'var(--deep-pine)', data: t.pricing.oneTime.audit },
+                { icon: Stethoscope, bg: 'var(--sage)', data: t.pricing.oneTime.consultation, plan: 'consultation' },
+                { icon: Clipboard, bg: 'var(--deep-pine)', data: t.pricing.oneTime.audit, plan: 'safetyAudit' },
               ].map((service, i) => {
                 const Icon = service.icon;
                 return (
@@ -525,7 +550,7 @@ export default function LandingPage() {
                     </div>
                     <p className="text-sm mb-4 min-h-[1.25rem]" style={{ color: 'var(--muted-ink)' }}>{service.data.note || ''}</p>
                     <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{service.data.desc}</p>
-                    <button onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full">
+                    <button type="button" data-action="calendly" data-plan={service.plan} onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full">
                       {service.data.cta}
                     </button>
                   </div>
@@ -568,7 +593,13 @@ export default function LandingPage() {
                       </div>
                       <p className="text-sm mb-2 flex-1" style={{ color: 'var(--muted-ink)' }}>{opt.note}</p>
                       {opt.perk && <p className="text-sm font-semibold mb-2" style={{ color: 'var(--pine)' }}>{opt.perk}</p>}
-                      <button onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full mt-4">{opt.cta}</button>
+                      <button
+                        type="button"
+                        data-action={key === 'standard' ? 'checkout' : 'calendly'}
+                        data-plan={key === 'standard' ? 'transition' : 'transitionExpress'}
+                        onClick={() => (key === 'standard' ? setCheckoutPlan('transition') : openCalendly())}
+                        className="btn-capsule btn-capsule-primary w-full mt-4"
+                      >{opt.cta}</button>
                     </div>
                   );
                 })}
@@ -627,7 +658,13 @@ export default function LandingPage() {
                         const tier = t.pricing.subscriptions[key];
                         return (
                           <td key={key} className="p-4 text-center">
-                            <button onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]">{tier.cta}</button>
+                            <button
+                              type="button"
+                              data-action={key === 'foundation' ? 'checkout' : 'calendly'}
+                              data-plan={key}
+                              onClick={() => (key === 'foundation' ? setCheckoutPlan('foundation') : openCalendly())}
+                              className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]"
+                            >{tier.cta}</button>
                           </td>
                         );
                       })}
@@ -663,7 +700,13 @@ export default function LandingPage() {
                           {tier.note && <p className="text-xs mt-2" style={{ color: 'var(--muted-ink)' }}>{tier.note}</p>}
                           {tier.spots && <p className="text-xs font-semibold mt-2" style={{ color: 'var(--muted-ink)' }}>⚠️ {tier.spots}</p>}
                         </div>
-                        <button onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]">{tier.cta}</button>
+                        <button
+                          type="button"
+                          data-action={key === 'foundation' ? 'checkout' : 'calendly'}
+                          data-plan={key}
+                          onClick={() => (key === 'foundation' ? setCheckoutPlan('foundation') : openCalendly())}
+                          className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]"
+                        >{tier.cta}</button>
                         <ul className="mt-6 space-y-3">
                           {t.pricing.compare.rows.map((row, i) => (
                             <li key={i} className="flex items-start justify-between gap-4 text-sm">
@@ -699,7 +742,7 @@ export default function LandingPage() {
                   <span className="font-body text-xl" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.transition10.period}</span>
                 </div>
                 <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.transition10.desc}</p>
-                <button onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
+                <button type="button" data-action="calendly" data-plan="b2b-transition" onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
                   {t.pricing.b2b.transition10.cta}
                 </button>
               </div>
@@ -715,7 +758,7 @@ export default function LandingPage() {
                   <span className="font-body text-xl" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.review10.period}</span>
                 </div>
                 <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.review10.desc}</p>
-                <button onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
+                <button type="button" data-action="calendly" data-plan="b2b-review" onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
                   {t.pricing.b2b.review10.cta}
                 </button>
               </div>
@@ -823,7 +866,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-4xl font-medium text-[#F4EFE6] mb-4">{t.finalCta.title}</h2>
           <p className="text-xl mb-8" style={{ color: 'var(--sage)' }}>{t.finalCta.subtitle}</p>
-          <button onClick={openCalendly} className="btn-capsule inline-flex items-center gap-2" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
+          <button type="button" data-action="calendly" data-plan="final-consult" onClick={openCalendly} className="btn-capsule inline-flex items-center gap-2" style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}>
             <Calendar className="w-5 h-5" strokeWidth={2.5} />
             {t.finalCta.cta}
           </button>
