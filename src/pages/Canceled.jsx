@@ -89,7 +89,7 @@ export default function Canceled() {
             </a>
             <a href="tel:+17876676560" className="flex items-center gap-2 text-teal-600 hover:underline">
               <span>📞</span>
-              <span>+1 (787) 457-0388</span>
+              <span>+1 (787) 667-6560</span>
             </a>
           </div>
         </div>

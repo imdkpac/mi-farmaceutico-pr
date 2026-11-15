@@ -1,31 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import { X, Loader, Check, CreditCard, Shield, AlertCircle } from 'lucide-react';
 import { useStripe } from '../context/StripeContext';
+import { checkoutReducer, CHECKOUT_INITIAL, isBusy, canClose } from '../lib/checkoutMachine';
 
 export default function CheckoutModal({ isOpen, onClose, plan, type = 'subscription' }) {
   const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [machine, dispatch] = useReducer(checkoutReducer, CHECKOUT_INITIAL);
   const { createCheckoutSession, createPaymentSession } = useStripe();
+  const loading = isBusy(machine);
+  const error = machine.error;
+  const showConfirmation = machine.status === 'confirming';
+
+  // Closing the modal always returns the machine to idle.
+  useEffect(() => {
+    if (!isOpen) dispatch({ type: 'RESET' });
+  }, [isOpen]);
 
   if (!isOpen || !plan) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-    
-    // Show confirmation modal before proceeding
-    setShowConfirmation(true);
+    dispatch({ type: 'SUBMIT' });
   };
 
   const handleConfirmCharge = async () => {
-    setShowConfirmation(false);
-    setLoading(true);
+    if (machine.status !== 'confirming') return;
+    dispatch({ type: 'CONFIRM' });
 
     try {
       const priceId = plan.priceId;
-      
+
       if (!priceId) {
         throw new Error('Price ID is missing. Please contact support.');
       }
@@ -42,20 +46,20 @@ export default function CheckoutModal({ isOpen, onClose, plan, type = 'subscript
       } else {
         await createPaymentSession(priceId, email, metadata);
       }
+      // Browser is navigating to Stripe; stay locked so nothing can be re-submitted.
+      dispatch({ type: 'SUCCEEDED' });
     } catch (err) {
-      setError(err.message || 'Failed to start checkout. Please try again.');
+      dispatch({ type: 'FAILED', message: err.message || 'Failed to start checkout. Please try again.' });
       console.error('Checkout error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleCancelConfirmation = () => {
-    setShowConfirmation(false);
+    dispatch({ type: 'CANCEL' });
   };
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget && !loading && !showConfirmation) {
+    if (e.target === e.currentTarget && canClose(machine)) {
       onClose();
     }
   };
@@ -73,7 +77,7 @@ export default function CheckoutModal({ isOpen, onClose, plan, type = 'subscript
       >
         <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
           {/* Close button */}
-          {!loading && !showConfirmation && (
+          {canClose(machine) && (
             <button
               onClick={onClose}
               className="absolute top-6 right-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
