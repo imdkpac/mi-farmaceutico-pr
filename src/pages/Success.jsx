@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, Home, Mail, Calendar, Loader } from 'lucide-react';
-import { useStripe } from '../context/StripeContext';
 import { useLanguage } from '../context/LanguageContext';
 
 const translations = {
@@ -49,28 +48,34 @@ const translations = {
 };
 
 export default function Success() {
+  // status: 'loading' | 'ready' | 'unavailable'  (unavailable = no session id or lookup failed;
+  // the page still confirms the payment generically, it just hides order details)
+  const [status, setStatus] = useState('loading');
   const [sessionData, setSessionData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { getCheckoutSession } = useStripe();
   const { lang } = useLanguage();
   const t = translations[lang];
+  const loading = status === 'loading';
 
   useEffect(() => {
-    const fetchSessionData = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session_id');
-      if (sessionId) {
-        try {
-          const data = await getCheckoutSession(sessionId);
-          setSessionData(data);
-        } catch (error) {
-          console.error('Error fetching session:', error);
-        }
-      }
-      setLoading(false);
-    };
-    fetchSessionData();
-  }, [getCheckoutSession]);
+    const sessionId = new URLSearchParams(window.location.search).get('session_id');
+    if (!sessionId) {
+      setStatus('unavailable');
+      return undefined;
+    }
+    const controller = new AbortController();
+    const base = window.location.hostname.includes('localhost')
+      ? import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      : window.location.origin;
+    fetch(`${base}/api/checkout-session/${encodeURIComponent(sessionId)}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((data) => { setSessionData(data); setStatus('ready'); })
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+        console.error('Error fetching session:', err);
+        setStatus('unavailable');
+      });
+    return () => controller.abort();
+  }, []);
 
   const handleGoHome = () => {
     window.location.href = '/';
@@ -154,7 +159,7 @@ export default function Success() {
             <strong>{t.needHelp}</strong> {t.contactUs}{' '}
             <a href="mailto:boticarxpr@outlook.com" className="underline hover:text-amber-700">boticarxpr@outlook.com</a>
             {' '}{t.orCall}{' '}
-            <a href="tel:+17876676560" className="underline hover:text-amber-700">+1 (787) 457-0388</a>
+            <a href="tel:+17876676560" className="underline hover:text-amber-700">+1 (787) 667-6560</a>
           </p>
         </div>
 

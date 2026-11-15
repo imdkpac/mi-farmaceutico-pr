@@ -2,10 +2,7 @@
 
 ## Resumen
 
-Este paquete une tres proyectos en uno solo:
-- **mi-farmaceutico-pr** (root) — Lista de medicamentos + Stripe
-- **app/** — Aprende (educación del paciente)
-- **Guia-de-Salud-PR-main** — Guía de salud PR
+La raíz del repositorio es el sitio canónico (lista de medicamentos, guía de salud, Aprende y Stripe). Las carpetas duplicadas `unified-site/`, `app/` y `Guia-de-Salud-PR-main/` se eliminaron; su contenido ya vive bajo `src/`.
 
 ## Estructura del sitio unificado
 
@@ -59,7 +56,7 @@ mkdir -p src/context
 Copie todos los archivos de este paquete a su proyecto:
 
 ```bash
-# Desde esta carpeta (unified-site/)
+# Desde la raíz de este repositorio (no existe una carpeta unified-site/)
 cp src/context/LanguageContext.jsx  /ruta/a/su/proyecto/src/context/
 cp src/components/Navbar.jsx        /ruta/a/su/proyecto/src/components/
 cp src/App.jsx                      /ruta/a/su/proyecto/src/
@@ -133,14 +130,10 @@ npm run dev
 ## Próximos pasos sugeridos
 
 ### Prioridad Alta
-1. **Portar contenido de Guia-de-Salud-PR-main** → `/guia`
-   - Copiar componentes: Hospitals, NursingHomes, Costs, Checklist
-   - Convertir de TypeScript a JSX si es necesario
-
-2. **Portar contenido de app/** → `/aprende`
-   - Copiar componentes: Library, SlideDetail
-   - Copiar datos: DECKS
-   - Convertir de TypeScript a JSX
+1. **Guía y Aprende ya están en el sitio raíz**
+   - `/guia` usa `src/pages/GuiaPage.jsx` y `src/pages/guia-sections/`
+   - `/aprende` usa `src/pages/AprendePage.jsx` y `src/pages/aprende-sections/`
+   - No quedan carpetas fuente aparte que portar
 
 ### Prioridad Media
 3. **Agregar más interacción para 45+**:
@@ -169,7 +162,7 @@ npm run dev
 1. Revise la consola del navegador (F12)
 2. Verifique que `LanguageContext.jsx` esté en `src/context/`
 3. Verifique que no haya dos `BrowserRouter` (solo debe estar en `App.jsx`)
-4. Si `BuilderMedicamentos` no aparece, verifique la ruta de importación en `HomePage.jsx`
+4. La lista de medicamentos abre `/builder.html` (`public/builder.html`), enlazada desde `HomePage.jsx`. El componente `src/components/medicamentos/BuilderMedicamentos.jsx` se eliminó porque nada lo importaba.
 
 ## Contacto
 
