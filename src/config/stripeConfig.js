@@ -1,10 +1,19 @@
 /**
- * Stripe Price Configuration - PRODUCTION KEYS
- * All Price IDs are for LIVE mode (not test/sandbox)
+ * Stripe price catalog. Server-side only — do not import this from React.
+ * The browser sends a plan key. Price IDs never belong in the client bundle.
+ *
+ * Online checkout (env override, these live IDs are the fallback):
+ *   STRIPE_PRICE_FOUNDATION  → foundation
+ *   STRIPE_PRICE_TRANSITION  → transition
+ *
+ * Not on the allowlist and not wired to a button:
+ *   foundationPlus ($165), enhanced ($195), concierge ($325),
+ *   transitionExpress ($800), homeVisit ($350), safetyAudit ($250).
+ * The site's displayed Safety Audit / Home Visit price is $425. Do not
+ * attach homeVisit or safetyAudit to a button.
  */
 
 export const STRIPE_PRICES = {
-  // Subscription Plans
   subscriptions: {
     foundation: 'price_1Sv7xjLm2d84XGYAGq7oO5FV',        // $110/month
     foundationPlus: 'price_1Sv801Lm2d84XGYA51lEDMgU',    // $165/month (2 parents)
@@ -12,7 +21,6 @@ export const STRIPE_PRICES = {
     concierge: 'price_1Sv84XLm2d84XGYAljWslj3i',         // $325/month
   },
 
-  // One-time Services
   oneTime: {
     transition: 'price_1Sv86TLm2d84XGYAr9vvlvuQ',             // $650
     transitionExpress: 'price_1Sv8J3Lm2d84XGYA2OlnYv72',      // $800
@@ -21,7 +29,6 @@ export const STRIPE_PRICES = {
   },
 };
 
-// Price labels for display
 export const PRICE_LABELS = {
   foundation: '$110/month',
   foundationPlus: '$165/month',

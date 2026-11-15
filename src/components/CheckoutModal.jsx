@@ -1,258 +1,203 @@
-import React, { useState, useReducer, useEffect } from 'react';
-import { X, Loader, Check, CreditCard, Shield, AlertCircle } from 'lucide-react';
-import { useStripe } from '../context/StripeContext';
+import React, { useEffect, useReducer, useState } from 'react';
+import { X, Loader, Shield } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { useCheckout } from '../hooks/useCheckout';
 import { checkoutReducer, CHECKOUT_INITIAL, isBusy, canClose } from '../lib/checkoutMachine';
+import { SERVICE_AGREEMENT_HREF } from '../lib/serviceAgreement';
 
-export default function CheckoutModal({ isOpen, onClose, plan, type = 'subscription' }) {
-  const [email, setEmail] = useState('');
+const copy = {
+  en: {
+    close: 'Close',
+    oneTime: 'One-time payment. This charge does not renew.',
+    terms: "Cancellation requires 30 days' written notice. Only the first month is refundable, and only if you request that refund in writing within 30 days of the service start date. Later months are not refundable.",
+    agreeBefore: "I've read the ",
+    agreeLink: 'Service Agreement',
+    agreementRequired: 'Check the box to confirm you have read the Service Agreement.',
+    continue: 'Continue to secure checkout',
+    starting: 'Starting checkout...',
+    redirect: "You'll be redirected to Stripe's secure checkout page.",
+    plan_not_allowed: 'This service is not available for online checkout. Please schedule a consultation.',
+    checkout_unavailable: 'Checkout could not be started. Please try again in a moment.',
+  },
+  es: {
+    close: 'Cerrar',
+    oneTime: 'Pago único. Este cargo no se renueva.',
+    terms: 'La cancelación requiere aviso por escrito con 30 días de anticipación. Solo el primer mes es reembolsable, y solo si solicita ese reembolso por escrito dentro de los 30 días posteriores a la fecha de inicio del servicio. Los meses siguientes no son reembolsables.',
+    agreeBefore: 'He leído el ',
+    agreeLink: 'Acuerdo de Servicio',
+    agreementRequired: 'Marque la casilla para confirmar que ha leído el Acuerdo de Servicio.',
+    continue: 'Continuar al pago seguro',
+    starting: 'Abriendo el pago...',
+    redirect: 'Se le redirigirá a la página de pago seguro de Stripe.',
+    plan_not_allowed: 'Este servicio no está disponible para pago en línea. Por favor agende una consulta.',
+    checkout_unavailable: 'No se pudo iniciar el pago. Inténtelo de nuevo en un momento.',
+  },
+};
+
+export default function CheckoutModal({ isOpen, onClose, plan }) {
+  const { lang } = useLanguage();
+  const t = copy[lang] || copy.es;
+  const { startCheckout } = useCheckout();
+  const [agreed, setAgreed] = useState(false);
+  const [agreementError, setAgreementError] = useState('');
   const [machine, dispatch] = useReducer(checkoutReducer, CHECKOUT_INITIAL);
-  const { createCheckoutSession, createPaymentSession } = useStripe();
   const loading = isBusy(machine);
-  const error = machine.error;
-  const showConfirmation = machine.status === 'confirming';
 
-  // Closing the modal always returns the machine to idle.
   useEffect(() => {
-    if (!isOpen) dispatch({ type: 'RESET' });
+    if (!isOpen) {
+      dispatch({ type: 'RESET' });
+      setAgreed(false);
+      setAgreementError('');
+    }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKey = (event) => {
+      if (event.key === 'Escape' && canClose(machine)) onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, machine, onClose]);
 
   if (!isOpen || !plan) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const errorCode = machine.error;
+  const errorText = errorCode ? (t[errorCode] || t.checkout_unavailable) : agreementError;
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!agreed) {
+      setAgreementError(t.agreementRequired);
+      return;
+    }
+    if (loading) return;
+    setAgreementError('');
     dispatch({ type: 'SUBMIT' });
-  };
-
-  const handleConfirmCharge = async () => {
-    if (machine.status !== 'confirming') return;
-    dispatch({ type: 'CONFIRM' });
-
     try {
-      const priceId = plan.priceId;
-
-      if (!priceId) {
-        throw new Error('Price ID is missing. Please contact support.');
-      }
-
-      const metadata = {
-        planName: plan.name,
-        planSubtitle: plan.sub || '',
-        planType: type,
-        language: plan.language || 'en',
-      };
-
-      if (type === 'subscription') {
-        await createCheckoutSession(priceId, email, metadata);
-      } else {
-        await createPaymentSession(priceId, email, metadata);
-      }
-      // Browser is navigating to Stripe; stay locked so nothing can be re-submitted.
+      await startCheckout(plan.key);
       dispatch({ type: 'SUCCEEDED' });
     } catch (err) {
-      dispatch({ type: 'FAILED', message: err.message || 'Failed to start checkout. Please try again.' });
-      console.error('Checkout error:', err);
+      dispatch({
+        type: 'FAILED',
+        message: err.code === 'plan_not_allowed' ? 'plan_not_allowed' : 'checkout_unavailable',
+      });
     }
   };
 
-  const handleCancelConfirmation = () => {
-    dispatch({ type: 'CANCEL' });
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget && canClose(machine)) onClose();
   };
-
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget && canClose(machine)) {
-      onClose();
-    }
-  };
-
-  // Extract price amount for display
-  const priceAmount = plan.price;
-  const chargeType = type === 'subscription' ? 'monthly subscription' : 'one-time payment';
 
   return (
-    <>
-      {/* Main Checkout Modal */}
-      <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-        onClick={handleBackdropClick}
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(15, 46, 48, 0.72)' }}
+      onClick={handleBackdropClick}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkout-title"
+        className="relative w-full max-w-lg p-6 sm:p-8"
+        style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}
       >
-        <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
-          {/* Close button */}
-          {canClose(machine) && (
-            <button
-              onClick={onClose}
-              className="absolute top-6 right-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-5 h-5 text-slate-500" />
-            </button>
-          )}
+        {canClose(machine) && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full"
+            style={{ color: 'var(--pine)' }}
+            aria-label={t.close}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
 
-          {/* Header */}
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {plan.name}
-            </h2>
-            {plan.sub && (
-              <p className="text-teal-600 dark:text-teal-400 font-medium">
-                {plan.sub}
-              </p>
+        <h2 id="checkout-title" className="font-display text-3xl font-medium text-[#0F2E30] pr-10 mb-4">
+          {plan.name}
+        </h2>
+
+        <div className="mb-5 p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '20px' }}>
+          <p className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>
+            {plan.price}
+            {plan.period && (
+              <span className="font-body text-lg" style={{ color: 'var(--muted-ink)' }}>{plan.period}</span>
             )}
-          </div>
+          </p>
+          {plan.mode === 'payment' && (
+            <p className="font-body text-sm mt-2" style={{ color: 'var(--muted-ink)' }}>{t.oneTime}</p>
+          )}
+        </div>
 
-          {/* Price display */}
-          <div className="mb-6 p-6 bg-gradient-to-br from-teal-50 to-sky-50 dark:from-teal-900/20 dark:to-sky-900/20 rounded-2xl border border-teal-100 dark:border-teal-800">
-            <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-4xl font-bold text-teal-600 dark:text-teal-400">
-                {priceAmount}
-              </span>
-              {type === 'subscription' && (
-                <span className="text-slate-600 dark:text-slate-400 font-medium">
-                  /month
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {type === 'subscription' 
-                ? 'Billed monthly • Cancel anytime' 
-                : 'One-time payment • No recurring charges'}
+        <p className="font-body text-sm leading-relaxed mb-5" style={{ color: 'var(--pine)' }}>
+          {t.terms}
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => {
+                setAgreed(event.target.checked);
+                if (event.target.checked) setAgreementError('');
+              }}
+              disabled={loading}
+              required
+              className="mt-1 h-5 w-5 flex-shrink-0"
+              style={{ accentColor: 'var(--pine)' }}
+            />
+            <span className="font-body text-base" style={{ color: 'var(--pine)' }}>
+              {t.agreeBefore}
+              <a
+                href={SERVICE_AGREEMENT_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-semibold"
+                style={{ color: 'var(--flamboyan)' }}
+              >
+                {t.agreeLink}
+              </a>
+            </span>
+          </label>
+
+          {errorText && (
+            <p role="alert" className="font-body text-sm" style={{ color: 'var(--flamboyan)' }}>
+              {errorText}
             </p>
-          </div>
-
-          {/* Production Warning */}
-          <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-                  Real Payment - Not a Test
-                </p>
-                <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
-                  Your card will be charged immediately. You'll receive a confirmation before processing.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Error message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl animate-in slide-in-from-top duration-200">
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-                {error}
-              </p>
-            </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label 
-                htmlFor="email"
-                className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              />
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                We'll send your receipt and service details to this email
-              </p>
-            </div>
+          <button
+            type="submit"
+            disabled={loading || !agreed}
+            className="btn-capsule btn-capsule-primary w-full text-base px-6 py-3 inline-flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <Loader className="w-5 h-5 animate-spin" aria-hidden="true" />
+                <span>{t.starting}</span>
+              </>
+            ) : (
+              <span>{t.continue}</span>
+            )}
+          </button>
+        </form>
 
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={loading || !email}
-              className="w-full bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 disabled:from-slate-400 disabled:to-slate-400 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <Loader className="w-5 h-5 animate-spin" />
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5" />
-                  <span>Continue to Secure Checkout</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Security badges */}
-          <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <div className="flex items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-teal-600" />
-                <span>Secure Payment</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-teal-600" />
-                <span>Stripe Verified</span>
-              </div>
-            </div>
-            <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-3">
-              You'll be redirected to Stripe's secure checkout page
-            </p>
-          </div>
-        </div>
+        <p className="mt-5 flex items-center justify-center gap-2 font-body text-xs" style={{ color: 'var(--muted-ink)' }}>
+          <Shield className="w-4 h-4" aria-hidden="true" />
+          {t.redirect}
+        </p>
       </div>
-
-      {/* Confirmation Modal Overlay */}
-      {showConfirmation && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-8 shadow-2xl animate-in zoom-in duration-200">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-8 h-8 text-amber-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                Confirm Your {type === 'subscription' ? 'Subscription' : 'Purchase'}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                This is a real charge to your credit card
-              </p>
-            </div>
-
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-6 mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-slate-600 dark:text-slate-400">Service:</span>
-                <span className="font-semibold text-slate-900 dark:text-white">{plan.name}</span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-slate-600 dark:text-slate-400">Amount:</span>
-                <span className="text-2xl font-bold text-teal-600">{priceAmount}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">Type:</span>
-                <span className="text-slate-900 dark:text-white capitalize">{chargeType}</span>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={handleConfirmCharge}
-                className="w-full bg-gradient-to-r from-teal-600 to-sky-600 hover:from-teal-700 hover:to-sky-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg"
-              >
-                Yes, Proceed to Payment
-              </button>
-              <button
-                onClick={handleCancelConfirmation}
-                className="w-full border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold py-4 rounded-xl transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 }

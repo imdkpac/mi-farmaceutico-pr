@@ -2,6 +2,9 @@ import express from 'express';
 import Stripe from 'stripe';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createAllowedCheckout } from './lib/stripe/createAllowedCheckout.js';
+import { processStripeEvent } from './lib/stripe/stripeEvents.js';
+import { publicCheckoutSummary } from './lib/stripe/publicSession.js';
 
 dotenv.config();
 
@@ -28,209 +31,65 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Create Checkout Session for Subscriptions
+// Create Checkout Session. Allowlist is foundation (subscription) and transition (payment).
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
-    const { priceId, quantity = 1, customerEmail, metadata = {} } = req.body;
-
-    if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity,
-        },
-      ],
-      customer_email: customerEmail,
-      metadata: {
-        ...metadata,
-        service_type: 'subscription'
-      },
-      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/canceled`,
-      billing_address_collection: 'required',
-      allow_promotion_codes: true,
-      subscription_data: {
-        metadata: {
-          ...metadata
-        }
-      }
+    const result = await createAllowedCheckout({
+      plan: req.body?.plan,
+      priceId: req.body?.priceId,
+      lang: req.body?.lang,
+      origin: req.headers.origin,
     });
-
-    res.json({ 
-      sessionId: session.id, 
-      url: session.url 
-    });
+    res.json(result);
   } catch (error) {
-    console.error('Error creating checkout session:', error);
-    res.status(500).json({ 
-      error: error.message,
-      type: error.type 
-    });
+    const status = error.statusCode || 500;
+    if (status >= 500) console.error('checkout_session_failed');
+    res.status(status).json({ error: error.publicCode || 'checkout_unavailable' });
   }
 });
 
-// Create Checkout Session for One-time Payments
+// Legacy one-time endpoint. Payment-mode allowlist only (transition).
 app.post('/api/create-payment-session', async (req, res) => {
   try {
-    const { priceId, quantity = 1, customerEmail, metadata = {} } = req.body;
-
-    if (!priceId) {
-      return res.status(400).json({ error: 'Price ID is required' });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity,
-        },
-      ],
-      customer_email: customerEmail,
-      metadata: {
-        ...metadata,
-        service_type: 'one_time'
-      },
-      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/canceled`,
-      billing_address_collection: 'required',
+    const result = await createAllowedCheckout({
+      plan: req.body?.plan,
+      priceId: req.body?.priceId,
+      lang: req.body?.lang,
+      origin: req.headers.origin,
+      requiredMode: 'payment',
     });
-
-    res.json({ 
-      sessionId: session.id, 
-      url: session.url 
-    });
+    res.json(result);
   } catch (error) {
-    console.error('Error creating payment session:', error);
-    res.status(500).json({ 
-      error: error.message,
-      type: error.type 
-    });
+    const status = error.statusCode || 500;
+    if (status >= 500) console.error('payment_session_failed');
+    res.status(status).json({ error: error.publicCode || 'checkout_unavailable' });
   }
 });
 
-// Webhook endpoint for Stripe events
-app.post('/api/webhook', 
-  express.raw({ type: 'application/json' }), 
+// Webhook endpoint for Stripe events. Does not run on Vercel; api/webhook.js does.
+// This copy stays so local Express matches the serverless handler.
+app.post('/api/webhook',
+  express.raw({ type: 'application/json' }),
   async (req, res) => {
-    const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    let event;
-
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } catch (err) {
-      console.error('⚠️  Webhook signature verification failed:', err.message);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
+    if (!webhookSecret) {
+      return res.status(500).json({ error: 'webhook_not_configured' });
     }
 
-    // Handle the event
+    let event;
     try {
-      switch (event.type) {
-        case 'checkout.session.completed':
-          const session = event.data.object;
-          console.log('✅ Payment successful:', {
-            sessionId: session.id,
-            customerEmail: session.customer_email,
-            amountTotal: session.amount_total,
-            metadata: session.metadata
-          });
-          
-          // TODO: Implement your business logic here:
-          // - Send confirmation email
-          // - Create user account
-          // - Activate subscription in your database
-          // - Send welcome email with next steps
-          
-          break;
+      event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], webhookSecret);
+    } catch {
+      console.error('webhook_signature_failed');
+      return res.status(400).json({ error: 'invalid_signature' });
+    }
 
-        case 'customer.subscription.created':
-          const subscriptionCreated = event.data.object;
-          console.log('🎉 Subscription created:', {
-            subscriptionId: subscriptionCreated.id,
-            customerId: subscriptionCreated.customer,
-            status: subscriptionCreated.status,
-            metadata: subscriptionCreated.metadata
-          });
-          
-          // TODO: Activate subscription in your database
-          
-          break;
-
-        case 'customer.subscription.updated':
-          const subscriptionUpdated = event.data.object;
-          console.log('🔄 Subscription updated:', {
-            subscriptionId: subscriptionUpdated.id,
-            status: subscriptionUpdated.status,
-            currentPeriodEnd: new Date(subscriptionUpdated.current_period_end * 1000)
-          });
-          
-          // TODO: Update subscription status in your database
-          
-          break;
-
-        case 'customer.subscription.deleted':
-          const subscriptionDeleted = event.data.object;
-          console.log('❌ Subscription canceled:', {
-            subscriptionId: subscriptionDeleted.id,
-            customerId: subscriptionDeleted.customer
-          });
-          
-          // TODO: Deactivate subscription in your database
-          
-          break;
-
-        case 'invoice.payment_succeeded':
-          const invoice = event.data.object;
-          console.log('💰 Invoice paid:', {
-            invoiceId: invoice.id,
-            amountPaid: invoice.amount_paid,
-            subscriptionId: invoice.subscription
-          });
-          
-          // TODO: Send receipt, update billing records
-          
-          break;
-
-        case 'invoice.payment_failed':
-          const failedInvoice = event.data.object;
-          console.log('⚠️  Payment failed:', {
-            invoiceId: failedInvoice.id,
-            customerId: failedInvoice.customer,
-            attemptCount: failedInvoice.attempt_count
-          });
-          
-          // TODO: Send payment failed notification
-          // - Notify customer via email
-          // - Update subscription status
-          // - Potentially pause service access
-          
-          break;
-
-        case 'customer.created':
-          const customer = event.data.object;
-          console.log('👤 Customer created:', {
-            customerId: customer.id,
-            email: customer.email
-          });
-          break;
-
-        default:
-          console.log(`ℹ️  Unhandled event type: ${event.type}`);
-      }
-
-      res.json({ received: true });
-    } catch (err) {
-      console.error('Error processing webhook:', err);
-      res.status(500).json({ error: 'Webhook processing failed' });
+    try {
+      const result = await processStripeEvent(event);
+      res.json({ received: true, duplicate: Boolean(result.duplicate) });
+    } catch {
+      console.error('webhook_handler_failed');
+      res.status(500).json({ error: 'webhook_failed' });
     }
   }
 );
@@ -246,7 +105,7 @@ app.get('/api/subscription/:subscriptionId', async (req, res) => {
     );
     res.json(subscription);
   } catch (error) {
-    console.error('Error retrieving subscription:', error);
+    console.error('subscription_retrieve_failed');
     res.status(500).json({ error: error.message });
   }
 });
@@ -273,7 +132,7 @@ app.post('/api/cancel-subscription', async (req, res) => {
 
     res.json(subscription);
   } catch (error) {
-    console.error('Error canceling subscription:', error);
+    console.error('subscription_cancel_failed');
     res.status(500).json({ error: error.message });
   }
 });
@@ -294,24 +153,25 @@ app.post('/api/create-portal-session', async (req, res) => {
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error('Error creating portal session:', error);
+    console.error('portal_session_failed');
     res.status(500).json({ error: error.message });
   }
 });
 
-// Get checkout session details
+// Get the few checkout fields the success page renders.
 app.get('/api/checkout-session/:sessionId', async (req, res) => {
+  const sessionId = req.params.sessionId;
+  if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId || '')) {
+    return res.status(400).json({ error: 'invalid_session' });
+  }
   try {
-    const session = await stripe.checkout.sessions.retrieve(
-      req.params.sessionId,
-      {
-        expand: ['customer', 'subscription']
-      }
-    );
-    res.json(session);
-  } catch (error) {
-    console.error('Error retrieving session:', error);
-    res.status(500).json({ error: error.message });
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const summary = publicCheckoutSummary(session);
+    if (!summary) return res.status(404).json({ error: 'not_found' });
+    res.json(summary);
+  } catch {
+    console.error('checkout_summary_failed');
+    res.status(500).json({ error: 'checkout_unavailable' });
   }
 });
 
@@ -334,7 +194,7 @@ app.post('/api/add-subscription-item', async (req, res) => {
 
     res.json(subscriptionItem);
   } catch (error) {
-    console.error('Error adding subscription item:', error);
+    console.error('subscription_item_add_failed');
     res.status(500).json({ error: error.message });
   }
 });
@@ -356,14 +216,14 @@ app.post('/api/remove-subscription-item', async (req, res) => {
 
     res.json(deleted);
   } catch (error) {
-    console.error('Error removing subscription item:', error);
+    console.error('subscription_item_remove_failed');
     res.status(500).json({ error: error.message });
   }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error('server_error');
   res.status(500).json({ 
     error: 'Internal server error',
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
