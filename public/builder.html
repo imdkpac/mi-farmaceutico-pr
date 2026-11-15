@@ -6,12 +6,22 @@
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Cree su lista de medicamentos gratis y privada. Mi Farmacéutico en PR.">
 <title>Mi Lista de Medicamentos — Mi Farmacéutico en PR</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<meta name="theme-color" content="#0F2E30">
+<link rel="manifest" href="/manifest.webmanifest">
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="vendor/jspdf.plugin.autotable.min.js"></script>
 <style>
+/* Self-hosted fonts — no third-party requests ever leave this page */
+@font-face {
+  font-family: 'Fraunces'; font-style: normal; font-weight: 400 700; font-display: swap;
+  src: url('fonts/fraunces-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans'; font-style: normal; font-weight: 400 1000; font-display: swap;
+  src: url('fonts/dmsans-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
   --pine: #0F2E30; --deep-pine: #1A4A4D; --paper: #F4EFE6;
   --sand: #E2D6BF; --sage: #A8BDA6; --muted-ink: #5C6F6A;
@@ -27,7 +37,9 @@
 html { scroll-behavior: smooth; scroll-padding-bottom: calc(var(--action-bar-height) + env(safe-area-inset-bottom) + 16px); }
 body {
   font-family: var(--font-body); background: var(--pine); color: var(--paper);
-  font-size: 20px; line-height: 1.5; min-height: 100vh; -webkit-font-smoothing: antialiased;
+  font-size: 20px; line-height: 1.5; min-height: 100vh; min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column;
 }
 
 /* ─── TOP BAR ─── */
@@ -55,24 +67,38 @@ body {
 @media (min-width: 640px) { .topbar-phone { display: inline-flex; align-items: center; gap: 6px; } }
 
 /* ─── MAIN ─── */
-main { max-width: 640px; margin: 0 auto; padding: 20px 16px 40px; }
+main { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 20px 16px 40px; }
 main.has-fixed-bar { padding-bottom: calc(var(--action-bar-height) + env(safe-area-inset-bottom) + 20px); }
+/* Initial screen: the whole first viewport is one giant start button */
+body.on-hero main { display: flex; flex-direction: column; justify-content: center; }
+body.on-hero main .hero-card { flex: 1; margin-bottom: 0; min-height: 320px; }
+@media (max-width: 480px) { .topbar-brand { font-size: 15px; } }
 
 /* ─── HERO ─── */
 .hero-card {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  width: 100%; min-height: 180px; padding: 36px 24px; margin-bottom: 28px;
+  gap: 14px;
+  width: 100%; min-height: 180px; padding: 40px 26px; margin-bottom: 28px;
   background: var(--flamboyan); color: var(--paper);
   border: none; border-radius: var(--radius-sm); cursor: pointer;
-  font-family: var(--font-body); font-weight: 700; font-size: 24px; line-height: 1.3;
+  font-family: var(--font-body); font-weight: 700; font-size: 24px; line-height: 1.35;
   text-align: center; text-decoration: none;
-  box-shadow: 0 8px 0 rgba(0,0,0,0.2), 0 16px 40px rgba(226,81,47,0.3);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.2);
   transition: filter 0.15s, transform 0.1s;
 }
 .hero-card:hover { filter: brightness(1.06); }
-.hero-card:active { transform: scale(0.98); }
-.hero-card .hero-logo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 14px; background: var(--white); padding: 4px; }
-.hero-card .hero-sub { font-size: 18px; font-weight: 500; opacity: 0.92; margin-top: 10px; }
+.hero-card:active { transform: scale(0.99); }
+.hero-card .hero-logo { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; background: var(--white); padding: 4px; }
+.hero-card .hero-title { font-family: var(--font-display); font-weight: 600; font-size: 34px; line-height: 1.15; }
+.hero-card .hero-body { font-weight: 500; font-size: 19px; line-height: 1.45; opacity: 0.95; max-width: 460px; }
+.hero-card .hero-cta {
+  display: inline-block; background: var(--paper); color: var(--pine);
+  font-size: 22px; font-weight: 700; padding: 16px 30px; border-radius: 999px;
+  margin-top: 8px;
+}
+.hero-card .hero-sub { font-size: 15px; font-weight: 500; opacity: 0.9; }
+.hero-backup { display: none; text-align: center; margin-top: 10px; }
+body.on-hero .hero-backup { display: block; }
 
 /* ─── WIZARD ─── */
 .wizard-screen { margin-bottom: 20px; }
@@ -291,12 +317,15 @@ footer { text-align: center; padding: 40px 16px; color: var(--sage); font-size: 
   .question-title { font-size: 22px; }
   .wiz-input { font-size: 18px; min-height: 56px; padding: 14px 16px; }
   .btn-wiz { font-size: 18px; min-height: 56px; padding: 16px 20px; }
-  .hero-card { font-size: 20px; min-height: 140px; }
+  .hero-card { padding: 28px 18px; }
+  .hero-card .hero-title { font-size: 27px; }
+  .hero-card .hero-body { font-size: 17px; }
+  .hero-card .hero-cta { font-size: 19px; padding: 14px 22px; }
   .form-icons { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
-<body>
+<body class="on-hero">
 
 <!-- ═══ TOP BAR ═══ -->
 <header class="topbar no-print" role="banner">
@@ -319,11 +348,17 @@ footer { text-align: center; padding: 40px 16px; color: var(--sage); font-size: 
 <main id="main">
 
 <!-- ═══ HERO ═══ -->
-<button class="hero-card no-print" id="hero-card" onclick="startWizard()" aria-label="Start medication list">
-  <img src="logo.png" alt="" class="hero-logo" aria-hidden="true" width="80" height="80">
-  <span id="hero-text" data-t="heroText">Toque aquí para comenzar su lista de medicamentos</span>
+<button class="hero-card no-print" id="hero-card" onclick="startWizard()" data-t-aria="heroTitle" aria-label="Comenzar mi lista de medicamentos">
+  <img src="logo.png" alt="" class="hero-logo" aria-hidden="true" width="76" height="76">
+  <span class="hero-title" id="hero-text" data-t="heroTitle">Su lista de medicamentos, siempre a la mano</span>
+  <span class="hero-body" data-t="heroBody">Cree e imprima su lista. Llévela a sus citas médicas, a la farmacia, o a Mi Farmacéutico en PR.</span>
+  <span class="hero-cta" data-t="heroCta">Toque la pantalla para empezar</span>
   <span class="hero-sub" data-t="heroSub">Gratis y privada. Su información nunca sale de este dispositivo.</span>
 </button>
+<div class="hero-backup no-print" id="hero-backup">
+  <button class="btn-link" onclick="document.getElementById('backup-file').click()" data-t="backupHeroHint">¿Ya tiene un respaldo? Toque aquí para cargarlo</button>
+</div>
+<input type="file" id="backup-file" accept="application/json,.json" style="display:none" onchange="loadBackup(this)">
 
 <!-- ═══ WIZARD SCREEN ═══ -->
 <div class="wizard-screen no-print" id="wizard-screen" style="display:none">
@@ -366,6 +401,7 @@ footer { text-align: center; padding: 40px 16px; color: var(--sage); font-size: 
 <!-- ═══ ACTION BAR (review only) ═══ -->
 <div class="action-bar no-print" id="action-bar" style="display:none" role="toolbar">
   <button class="btn-pdf" onclick="savePDF()" data-t="btnPDF">📄 Guardar PDF</button>
+  <button class="btn-share" onclick="saveFridgeSheet()" data-t="btnFridge">🧊 Hoja para la nevera</button>
   <button class="btn-share" onclick="shareList()" data-t="btnShare">📤 Compartir</button>
 </div>
 
@@ -394,8 +430,19 @@ const { jsPDF } = window.jspdf;
 const T = {
   es: {
     brandName: 'Mi Farmacéutico en PR',
-    heroText: 'Toque aquí para comenzar su lista de medicamentos',
+    heroTitle: 'Su lista de medicamentos, siempre a la mano',
+    heroBody: 'Cree e imprima su lista. Llévela a sus citas médicas, a la farmacia, o a Mi Farmacéutico en PR.',
+    heroCta: 'Toque la pantalla para empezar',
     heroSub: 'Gratis y privada. Su información nunca sale de este dispositivo.',
+    btnFridge: '🧊 Hoja para la nevera',
+    backupDownload: '⬇️ Descargar respaldo',
+    backupLoad: '⬆️ Cargar respaldo',
+    backupHeroHint: '¿Ya tiene un respaldo? Toque aquí para cargarlo',
+    backupLoaded: 'Lista cargada de su respaldo.',
+    backupError: 'No se pudo leer ese archivo. Use un respaldo creado en esta página.',
+    fridgeAllergies: 'ALERGIAS',
+    fridgeAvoid: 'NO TOMAR',
+    fridgeOther: 'Otra hora / según indicación',
     step: 'Paso',
     of: 'de',
     next: 'Siguiente →',
@@ -509,6 +556,7 @@ const T = {
     placeholderNotes: 'Cualquier otra información',
     // Review
     titleReview: 'Su lista de medicamentos',
+    medsSection: 'Medicamentos',
     noAllergies: 'Ninguna alergia reportada',
     noAvoid: 'Ningún medicamento a evitar',
     noMeds: 'Ningún medicamento agregado',
@@ -537,13 +585,24 @@ const T = {
     shareFallback: 'No se pudo copiar.',
     emergencyStrip: 'Emergencia / Emergency: 9-1-1',
     pageNumber: 'Página',
-    pdfHeaderBrand: 'Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticoenpr.com',
+    pdfHeaderBrand: 'Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticopr.com',
     pdfFooterDisclaimer: 'Este documento es para referencia. Siga siempre las instrucciones de su farmacia.',
   },
   en: {
     brandName: 'Mi Farmacéutico en PR',
-    heroText: 'Touch here to start your medication list',
+    heroTitle: 'Your medication list, always at hand',
+    heroBody: "Create and print your list. Bring it to your doctor's appointments, to the pharmacy, or to Mi Farmacéutico en PR.",
+    heroCta: 'Tap the screen to start',
     heroSub: 'Free and private. Your information never leaves this device.',
+    btnFridge: '🧊 Fridge sheet',
+    backupDownload: '⬇️ Download backup',
+    backupLoad: '⬆️ Load backup',
+    backupHeroHint: 'Already have a backup? Tap here to load it',
+    backupLoaded: 'List loaded from your backup.',
+    backupError: 'Could not read that file. Use a backup created on this page.',
+    fridgeAllergies: 'ALLERGIES',
+    fridgeAvoid: 'DO NOT TAKE',
+    fridgeOther: 'Other times / as directed',
     step: 'Step',
     of: 'of',
     next: 'Next →',
@@ -646,6 +705,7 @@ const T = {
     labelNotes: 'Notes',
     placeholderNotes: 'Any other information',
     titleReview: 'Your medication list',
+    medsSection: 'Medicines',
     noAllergies: 'No allergies reported',
     noAvoid: 'No medicines to avoid',
     noMeds: 'No medications added',
@@ -672,7 +732,7 @@ const T = {
     shareFallback: 'Could not copy.',
     emergencyStrip: 'Emergency / Emergencia: 9-1-1',
     pageNumber: 'Page',
-    pdfHeaderBrand: 'Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticoenpr.com',
+    pdfHeaderBrand: 'Mi Farmacéutico en PR | (787) 667-6560 | mifarmaceuticopr.com',
     pdfFooterDisclaimer: 'This document is for reference. Always follow your pharmacy label instructions.',
   }
 };
@@ -723,7 +783,7 @@ function t(k, vars) {
   if (vars) { Object.keys(vars).forEach(key => { s = s.replace('{'+key+'}', vars[key]); }); }
   return s;
 }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
 function announce(msg) { document.getElementById('aria-announcer').textContent = msg; }
 function show(id) { document.getElementById(id).style.display = 'block'; }
@@ -745,6 +805,10 @@ function setLang(l) {
     const key = el.getAttribute('data-t');
     if (T[lang][key]) el.textContent = T[lang][key];
   });
+  document.querySelectorAll('[data-t-aria]').forEach(el => {
+    const key = el.getAttribute('data-t-aria');
+    if (T[lang][key]) el.setAttribute('aria-label', T[lang][key]);
+  });
   renderScreen();
   renderContinuousList();
 }
@@ -753,6 +817,7 @@ function setLang(l) {
 function startWizard() {
   screen = 'wizard'; step = 'A';
   currentMed = emptyMed(); editingMedIndex = -1;
+  document.body.classList.remove('on-hero');
   hide('hero-card');
   show('wizard-screen'); show('continuous-list');
   setActionBar(false);
@@ -790,7 +855,7 @@ function goNext() {
     hide('wizard-screen'); show('options-screen');
     renderOptions(); renderContinuousList(); return;
   }
-  renderWizard(); focusFirst();
+  renderWizard(); renderContinuousList(); focusFirst();
 }
 
 function goBack() {
@@ -799,9 +864,9 @@ function goBack() {
   else if (step === 'D') step = 'C';
   else if (step === 'E') step = 'D';
   else if (step === 'F') step = 'E';
-  else if (step === 'A') { screen = 'hero'; hide('wizard-screen'); show('hero-card'); hide('continuous-list'); setActionBar(false); return; }
+  else if (step === 'A') { screen = 'hero'; hide('wizard-screen'); document.getElementById('hero-card').style.display = 'flex'; hide('continuous-list'); setActionBar(false); document.body.classList.add('on-hero'); return; }
   else { screen = 'options'; hide('wizard-screen'); show('options-screen'); renderOptions(); return; }
-  renderWizard(); focusFirst();
+  renderWizard(); renderContinuousList(); focusFirst();
 }
 
 function goSkip() {
@@ -812,7 +877,7 @@ function goSkip() {
   else if (step === 'prescriber' || step === 'pharmacy' || step === 'details') {
     screen = 'options'; hide('wizard-screen'); show('options-screen'); renderOptions(); return;
   }
-  renderWizard(); focusFirst();
+  renderWizard(); renderContinuousList(); focusFirst();
 }
 
 function saveCurrentMed() {
@@ -1043,10 +1108,10 @@ function renderPrescriber() {
     <div class="field-group">
       <label>${t('whichMeds')}</label>
       <div class="checkbox-list">
-        ${medications.map((m) => `
+        ${medications.map((m, i) => `
           <label class="checkbox-item">
             <input type="checkbox" ${currentPrescriber.forMeds.includes(m.name) ? 'checked' : ''}
-              onchange="togglePrescriberMed('${esc(m.name)}', this.checked)">
+              onchange="togglePrescriberMed(${i}, this.checked)">
             ${esc(m.name)} ${m.strength ? esc(m.strength) : ''}
           </label>
         `).join('')}
@@ -1054,8 +1119,10 @@ function renderPrescriber() {
     </div>
   `;
 }
-function togglePrescriberMed(name, checked) {
-  if (checked) currentPrescriber.forMeds.push(name);
+function togglePrescriberMed(i, checked) {
+  const name = medications[i] ? medications[i].name : '';
+  if (!name) return;
+  if (checked) { if (!currentPrescriber.forMeds.includes(name)) currentPrescriber.forMeds.push(name); }
   else currentPrescriber.forMeds = currentPrescriber.forMeds.filter(n => n !== name);
 }
 
@@ -1073,10 +1140,10 @@ function renderPharmacy() {
     <div class="field-group">
       <label>${t('whichMeds')}</label>
       <div class="checkbox-list">
-        ${medications.map((m) => `
+        ${medications.map((m, i) => `
           <label class="checkbox-item">
             <input type="checkbox" ${currentPharmacy.forMeds.includes(m.name) ? 'checked' : ''}
-              onchange="togglePharmacyMed('${esc(m.name)}', this.checked)">
+              onchange="togglePharmacyMed(${i}, this.checked)">
             ${esc(m.name)} ${m.strength ? esc(m.strength) : ''}
           </label>
         `).join('')}
@@ -1084,8 +1151,10 @@ function renderPharmacy() {
     </div>
   `;
 }
-function togglePharmacyMed(name, checked) {
-  if (checked) currentPharmacy.forMeds.push(name);
+function togglePharmacyMed(i, checked) {
+  const name = medications[i] ? medications[i].name : '';
+  if (!name) return;
+  if (checked) { if (!currentPharmacy.forMeds.includes(name)) currentPharmacy.forMeds.push(name); }
   else currentPharmacy.forMeds = currentPharmacy.forMeds.filter(n => n !== name);
 }
 
@@ -1134,7 +1203,11 @@ function renderOptions() {
     <button class="option-btn" onclick="startPrescriber()"><span class="opt-emoji">👨‍⚕️</span><span class="opt-label">${t('optAddPrescriber')}</span></button>
     <button class="option-btn" onclick="startPharmacy()"><span class="opt-emoji">🏥</span><span class="opt-label">${t('optAddPharmacy')}</span></button>
     <button class="option-btn" onclick="startDetails()"><span class="opt-emoji">📝</span><span class="opt-label">${t('optAddDetails')}</span></button>
-    <button class="option-btn finish" onclick="finishList()"><span class="opt-emoji">✓</span><span class="opt-label">${t('optFinish')}</span></button>
+    <button class="option-btn finish" onclick="finishList()"><span class="opt-label">${t('optFinish')}</span></button>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn-wiz btn-outline" style="font-size:16px;padding:14px" onclick="downloadBackup()">${t('backupDownload')}</button>
+      <button class="btn-wiz btn-outline" style="font-size:16px;padding:14px" onclick="document.getElementById('backup-file').click()">${t('backupLoad')}</button>
+    </div>
   `;
 }
 
@@ -1142,7 +1215,7 @@ function startNewMed() { screen = 'wizard'; step = 'B'; currentMed = emptyMed();
 function startPrescriber() { screen = 'wizard'; step = 'prescriber'; currentPrescriber = { name:'', forMeds: [] }; hide('options-screen'); show('wizard-screen'); renderWizard(); focusFirst(); }
 function startPharmacy() { screen = 'wizard'; step = 'pharmacy'; currentPharmacy = { name:'', phone:'', forMeds: [] }; hide('options-screen'); show('wizard-screen'); renderWizard(); focusFirst(); }
 function startDetails() { screen = 'wizard'; step = 'details'; selectedDetailsMedIndex = -1; hide('options-screen'); show('wizard-screen'); renderWizard(); focusFirst(); }
-function finishList() { screen = 'review'; hide('options-screen'); show('review-screen'); renderReview(); announce(t('titleReview')); setActionBar(true); }
+function finishList() { screen = 'review'; hide('options-screen'); hide('continuous-list'); show('review-screen'); renderReview(); announce(t('titleReview')); setActionBar(true); }
 
 /* ─── CONTINUOUS LIST ─── */
 function renderContinuousList() {
@@ -1157,20 +1230,22 @@ function renderContinuousList() {
 
   if (hasRealAllergy) {
     html += `<div class="list-section-title">${t('labelAllergy')}</div>`;
-    allergies.filter(a => a.name.trim()).forEach((a, i) => {
+    allergies.forEach((a, i) => {
+      if (!a.name.trim()) return;
       html += `<div class="list-line"><span class="line-text">${esc(a.name)}${a.reaction ? ' → ' + esc(a.reaction) : ''}</span><div class="line-actions"><button onclick="editAllergy(${i})">${t('edit')}</button><button class="danger" onclick="removeAllergy(${i})">${t('remove')}</button></div></div>`;
     });
   }
 
   if (hasRealAvoid) {
     html += `<div class="list-section-title" style="margin-top:20px">${t('labelAvoidMed')}</div>`;
-    avoid.filter(a => a.med.trim()).forEach((a, i) => {
+    avoid.forEach((a, i) => {
+      if (!a.med.trim()) return;
       html += `<div class="list-line"><span class="line-text">${esc(a.med)}${a.reason ? ' — ' + esc(a.reason) : ''}</span><div class="line-actions"><button onclick="editAvoid(${i})">${t('edit')}</button><button class="danger" onclick="removeAvoid(${i})">${t('remove')}</button></div></div>`;
     });
   }
 
   if (medications.length) {
-    html += `<div class="list-section-title" style="margin-top:20px">${t('labelMedName')}</div>`;
+    html += `<div class="list-section-title" style="margin-top:20px">${t('medsSection')}</div>`;
     medications.forEach((m, i) => {
       const parts = [m.name];
       if (m.strength) parts.push(m.strength);
@@ -1201,14 +1276,14 @@ function renderContinuousList() {
   document.getElementById('list-content').innerHTML = html;
 }
 
-function editAllergy(i) { screen = 'wizard'; step = 'A'; hide('options-screen'); hide('review-screen'); show('wizard-screen'); setActionBar(false); renderWizard(); focusFirst(); }
+function editAllergy(i) { screen = 'wizard'; step = 'A'; hide('options-screen'); hide('review-screen'); show('wizard-screen'); setActionBar(false); renderWizard(); renderContinuousList(); focusFirst(); }
 function editAvoid(i) { editAllergy(i); }
 function editMed(i) {
   screen = 'wizard'; step = 'B';
   currentMed = { ...medications[i] };
   editingMedIndex = i;
   hide('options-screen'); hide('review-screen'); show('wizard-screen'); setActionBar(false);
-  renderWizard(); focusFirst();
+  renderWizard(); renderContinuousList(); focusFirst();
 }
 function removeAllergy(i) { undoItem = { type:'allergy', index:i, data:allergies[i] }; allergies.splice(i, 1); renderContinuousList(); showUndo(); }
 function removeAvoid(i) { undoItem = { type:'avoid', index:i, data:avoid[i] }; avoid.splice(i, 1); renderContinuousList(); showUndo(); }
@@ -1250,7 +1325,7 @@ function renderReview() {
   if (!realAvoid.length) html += `<p style="color:var(--muted-ink);margin-bottom:16px">${t('noAvoid')}</p>`;
   else realAvoid.forEach(a => { html += `<p style="margin-bottom:6px">• ${esc(a.med)}${a.reason ? ' — ' + esc(a.reason) : ''}</p>`; });
 
-  html += `<h3 style="font-family:var(--font-display);font-size:18px;margin:20px 0 10px">${t('labelMedName')}</h3>`;
+  html += `<h3 style="font-family:var(--font-display);font-size:18px;margin:20px 0 10px">${t('medsSection')}</h3>`;
   if (!medications.length) html += `<p style="color:var(--muted-ink)">${t('noMeds')}</p>`;
   else medications.forEach(m => {
     const parts = [m.name];
@@ -1276,8 +1351,8 @@ function renderReview() {
   }
 
   html += `<div style="margin-top:24px;padding-top:20px;border-top:2px solid var(--sand);display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
-    <button onclick="editList()" style="font-family:var(--font-body);font-weight:700;font-size:16px;padding:12px 20px;border-radius:999px;border:2px solid var(--deep-pine);background:transparent;color:var(--pine);cursor:pointer">✏️ ${t('btnEdit')}</button>
-    <button onclick="confirmErase()" style="font-family:var(--font-body);font-weight:700;font-size:16px;padding:12px 20px;border-radius:999px;border:2px solid var(--flamboyan);background:transparent;color:var(--flamboyan);cursor:pointer">🗑️ ${t('btnErase')}</button>
+    <button onclick="editList()" style="font-family:var(--font-body);font-weight:700;font-size:16px;padding:12px 20px;border-radius:999px;border:2px solid var(--deep-pine);background:transparent;color:var(--pine);cursor:pointer">${t('btnEdit')}</button>
+    <button onclick="confirmErase()" style="font-family:var(--font-body);font-weight:700;font-size:16px;padding:12px 20px;border-radius:999px;border:2px solid var(--flamboyan);background:transparent;color:var(--flamboyan);cursor:pointer">${t('btnErase')}</button>
   </div>`;
   html += '</div>';
   document.getElementById('review-content').innerHTML = html;
@@ -1300,7 +1375,8 @@ function doErase() {
   closeDialog();
   hide('wizard-screen'); hide('options-screen'); hide('review-screen');
   hide('continuous-list'); setActionBar(false);
-  show('hero-card');
+  document.getElementById('hero-card').style.display = 'flex';
+  document.body.classList.add('on-hero');
 }
 
 /* ─── PRINT ─── */
@@ -1314,6 +1390,147 @@ async function shareList() {
   }
   try { await navigator.clipboard.writeText(text + '\n\n' + window.location.href); alert(t('shareCopied')); }
   catch(e) { alert(t('shareFallback')); }
+}
+
+/* ─── BACKUP (download / load list file — stays on device) ─── */
+function collectState() {
+  return {
+    app: 'mf-medication-list', version: 1, exportedAt: new Date().toISOString(),
+    allergies: allergies.filter(a => a.name.trim()),
+    avoid: avoid.filter(a => a.med.trim()),
+    medications, prescribers, pharmacies
+  };
+}
+function downloadBackup() {
+  const blob = new Blob([JSON.stringify(collectState(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `mi-lista-de-medicamentos-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  announce(t('backupDownload'));
+}
+function loadBackup(input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const d = JSON.parse(reader.result);
+      if (!d || d.app !== 'mf-medication-list' || !Array.isArray(d.medications)) throw new Error('not a backup');
+      const blank = emptyMed();
+      medications = d.medications.map(med => ({ ...blank, ...med, when: { ...blank.when, ...(med.when || {}) } }));
+      allergies = Array.isArray(d.allergies) ? d.allergies : [];
+      avoid = Array.isArray(d.avoid) ? d.avoid : [];
+      prescribers = Array.isArray(d.prescribers) ? d.prescribers : [];
+      pharmacies = Array.isArray(d.pharmacies) ? d.pharmacies : [];
+      currentMed = emptyMed(); editingMedIndex = -1;
+      screen = 'review'; step = '';
+      document.body.classList.remove('on-hero');
+      hide('hero-card'); hide('wizard-screen'); hide('options-screen'); hide('continuous-list');
+      show('review-screen'); renderReview(); setActionBar(true);
+      announce(t('backupLoaded'));
+    } catch (e) {
+      alert(t('backupError'));
+    }
+  };
+  reader.readAsText(f);
+}
+
+/* ─── FRIDGE SHEET (one-page, large type, grouped by time of day) ─── */
+function saveFridgeSheet() {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  const m = 40;
+
+  // Header band
+  doc.setFillColor(15,46,48); doc.rect(0,0,pw,64,'F');
+  if (logoBase64) { try { doc.addImage(logoBase64, 'PNG', m, 16, 32, 32); } catch(e) {} }
+  doc.setTextColor(244,239,230); doc.setFont('helvetica','bold'); doc.setFontSize(20);
+  doc.text(t('titleReview'), m + 42, 39);
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('mifarmaceuticopr.com', pw-m, 39, { align: 'right' });
+  let y = 84;
+
+  // Emergency strip
+  doc.setFillColor(226,81,47); doc.rect(m, y, pw-m*2, 34, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text(t('emergencyStrip'), pw/2, y+22, { align: 'center' });
+  y += 50;
+
+  // Allergies & avoid — safety first, large
+  const rA = allergies.filter(a => a.name.trim());
+  const rV = avoid.filter(a => a.med.trim());
+  if (rA.length) {
+    doc.setTextColor(226,81,47); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    const ls = doc.splitTextToSize(t('fridgeAllergies') + ': ' + rA.map(a => a.name + (a.reaction ? ' (' + a.reaction + ')' : '')).join(', '), pw-m*2);
+    doc.text(ls, m, y); y += ls.length * 18 + 6;
+  }
+  if (rV.length) {
+    doc.setTextColor(226,81,47); doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    const ls = doc.splitTextToSize(t('fridgeAvoid') + ': ' + rV.map(a => a.med + (a.reason ? ' — ' + a.reason : '')).join(', '), pw-m*2);
+    doc.text(ls, m, y); y += ls.length * 18 + 6;
+  }
+  if (!rA.length && !rV.length) {
+    doc.setTextColor(92,111,106); doc.setFont('helvetica','normal'); doc.setFontSize(12);
+    doc.text(t('noAllergies'), m, y); y += 20;
+  }
+  y += 8;
+
+  // Group meds by time of day; anything without a time slot goes to "other"
+  const slots = ['morning','noon','evening','bedtime'];
+  const groups = { morning: [], noon: [], evening: [], bedtime: [], other: [] };
+  medications.forEach(med => {
+    const hit = slots.filter(s => med.when[s]);
+    if (hit.length) hit.forEach(k => groups[k].push(med));
+    else groups.other.push(med);
+  });
+
+  const drawSection = (label, list) => {
+    if (!list.length) return;
+    if (y > ph - 120) { doc.addPage(); y = 60; }
+    doc.setTextColor(15,46,48); doc.setFont('helvetica','bold'); doc.setFontSize(16);
+    doc.text(label, m, y);
+    doc.setDrawColor(226,214,191); doc.setLineWidth(2); doc.line(m, y+6, pw-m, y+6);
+    y += 26;
+    list.forEach(med => {
+      const line = `${med.name}${med.strength ? ' — ' + med.strength : ''}${med.frequency ? ' · ' + t('freq' + cap(med.frequency)) : ''}`;
+      const ls = doc.splitTextToSize(line, pw - m*2 - 20);
+      if (y + ls.length * 20 > ph - 90) { doc.addPage(); y = 60; }
+      doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(15,46,48);
+      doc.text(ls, m+8, y);
+      y += ls.length * 20;
+      if (med.instructions) {
+        const il = doc.splitTextToSize(med.instructions, pw - m*2 - 32);
+        if (y + il.length * 15 > ph - 90) { doc.addPage(); y = 60; }
+        doc.setFont('helvetica','normal'); doc.setFontSize(12); doc.setTextColor(92,111,106);
+        doc.text(il, m+20, y-4);
+        y += il.length * 15 + 2;
+      }
+      y += 6;
+    });
+    y += 10;
+  };
+  drawSection(t('whenMorning').replace(/^[^ ]+ /,''), groups.morning);
+  drawSection(t('whenNoon').replace(/^[^ ]+ /,''), groups.noon);
+  drawSection(t('whenEvening').replace(/^[^ ]+ /,''), groups.evening);
+  drawSection(t('whenBedtime').replace(/^[^ ]+ /,''), groups.bedtime);
+  drawSection(t('fridgeOther'), groups.other);
+
+  if (!medications.length) {
+    doc.setFontSize(12); doc.setTextColor(150,150,150); doc.setFont('helvetica','normal');
+    doc.text(t('noMeds'), m, y+10);
+  }
+
+  // Footer
+  doc.setFontSize(10); doc.setTextColor(92,111,106); doc.setFont('helvetica','normal');
+  doc.text(t('pdfHeaderBrand'), pw/2, ph-34, { align: 'center' });
+  doc.setFontSize(9); doc.setTextColor(150,150,150);
+  doc.text(doc.splitTextToSize(t('pdfFooterDisclaimer'), pw-m*2), pw/2, ph-20, { align: 'center' });
+
+  doc.save(`Hoja-de-Medicamentos-${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
 /* ─── PDF ─── */
@@ -1351,19 +1568,23 @@ function savePDF() {
   const realAllergiesPDF = allergies.filter(a => a.name.trim());
   const realAvoidPDF = avoid.filter(a => a.med.trim());
   if (realAllergiesPDF.length || realAvoidPDF.length) {
-    doc.setDrawColor(226,81,47); doc.setLineWidth(2);
-    const lines = realAllergiesPDF.length + realAvoidPDF.length;
-    doc.rect(m, y, pw-m*2, 14 + lines * 14);
-    doc.setTextColor(226,81,47); doc.setFont('helvetica','bold'); doc.setFontSize(10);
-    let by = y + 12;
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    const boxW = pw - m*2;
+    const textW = boxW - 12;
+    const wrapped = [];
     if (realAllergiesPDF.length) {
-      doc.text(t('labelAllergy') + ': ' + realAllergiesPDF.map(a => `${a.name}${a.reaction?' ('+a.reaction+')':''}`).join(', '), m+6, by);
-      by += 14;
+      wrapped.push(...doc.splitTextToSize(t('labelAllergy') + ': ' + realAllergiesPDF.map(a => `${a.name}${a.reaction?' ('+a.reaction+')':''}`).join(', '), textW));
     }
     if (realAvoidPDF.length) {
-      doc.text(t('labelAvoidMed') + ': ' + realAvoidPDF.map(a => `${a.med}${a.reason?' — '+a.reason:''}`).join(', '), m+6, by);
+      wrapped.push(...doc.splitTextToSize(t('labelAvoidMed') + ': ' + realAvoidPDF.map(a => `${a.med}${a.reason?' — '+a.reason:''}`).join(', '), textW));
     }
-    y += 20 + lines * 14;
+    const boxH = 12 + wrapped.length * 13;
+    doc.setDrawColor(226,81,47); doc.setLineWidth(2);
+    doc.rect(m, y, boxW, boxH);
+    doc.setTextColor(226,81,47);
+    let by = y + 14;
+    wrapped.forEach(line => { doc.text(line, m+6, by); by += 13; });
+    y += boxH + 12;
   }
 
   // Emergency strip
@@ -1419,28 +1640,32 @@ function savePDF() {
 
   // Prescribers
   if (prescribers.length) {
+    if (y > ph - 120) { doc.addPage(); y = 72; }
     doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.setTextColor(15,46,48);
     doc.text(t('prescriberLabel'), m, y);
     y += 16;
     doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60);
     prescribers.forEach(p => {
       const line = `• ${p.name}${p.forMeds.length ? '  —  ' + t('forMeds') + ' ' + p.forMeds.join(', ') : ''}`;
-      doc.text(line, m, y);
-      y += 14;
+      const ls = doc.splitTextToSize(line, pw - m*2);
+      doc.text(ls, m, y);
+      y += ls.length * 13;
     });
     y += 10;
   }
 
   // Pharmacies
   if (pharmacies.length) {
+    if (y > ph - 120) { doc.addPage(); y = 72; }
     doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.setTextColor(15,46,48);
     doc.text(t('pharmacyLabel'), m, y);
     y += 16;
     doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(60,60,60);
     pharmacies.forEach(p => {
       const line = `• ${p.name}${p.phone ? '  —  ' + p.phone : ''}${p.forMeds.length ? '  —  ' + t('forMeds') + ' ' + p.forMeds.join(', ') : ''}`;
-      doc.text(line, m, y);
-      y += 14;
+      const ls = doc.splitTextToSize(line, pw - m*2);
+      doc.text(ls, m, y);
+      y += ls.length * 13;
     });
     y += 10;
   }
@@ -1472,6 +1697,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setLang(lang);
   loadLogoForPDF();
   selfCheckTranslations();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
 });
 </script>
 </body>
