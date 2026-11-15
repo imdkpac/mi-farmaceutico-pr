@@ -135,7 +135,7 @@ const translations = {
         subtitle: 'Enterprise pricing for healthcare facilities',
         transition10: {
           name: '10-Patient Transition Program', price: '$3,000', period: '/mo',
-          desc: 'Dedicated pharmacist support for up to 10 post-discharge patients per month. Reduced readmissions, improved outcomes, documented ROI.',
+          desc: 'Dedicated pharmacist support for up to 10 post-discharge patients per month: medication reconciliation, follow-ups on days 3, 7, and 14, and a monthly report for your team.',
           cta: 'Inquire Now'
         },
         review10: {
