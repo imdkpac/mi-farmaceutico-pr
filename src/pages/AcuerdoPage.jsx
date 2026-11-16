@@ -87,8 +87,7 @@ export default function AcuerdoPage() {
           Planes de suscripción (se cobran cada mes):
         </p>
         <div className="space-y-2 mb-4">
-          <CheckLine>Fundación — un padre o una madre — $110 / mes</CheckLine>
-          <CheckLine>Fundación — dos padres, la misma casa — $165 / mes</CheckLine>
+          <CheckLine>Fundación — $110 / mes</CheckLine>
           <CheckLine>Mejorado — $195 / mes</CheckLine>
           <CheckLine>Concierge — $325 / mes</CheckLine>
         </div>

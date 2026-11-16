@@ -53,9 +53,6 @@ const translations = {
           name: 'Foundation',
           amount: '$110',
           period: '/mo',
-          plusName: 'Foundation, two parents',
-          plusAmount: '$165',
-          plusNote: 'two parents',
           forWhom: 'For a stable set of medications. The follow-up is remote.',
           includes: [
             'A medication review every month',
@@ -64,7 +61,6 @@ const translations = {
             'A reply the next business day',
           ],
           cta: 'Get started',
-          plusCta: 'Get started, two parents',
         },
         enhanced: {
           name: 'Enhanced',
@@ -226,9 +222,6 @@ const translations = {
           name: 'Fundación',
           amount: '$110',
           period: '/mes',
-          plusName: 'Fundación, dos padres',
-          plusAmount: '$165',
-          plusNote: 'dos padres',
           forWhom: 'Para un tratamiento estable. El seguimiento es a distancia.',
           includes: [
             'Revisión de los medicamentos cada mes',
@@ -237,7 +230,6 @@ const translations = {
             'Respuesta al día siguiente laborable',
           ],
           cta: 'Empezar',
-          plusCta: 'Empezar, dos padres',
         },
         enhanced: {
           name: 'Mejorado',
@@ -423,13 +415,6 @@ export default function LandingPage() {
       mode: 'subscription',
       name: t.pricing.subscriptions.foundation.name,
       price: t.pricing.subscriptions.foundation.amount,
-      period: t.pricing.subscriptions.foundation.period,
-    },
-    foundationPlus: {
-      key: 'foundationPlus',
-      mode: 'subscription',
-      name: t.pricing.subscriptions.foundation.plusName,
-      price: t.pricing.subscriptions.foundation.plusAmount,
       period: t.pricing.subscriptions.foundation.period,
     },
     enhanced: {
@@ -646,19 +631,11 @@ export default function LandingPage() {
               badges={[t.pricing.badges.founding]}
               name={t.pricing.subscriptions.foundation.name}
               forWhom={t.pricing.subscriptions.foundation.forWhom}
-              prices={(
-                <>
-                  <PriceTag amount={t.pricing.subscriptions.foundation.amount} period={t.pricing.perMonth} />
-                  <PriceTag amount={t.pricing.subscriptions.foundation.plusAmount} period={`${t.pricing.perMonth} · ${t.pricing.subscriptions.foundation.plusNote}`} />
-                </>
-              )}
+              prices={<PriceTag amount={t.pricing.subscriptions.foundation.amount} period={t.pricing.perMonth} />}
               includes={t.pricing.subscriptions.foundation.includes}
             >
               <button type="button" data-action="checkout" data-plan="foundation" onClick={() => setCheckoutPlan('foundation')} className="btn-capsule btn-capsule-primary w-full">
                 {t.pricing.subscriptions.foundation.cta}
-              </button>
-              <button type="button" data-action="checkout" data-plan="foundationPlus" onClick={() => setCheckoutPlan('foundationPlus')} className="btn-capsule btn-capsule-outline w-full">
-                {t.pricing.subscriptions.foundation.plusCta}
               </button>
             </PlanCard>
             <PlanCard

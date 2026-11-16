@@ -4,7 +4,6 @@
  *
  * Founding prices (first 10 families). Env override, live IDs are the fallback:
  *   STRIPE_PRICE_FOUNDATION          → foundation            $110/mo
- *   STRIPE_PRICE_FOUNDATION_PLUS     → foundationPlus        $165/mo (two parents)
  *   STRIPE_PRICE_ENHANCED            → enhanced              $195/mo
  *   STRIPE_PRICE_CONCIERGE           → concierge             $325/mo
  *   STRIPE_PRICE_TRANSITION          → transition            $650 one-time
@@ -20,7 +19,9 @@
 export const STRIPE_PRICES = {
   subscriptions: {
     foundation: 'price_1Sv7xjLm2d84XGYAGq7oO5FV',        // $110/month
-    foundationPlus: 'price_1Sv801Lm2d84XGYA51lEDMgU',    // $165/month (2 parents)
+    // Quoted privately when a family asks. Not on the checkout allowlist.
+    // Env override, if this is wired back in: STRIPE_PRICE_FOUNDATION_PLUS.
+    foundationPlus: 'price_1Sv801Lm2d84XGYA51lEDMgU',
     enhanced: 'price_1Sv80bLm2d84XGYApQDFLjwx',          // $195/month
     concierge: 'price_1Sv84XLm2d84XGYAljWslj3i',         // $325/month
   },

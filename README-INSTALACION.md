@@ -176,7 +176,6 @@ Defina estas variables en el proyecto de Vercel (Production y Preview). Los Pric
 | `STRIPE_WEBHOOK_SECRET` | Para aceptar webhooks | Secreto de firma (`whsec_...`) del endpoint registrado en Stripe. |
 | `STRIPE_AUTOMATIC_TAX` | Impuesto en Checkout | `true` solo si Stripe Tax ya está activo en la cuenta. Cualquier otro valor, o si la variable falta, deja `automatic_tax` apagado. Sin Tax activo, `true` hace fallar la creación de la sesión. Aunque esté en `true`, Stripe solo cobra impuesto donde hay un registro activo. |
 | `STRIPE_PRICE_FOUNDATION` | Fundación | Suscripción, $110/mes. Respaldo: `price_1Sv7xjLm2d84XGYAGq7oO5FV`. |
-| `STRIPE_PRICE_FOUNDATION_PLUS` | Fundación, dos padres | Suscripción, $165/mes. Respaldo: `price_1Sv801Lm2d84XGYA51lEDMgU`. |
 | `STRIPE_PRICE_ENHANCED` | Mejorado | Suscripción, $195/mes. Respaldo: `price_1Sv80bLm2d84XGYApQDFLjwx`. |
 | `STRIPE_PRICE_CONCIERGE` | Concierge | Suscripción, $325/mes. Respaldo: `price_1Sv84XLm2d84XGYAljWslj3i`. |
 | `STRIPE_PRICE_TRANSITION` | Transición de cuidado | Pago único, $650. Respaldo: `price_1Sv86TLm2d84XGYAr9vvlvuQ`. |
@@ -211,7 +210,7 @@ No hay base de datos. El id del evento se recuerda solo en la memoria de esa ins
 
 ### Lista permitida
 
-El servidor crea sesiones para `foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit` y `consult`. Cualquier otro `plan` o `priceId` recibe `plan_not_allowed`. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
+El servidor crea sesiones para `foundation`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit` y `consult`. Cualquier otro `plan` o `priceId` recibe `plan_not_allowed`. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
 
 La consulta gratis de 15 minutos, y los programas para hospitales y hogares, siguen en Calendly o por correo. No tienen cobro en línea.
 
