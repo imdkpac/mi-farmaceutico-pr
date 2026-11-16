@@ -6,7 +6,7 @@ La guía de instalación, diseño y cobro está en [README-INSTALACION.md](READM
 
 ## Cobro en línea
 
-Checkout hospedado de Stripe. El navegador envía la clave del plan (`foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit`, `safetyAudit`, `consult`). El servidor elige el Price ID.
+Checkout hospedado de Stripe. El navegador envía la clave del plan (`foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit`, `consult`). El servidor elige el Price ID.
 
 En Vercel (Production y Preview) haga falta:
 
@@ -17,7 +17,7 @@ En Vercel (Production y Preview) haga falta:
 - `NOTIFY_EMAIL` — `portalatin@mifarmaceuticopr.com`
 - `NOTIFY_FROM`
 
-Los Price IDs de fundador pueden fijarse con `STRIPE_PRICE_FOUNDATION`, `STRIPE_PRICE_FOUNDATION_PLUS`, `STRIPE_PRICE_ENHANCED`, `STRIPE_PRICE_CONCIERGE`, `STRIPE_PRICE_TRANSITION`, `STRIPE_PRICE_TRANSITION_EXPRESS`, `STRIPE_PRICE_HOME_VISIT`, `STRIPE_PRICE_SAFETY_AUDIT` y `STRIPE_PRICE_CONSULT`. Si faltan, el código usa los IDs vivos de `src/config/stripeConfig.js`.
+Los Price IDs de fundador pueden fijarse con `STRIPE_PRICE_FOUNDATION`, `STRIPE_PRICE_FOUNDATION_PLUS`, `STRIPE_PRICE_ENHANCED`, `STRIPE_PRICE_CONCIERGE`, `STRIPE_PRICE_TRANSITION`, `STRIPE_PRICE_TRANSITION_EXPRESS`, `STRIPE_PRICE_HOME_VISIT` y `STRIPE_PRICE_CONSULT`. Si faltan, el código usa los IDs vivos de `src/config/stripeConfig.js`.
 
 Webhook de producción: `https://mi-farmaceutico-pr.vercel.app/api/webhook`
 

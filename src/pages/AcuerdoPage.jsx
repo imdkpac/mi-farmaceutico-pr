@@ -9,9 +9,10 @@ import { refundCopy } from '../lib/refundPolicy';
  * Section 3.D replaces the first-month refund with the owner's rule
  * (see refundPolicy.js). Section 4.B is a placeholder and does not say
  * that email or messaging platforms are covered by business associate agreements.
- * Safety Audit ($425) and the 1-hour consultation ($70) are listed so the
- * checkboxes match the services this site sells. The annual review remains $350,
- * the amount in the source document. Confirm those lines in review.
+ * The home visit and the safety audit are one service at $350, the same
+ * amount as the annual review. There is no separate $425 visit and no
+ * separate audit. The 1-hour consultation ($70) is listed so the checkbox
+ * matches checkout. Confirm those lines in review.
  */
 const POLICY = refundCopy('es');
 
@@ -103,8 +104,7 @@ export default function AcuerdoPage() {
         <div className="space-y-2 mb-4">
           <CheckLine>Transición de cuidado — $650</CheckLine>
           <CheckLine>Transición de cuidado, expedita — $850</CheckLine>
-          <CheckLine>Visita de seguridad de medicamentos en el hogar — $425</CheckLine>
-          <CheckLine>Auditoría de seguridad — $425</CheckLine>
+          <CheckLine>Visita y auditoría en el hogar — $350</CheckLine>
           <CheckLine>Consulta de 1 hora — $70</CheckLine>
           <CheckLine>Revisión anual completa de medicamentos (solo Fundación y Mejorado) — $350</CheckLine>
         </div>

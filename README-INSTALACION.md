@@ -181,8 +181,7 @@ Defina estas variables en el proyecto de Vercel (Production y Preview). Los Pric
 | `STRIPE_PRICE_CONCIERGE` | Concierge | Suscripción, $325/mes. Respaldo: `price_1Sv84XLm2d84XGYAljWslj3i`. |
 | `STRIPE_PRICE_TRANSITION` | Transición de cuidado | Pago único, $650. Respaldo: `price_1Sv86TLm2d84XGYAr9vvlvuQ`. |
 | `STRIPE_PRICE_TRANSITION_EXPRESS` | Transición expedita | Pago único, $850. Respaldo: `price_1Sv8J3Lm2d84XGYA2OlnYv72`. |
-| `STRIPE_PRICE_HOME_VISIT` | Visita en el hogar | Pago único, $425. Respaldo: `price_1UcE4QLm2d84XGYA6aPDgSOz`. |
-| `STRIPE_PRICE_SAFETY_AUDIT` | Auditoría de seguridad | Pago único, $425. Respaldo: `price_1UcE4SLm2d84XGYA7ebzKZWh`. |
+| `STRIPE_PRICE_HOME_VISIT` | Visita y auditoría en el hogar | Pago único, $350. Respaldo: `price_1Sv878Lm2d84XGYAYV6dahTG`. |
 | `STRIPE_PRICE_CONSULT` | Consulta de 1 hora | Pago único, $70. Respaldo: `price_1UcE4ULm2d84XGYAgtlYisKQ`. |
 | `RESEND_API_KEY` | Aviso al dueño | API key de [Resend](https://resend.com). Si falta, el webhook no envía correo y responde 200. |
 | `NOTIFY_EMAIL` | Aviso al dueño | Correo que recibe el aviso de pago. Valor a usar: `portalatin@mifarmaceuticopr.com`. Si falta, no se envía correo. |
@@ -212,7 +211,7 @@ No hay base de datos. El id del evento se recuerda solo en la memoria de esa ins
 
 ### Lista permitida
 
-El servidor crea sesiones para `foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit`, `safetyAudit` y `consult`. Cualquier otro `plan` o `priceId` recibe `plan_not_allowed`. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
+El servidor crea sesiones para `foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit` y `consult`. Cualquier otro `plan` o `priceId` recibe `plan_not_allowed`. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
 
 La consulta gratis de 15 minutos, y los programas para hospitales y hogares, siguen en Calendly o por correo. No tienen cobro en línea.
 

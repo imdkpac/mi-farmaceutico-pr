@@ -9,8 +9,7 @@
  *   STRIPE_PRICE_CONCIERGE           → concierge             $325/mo
  *   STRIPE_PRICE_TRANSITION          → transition            $650 one-time
  *   STRIPE_PRICE_TRANSITION_EXPRESS  → transitionExpress     $850 one-time
- *   STRIPE_PRICE_HOME_VISIT          → homeVisit             $425 one-time
- *   STRIPE_PRICE_SAFETY_AUDIT        → safetyAudit           $425 one-time
+ *   STRIPE_PRICE_HOME_VISIT          → homeVisit             $350 one-time
  *   STRIPE_PRICE_CONSULT             → consult               $70 one-time
  *
  * STRIPE_STANDARD_PRICES is the after-10-families catalog. Those prices are
@@ -29,8 +28,7 @@ export const STRIPE_PRICES = {
   oneTime: {
     transition: 'price_1Sv86TLm2d84XGYAr9vvlvuQ',             // $650
     transitionExpress: 'price_1Sv8J3Lm2d84XGYA2OlnYv72',      // $850
-    homeVisit: 'price_1UcE4QLm2d84XGYA6aPDgSOz',              // $425
-    safetyAudit: 'price_1UcE4SLm2d84XGYA7ebzKZWh',            // $425
+    homeVisit: 'price_1Sv878Lm2d84XGYAYV6dahTG',              // $350
     consult: 'price_1UcE4ULm2d84XGYAgtlYisKQ',                // $70
   },
 };
@@ -44,6 +42,7 @@ export const STRIPE_STANDARD_PRICES = {
   },
   oneTime: {
     transition: 'price_1UcE4dLm2d84XGYAerHnT5hw',   // $1,050
+    homeVisit: 'price_1UcE4QLm2d84XGYA6aPDgSOz',    // $425
   },
 };
 
@@ -54,7 +53,6 @@ export const PRICE_LABELS = {
   concierge: '$325/month',
   transition: '$650',
   transitionExpress: '$850',
-  homeVisit: '$425',
-  safetyAudit: '$425',
+  homeVisit: '$350',
   consult: '$70',
 };
