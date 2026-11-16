@@ -4,12 +4,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCheckout } from '../hooks/useCheckout';
 import { checkoutReducer, CHECKOUT_INITIAL, isBusy, canClose } from '../lib/checkoutMachine';
 import { SERVICE_AGREEMENT_HREF } from '../lib/serviceAgreement';
+import { refundCopy } from '../lib/refundPolicy';
 
 const copy = {
   en: {
     close: 'Close',
     oneTime: 'One-time payment. This charge does not renew.',
-    terms: "Cancellation requires 30 days' written notice. Only the first month is refundable, and only if you request that refund in writing within 30 days of the service start date. Later months are not refundable.",
     agreeBefore: "I've read the ",
     agreeLink: 'Service Agreement',
     agreementRequired: 'Check the box to confirm you have read the Service Agreement.',
@@ -22,7 +22,6 @@ const copy = {
   es: {
     close: 'Cerrar',
     oneTime: 'Pago único. Este cargo no se renueva.',
-    terms: 'La cancelación requiere aviso por escrito con 30 días de anticipación. Solo el primer mes es reembolsable, y solo si solicita ese reembolso por escrito dentro de los 30 días posteriores a la fecha de inicio del servicio. Los meses siguientes no son reembolsables.',
     agreeBefore: 'He leído el ',
     agreeLink: 'Acuerdo de Servicio',
     agreementRequired: 'Marque la casilla para confirmar que ha leído el Acuerdo de Servicio.',
@@ -37,6 +36,7 @@ const copy = {
 export default function CheckoutModal({ isOpen, onClose, plan }) {
   const { lang } = useLanguage();
   const t = copy[lang] || copy.es;
+  const policy = refundCopy(lang === 'en' ? 'en' : 'es');
   const { startCheckout } = useCheckout();
   const [agreed, setAgreed] = useState(false);
   const [agreementError, setAgreementError] = useState('');
@@ -139,8 +139,9 @@ export default function CheckoutModal({ isOpen, onClose, plan }) {
           )}
         </div>
 
+        {/* PENDING LEGAL REVIEW by Natalie Ramos. See src/lib/refundPolicy.js */}
         <p className="font-body text-sm leading-relaxed mb-5" style={{ color: 'var(--pine)' }}>
-          {t.terms}
+          {plan.mode === 'subscription' ? policy.combined : policy.refund}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">

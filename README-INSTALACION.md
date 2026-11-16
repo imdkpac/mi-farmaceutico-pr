@@ -168,27 +168,37 @@ npm run dev
 
 El cobro en línea es Stripe Checkout hospedado: el navegador hace POST a `/api/create-checkout-session` y redirige a `session.url`. No hace falta clave publicable ni Stripe.js.
 
-Defina estas variables en el proyecto de Vercel (Production y Preview). Los Price IDs de abajo son el respaldo en código: si la variable falta, el servidor usa ese ID vivo para que producción no se caiga antes de configurarlas. Aun así, conviene fijarlas en Vercel.
+Defina estas variables en el proyecto de Vercel (Production y Preview). Los Price IDs de abajo son el respaldo en código: si la variable falta, el servidor usa ese ID vivo para que producción no se caiga antes de configurarlas. Aun así, conviene fijarlas en Vercel. El ejemplo está en `.env.example`.
 
 | Variable | Cuándo hace falta | Qué es |
 | --- | --- | --- |
 | `STRIPE_SECRET_KEY` | Para crear sesiones | Clave secreta (`sk_live_...` o `sk_test_...`). Solo en el servidor. |
-| `STRIPE_PRICE_FOUNDATION` | Checkout de Fundación | Price ID de la suscripción Foundation a $110/mes. Respaldo: `price_1Sv7xjLm2d84XGYAGq7oO5FV`. Modo `subscription`. |
-| `STRIPE_PRICE_TRANSITION` | Checkout de Transición de Cuidado | Price ID del pago único a $650. Respaldo: `price_1Sv86TLm2d84XGYAr9vvlvuQ`. Modo `payment`. |
 | `STRIPE_WEBHOOK_SECRET` | Para aceptar webhooks | Secreto de firma (`whsec_...`) del endpoint registrado en Stripe. |
+| `STRIPE_AUTOMATIC_TAX` | Impuesto en Checkout | `true` solo si Stripe Tax ya está activo en la cuenta. Cualquier otro valor, o si la variable falta, deja `automatic_tax` apagado. Sin Tax activo, `true` hace fallar la creación de la sesión. Aunque esté en `true`, Stripe solo cobra impuesto donde hay un registro activo. |
+| `STRIPE_PRICE_FOUNDATION` | Fundación | Suscripción, $110/mes. Respaldo: `price_1Sv7xjLm2d84XGYAGq7oO5FV`. |
+| `STRIPE_PRICE_FOUNDATION_PLUS` | Fundación, dos padres | Suscripción, $165/mes. Respaldo: `price_1Sv801Lm2d84XGYA51lEDMgU`. |
+| `STRIPE_PRICE_ENHANCED` | Mejorado | Suscripción, $195/mes. Respaldo: `price_1Sv80bLm2d84XGYApQDFLjwx`. |
+| `STRIPE_PRICE_CONCIERGE` | Concierge | Suscripción, $325/mes. Respaldo: `price_1Sv84XLm2d84XGYAljWslj3i`. |
+| `STRIPE_PRICE_TRANSITION` | Transición de cuidado | Pago único, $650. Respaldo: `price_1Sv86TLm2d84XGYAr9vvlvuQ`. |
+| `STRIPE_PRICE_TRANSITION_EXPRESS` | Transición expedita | Pago único, $850. Respaldo: `price_1Sv8J3Lm2d84XGYA2OlnYv72`. |
+| `STRIPE_PRICE_HOME_VISIT` | Visita en el hogar | Pago único, $425. Respaldo: `price_1UcE4QLm2d84XGYA6aPDgSOz`. |
+| `STRIPE_PRICE_SAFETY_AUDIT` | Auditoría de seguridad | Pago único, $425. Respaldo: `price_1UcE4SLm2d84XGYA7ebzKZWh`. |
+| `STRIPE_PRICE_CONSULT` | Consulta de 1 hora | Pago único, $70. Respaldo: `price_1UcE4ULm2d84XGYAgtlYisKQ`. |
+| `RESEND_API_KEY` | Aviso al dueño | API key de [Resend](https://resend.com). Si falta, el webhook no envía correo y responde 200. |
+| `NOTIFY_EMAIL` | Aviso al dueño | Correo que recibe el aviso de pago. Valor a usar: `portalatin@mifarmaceuticopr.com`. Si falta, no se envía correo. |
+| `NOTIFY_FROM` | Aviso al dueño | Remitente verificado en Resend, por ejemplo `Mi Farmacéutico <avisos@mifarmaceuticopr.com>`. Si falta, no se envía correo. |
 | `CLIENT_URL` | Opcional | Origen de `/success` y `/canceled`, sin barra final. Si falta, se usa el encabezado `Origin` de la petición. |
-| `RESEND_API_KEY` | Opcional | API key de [Resend](https://resend.com). Si falta, el webhook no envía correo y responde 200. |
-| `NOTIFY_EMAIL` | Opcional | Correo del dueño que recibe el aviso de pago. Si falta, no se envía correo. |
-| `NOTIFY_FROM` | Opcional | Remitente verificado en Resend, por ejemplo `Mi Farmacéutico <avisos@su-dominio>`. Si falta, no se envía correo. |
 | `VITE_API_URL` | Solo en local | Origen del API cuando el sitio corre en localhost (por defecto `http://localhost:3001`). En Vercel no se usa. |
+
+No ponga en esas variables los Price IDs de después de la familia 10 (`STRIPE_STANDARD_PRICES` en `src/config/stripeConfig.js`). Están inactivos hasta la familia 11, no se muestran en el sitio y el servidor los rechaza.
 
 No configure `VITE_STRIPE_PUBLISHABLE_KEY`. El cliente ya no carga Stripe.js.
 
 ### Webhook en Stripe
 
-En Stripe → Developers → Webhooks, agregue el endpoint:
+En Stripe → Developers → Webhooks, el endpoint de producción es:
 
-`https://<dominio-de-produccion-en-vercel>/api/webhook`
+`https://mi-farmaceutico-pr.vercel.app/api/webhook`
 
 Evento mínimo: `checkout.session.completed`.
 
@@ -202,13 +212,15 @@ No hay base de datos. El id del evento se recuerda solo en la memoria de esa ins
 
 ### Lista permitida
 
-El servidor solo crea sesiones para `foundation` y `transition`. Cualquier otro `plan` o `priceId` —incluidos `foundationPlus`, `enhanced`, `concierge`, `transitionExpress`, `homeVisit` y `safetyAudit`— recibe `plan_not_allowed`. Esos IDs siguen en `src/config/stripeConfig.js` y no están conectados a ningún botón. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
+El servidor crea sesiones para `foundation`, `foundationPlus`, `enhanced`, `concierge`, `transition`, `transitionExpress`, `homeVisit`, `safetyAudit` y `consult`. Cualquier otro `plan` o `priceId` recibe `plan_not_allowed`. La cantidad siempre es 1. El correo del cliente lo pide Stripe en su página, no este sitio.
+
+La consulta gratis de 15 minutos, y los programas para hospitales y hogares, siguen en Calendly o por correo. No tienen cobro en línea.
 
 ### Lo que todavía hay que probar en test mode
 
-Cree una sesión con las claves `sk_test_` / `whsec_` de test, pague con `4242...`, confirme que `/success` muestra solo correo, monto, moneda, nombre del plan e id, y que el webhook llega a `/api/webhook` sin error de firma. Si la cuenta no tiene Stripe Tax activo, `automatic_tax` puede hacer fallar la creación de la sesión.
+Cree una sesión con las claves `sk_test_` / `whsec_` de test, pague con `4242...`, confirme que `/success` muestra solo correo, monto, moneda, nombre del plan e id, y que el webhook llega a `/api/webhook` sin error de firma. Deje `STRIPE_AUTOMATIC_TAX` sin definir, o en cualquier valor que no sea `true`, hasta que Stripe Tax esté activo en la cuenta.
 
 ## Contacto
 
 Christian Alexis Portalatín Cordero, Pharm.D.
-(787) 667-6560 | boticarxpr@outlook.com
+(787) 667-6560 | portalatin@mifarmaceuticopr.com

@@ -83,13 +83,13 @@ export default function Canceled() {
           <h3 className="text-lg font-bold text-slate-900 mb-3">{t.haveQuestions}</h3>
           <p className="text-sm text-slate-700 mb-4">{t.hereToHelp}</p>
           <div className="space-y-2 text-sm">
-            <a href="mailto:boticarxpr@outlook.com" className="flex items-center gap-2 text-teal-600 hover:underline">
+            <a href="mailto:portalatin@mifarmaceuticopr.com" className="flex items-center gap-2 text-teal-600 hover:underline">
               <span>📧</span>
-              <span>boticarxpr@outlook.com</span>
+              <span>portalatin@mifarmaceuticopr.com</span>
             </a>
             <a href="tel:+17876676560" className="flex items-center gap-2 text-teal-600 hover:underline">
               <span>📞</span>
-              <span>+1 (787) 667-6560</span>
+              <span>(787) 667-6560</span>
             </a>
           </div>
         </div>

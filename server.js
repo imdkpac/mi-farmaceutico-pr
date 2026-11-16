@@ -31,7 +31,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Create Checkout Session. Allowlist is foundation (subscription) and transition (payment).
+// Create Checkout Session. Allowlist is the founding plans in checkoutPlans.js.
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     const result = await createAllowedCheckout({
@@ -48,7 +48,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
   }
 });
 
-// Legacy one-time endpoint. Payment-mode allowlist only (transition).
+// Legacy one-time endpoint. Payment-mode allowlist only (rejects subscriptions).
 app.post('/api/create-payment-session', async (req, res) => {
   try {
     const result = await createAllowedCheckout({

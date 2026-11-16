@@ -37,9 +37,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-3 shrink-0 group">
-            <LogoMark className="w-11 h-11" />
-            <span className="font-display text-xl sm:text-2xl font-semibold text-[#0F2E30] tracking-tight">
+          <NavLink to="/" className="flex items-center gap-2 sm:gap-3 min-w-0 group">
+            <LogoMark className="w-11 h-11 shrink-0" />
+            <span className="font-display text-base sm:text-2xl font-semibold text-[#0F2E30] tracking-tight leading-tight">
               Mi Farmacéutico<span style={{ color: 'var(--flamboyan)' }}> en PR</span>
             </span>
           </NavLink>
@@ -64,7 +64,7 @@ export default function Navbar() {
           </nav>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Phone - always visible on desktop */}
             <a
               href="tel:7876676560"

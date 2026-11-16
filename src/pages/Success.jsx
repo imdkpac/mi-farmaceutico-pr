@@ -173,9 +173,9 @@ export default function Success() {
         <div className="mb-8 text-center p-4 bg-amber-50 rounded-xl border border-amber-200">
           <p className="text-sm text-amber-900">
             <strong>{t.needHelp}</strong> {t.contactUs}{' '}
-            <a href="mailto:boticarxpr@outlook.com" className="underline hover:text-amber-700">boticarxpr@outlook.com</a>
+            <a href="mailto:portalatin@mifarmaceuticopr.com" className="underline hover:text-amber-700">portalatin@mifarmaceuticopr.com</a>
             {' '}{t.orCall}{' '}
-            <a href="tel:+17876676560" className="underline hover:text-amber-700">+1 (787) 667-6560</a>
+            <a href="tel:+17876676560" className="underline hover:text-amber-700">(787) 667-6560</a>
           </p>
         </div>
 
