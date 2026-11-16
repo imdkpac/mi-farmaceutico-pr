@@ -34,10 +34,12 @@ const translations = {
     pricing: {
       sectionTitle: 'Services',
       sectionSubtitle: 'Choose the service that fits your family.',
+      startTitle: 'To start',
+      startIntro: 'An hour with the pharmacist, or a visit at home.',
       monthlyTitle: 'Each month',
       monthlyIntro: 'A pharmacist stays with the medications.',
-      onceTitle: 'One time',
-      onceIntro: 'A visit, the days after the hospital, or one conversation.',
+      transitionTitle: 'After the hospital',
+      transitionIntro: 'For the days after coming home.',
       perMonth: '/mo',
       oneTimeLabel: 'one-time',
       badges: {
@@ -205,10 +207,12 @@ const translations = {
     pricing: {
       sectionTitle: 'Servicios',
       sectionSubtitle: 'Elige el servicio que le hace falta a tu familia.',
+      startTitle: 'Para empezar',
+      startIntro: 'Una hora con el farmacéutico, o una visita a la casa.',
       monthlyTitle: 'Cada mes',
       monthlyIntro: 'Un farmacéutico sigue los medicamentos.',
-      onceTitle: 'Una sola vez',
-      onceIntro: 'Una visita, los días después del hospital, o una conversación.',
+      transitionTitle: 'Después del hospital',
+      transitionIntro: 'Para los días que siguen al alta.',
       perMonth: '/mes',
       oneTimeLabel: 'pago único',
       badges: {
@@ -613,6 +617,28 @@ export default function LandingPage() {
             </button>
           </div>
 
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.startTitle}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.startIntro}</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-14">
+            {[
+              ['consult', t.pricing.oneTime.consultation],
+              ['homeVisit', t.pricing.oneTime.homeVisit],
+            ].map(([key, service]) => (
+              <PlanCard
+                key={key}
+                badges={[t.pricing.badges.once, t.pricing.badges.founding]}
+                name={service.name}
+                forWhom={service.forWhom}
+                prices={<PriceTag amount={service.amount} period={t.pricing.oneTimeLabel} />}
+                includes={service.includes}
+              >
+                <button type="button" data-action="checkout" data-plan={key} onClick={() => setCheckoutPlan(key)} className="btn-capsule btn-capsule-primary w-full">
+                  {service.cta}
+                </button>
+              </PlanCard>
+            ))}
+          </div>
+
           <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.monthlyTitle}</h3>
           <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.monthlyIntro}</p>
           <div className="grid lg:grid-cols-3 gap-6 mb-14">
@@ -660,14 +686,12 @@ export default function LandingPage() {
             </PlanCard>
           </div>
 
-          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.onceTitle}</h3>
-          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.onceIntro}</p>
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 mb-14">
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.transitionTitle}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.transitionIntro}</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-14">
             {[
               ['transition', t.pricing.oneTime.transition, [t.pricing.badges.once, t.pricing.badges.founding]],
               ['transitionExpress', t.pricing.oneTime.express, [t.pricing.badges.sameDay, t.pricing.badges.founding]],
-              ['homeVisit', t.pricing.oneTime.homeVisit, [t.pricing.badges.once, t.pricing.badges.founding]],
-              ['consult', t.pricing.oneTime.consultation, [t.pricing.badges.once, t.pricing.badges.founding]],
             ].map(([key, service, badges]) => (
               <PlanCard
                 key={key}
@@ -687,14 +711,17 @@ export default function LandingPage() {
           <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.b2b.title}</h3>
           <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.b2b.subtitle}</p>
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {[t.pricing.b2b.transition10, t.pricing.b2b.review10].map((item) => (
-              <article key={item.name} className="p-6 sm:p-8 flex flex-col" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
+            {[
+              ['b2b-review', t.pricing.b2b.review10],
+              ['b2b-transition', t.pricing.b2b.transition10],
+            ].map(([plan, item]) => (
+              <article key={plan} className="p-6 sm:p-8 flex flex-col" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
                 <h4 className="font-display text-3xl font-medium text-[#0F2E30]">{item.name}</h4>
                 <p className="font-body text-base mt-2 text-[#0F2E30]">{item.desc}</p>
                 <div className="mt-4 mb-6">
                   <PriceTag amount={item.price} period={item.period} />
                 </div>
-                <button type="button" data-action="calendly" data-plan={item === t.pricing.b2b.transition10 ? 'b2b-transition' : 'b2b-review'} onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full mt-auto">
+                <button type="button" data-action="calendly" data-plan={plan} onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full mt-auto">
                   {item.cta}
                 </button>
               </article>
