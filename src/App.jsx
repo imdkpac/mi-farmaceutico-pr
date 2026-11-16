@@ -8,6 +8,7 @@ import GuiaPage from './pages/GuiaPage';
 import AprendePage from './pages/AprendePage';
 import Success from './pages/Success';
 import Canceled from './pages/Canceled';
+import AcuerdoPage from './pages/AcuerdoPage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/servicios" element={<LandingPage />} />
+            <Route path="/acuerdo-de-servicio" element={<AcuerdoPage />} />
             <Route path="/guia" element={<GuiaPage />} />
             <Route path="/aprende" element={<AprendePage />} />
             <Route path="/success" element={<Success />} />

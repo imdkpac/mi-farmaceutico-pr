@@ -27,8 +27,9 @@ function isStripeCheckoutUrl(value) {
 }
 
 /**
- * Start Stripe-hosted Checkout for an allowlisted plan key
- * (`foundation` or `transition`) and redirect to session.url.
+ * Start Stripe-hosted Checkout for an allowlisted plan key and redirect to session.url.
+ * Allowed keys: foundation, enhanced, concierge, transition,
+ * transitionExpress, homeVisit, consult.
  */
 export function useCheckout() {
   const { lang } = useLanguage();

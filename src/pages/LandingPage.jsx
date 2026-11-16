@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Phone, Mail, Shield, CheckCircle, Clipboard,
   Award, Globe, ChevronDown,
-  Star, MapPin, Building2, Users, Stethoscope,
+  MapPin,
   Calendar, ArrowUpRight
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import CheckoutModal from '../components/CheckoutModal';
+import { refundCopy } from '../lib/refundPolicy';
 
 /* ─── Translations ─── */
 const translations = {
@@ -26,138 +28,149 @@ const translations = {
       subtitle: 'Three simple steps to professional medication oversight for your loved ones',
       step1: { title: 'You Share', desc: "Build your parent's medication list using our free, private tool. No account needed—everything stays on your device. Then share it with us during your consultation.", cta: 'Create Medication List', ctaSub: 'Free & private. No download required.' },
       step2: { title: 'Free 15-Min Consult', desc: "Schedule a free 15-minute video call. We'll review your parent's medication history, discuss concerns, and recommend the right service level. No commitment required.", cta: 'Schedule Free Consult' },
-      step3: { title: 'You Relax', desc: "Choose the service that fits your family's needs and budget. Start small with a one-time consultation, or get ongoing peace of mind with a monthly subscription. We'll handle the rest.", cta: 'See Services & Pricing' },
+      step3: { title: 'You Relax', desc: "Choose the service that fits your family's needs. Start with one conversation, or keep a pharmacist looking at the medications every month.", cta: 'See the services' },
       serviceArea: 'Serving families in NY, FL, Chicago, and beyond. Core service area: San Juan Metro, Bayamón, Carolina, Guaynabo.'
     },
     pricing: {
-      sectionTitle: 'Services & Pricing',
-      sectionSubtitle: 'Clear, upfront pricing. No hidden fees. No insurance required.',
-      promoLabel: 'First 10 families',
-      regularLabel: 'Regular price',
-      monthly: '/month',
+      sectionTitle: 'Services',
+      sectionSubtitle: 'Choose the service that fits your family.',
+      startTitle: 'To start',
+      startIntro: 'An hour with the pharmacist, or a visit at home.',
+      monthlyTitle: 'Each month',
+      monthlyIntro: 'A pharmacist stays with the medications.',
+      transitionTitle: 'After the hospital',
+      transitionIntro: 'For the days after coming home.',
+      perMonth: '/mo',
+      oneTimeLabel: 'one-time',
+      badges: {
+        founding: 'Founding price',
+        popular: 'Most chosen',
+        once: 'One-time',
+        sameDay: 'Same day',
+      },
       subscriptions: {
-        title: 'Monthly Subscriptions',
-        subtitle: 'Ongoing medication oversight for your family',
         foundation: {
-          name: 'Foundation', badge: 'Remote Monitoring Only',
-          regular: '$169', promo: '$110', period: '/mo',
-          note: '$165 for 2 parents at promo price',
-          desc: 'Professional monitoring without home visits. Monthly medication review, pharmacy coordination, and family reports.',
-          bestFor: 'Best for: Simple regimens, families who visit often',
-          cta: 'Choose Foundation'
+          name: 'Foundation',
+          amount: '$110',
+          period: '/mo',
+          forWhom: 'For a stable set of medications. The follow-up is remote.',
+          includes: [
+            'A medication review every month',
+            'Coordination with the pharmacy',
+            'A written report for the family',
+            'A reply the next business day',
+          ],
+          cta: 'Get started',
         },
         enhanced: {
-          name: 'Enhanced', badge: 'Hybrid Care', popular: 'Most Popular',
-          regular: '$259', promo: '$195', period: '/mo',
-          desc: 'Remote oversight + in-home visits when clinically needed. Everything in Foundation, plus on-site medication organization and prescriber advocacy.',
-          bestFor: 'Best for: 5+ medications, multiple doctors, recent hospitalization',
-          cta: 'Start with Enhanced'
+          name: 'Enhanced',
+          amount: '$195',
+          period: '/mo',
+          forWhom: 'For several medications, more than one doctor, or a recent hospital stay.',
+          includes: [
+            'Monthly review, pharmacy coordination, and a family report',
+            'A reply the same business day',
+            'Two home visits a year',
+            'Pillbox, storage, and how to use the devices',
+            'The pharmacist talks with the prescribers',
+          ],
+          cta: 'Get started',
         },
         concierge: {
-          name: 'Concierge', badge: 'Limited Availability',
-          regular: '$429', promo: '$325', period: '/mo',
-          desc: 'White-glove advocacy for high-complexity situations. Unlimited access, priority scheduling, and dedicated pharmacist assignment.',
-          bestFor: 'Best for: 10+ medications, multiple specialists, cognitive concerns',
-          spots: 'Only 3 spots available until December 2026',
-          cta: 'Apply for Concierge'
-        }
+          name: 'Concierge',
+          amount: '$325',
+          period: '/mo',
+          forWhom: 'For many medications, several specialists, or worry about memory.',
+          includes: [
+            'The same pharmacist, with a reply within 4 business hours',
+            'A home visit every month',
+            'A deeper review each quarter, and the yearly review',
+            'Coordination with family, pharmacy, and doctors',
+            'First in line after a hospital stay',
+          ],
+          spots: '3 openings through December 2026.',
+          cta: 'Get started',
+        },
       },
       freeConsult: {
-        title: 'Start Here — Free',
-        subtitle: 'No commitment. No credit card required.',
-        name: '15-Minute Consultation',
-        price: 'FREE',
-        desc: 'A quick video call to understand your situation, review your medication list, and recommend the right next step. Perfect for diaspora families exploring options for the first time.',
-        cta: 'Schedule Free Consult'
+        line: 'If you are not sure which service fits, there is a 15-minute conversation. It is free and does not ask for a card.',
+        cta: 'Reserve',
       },
       oneTime: {
-        title: 'One-Time Services',
-        subtitle: 'Pay once, get clarity immediately',
-        consultation: {
-          name: '1-Hour Consultation', price: '$70', oldPrice: '',
-          desc: 'One-on-one medication review with a licensed pharmacist. Bring your list, your questions, and your concerns.',
-          cta: 'Book Consultation'
-        },
-        audit: {
-          name: 'Safety Audit', price: '$425', oldPrice: '',
-          desc: 'Comprehensive in-home medication safety assessment. We review every prescription, OTC, and supplement for interactions, duplicates, and fall risks.',
-          cta: 'Book Safety Audit'
-        },
         transition: {
-          name: 'Transition of Care', price: '$650', oldPrice: '$1,050',
-          note: 'Introductory price for now — regular price $1,050 after.',
-          desc: 'Post-hospital medication reconciliation. We coordinate with discharge instructions, reconcile new prescriptions, and ensure safe transitions home.',
-          cta: 'Book Transition Care'
-        }
-      },
-      compare: {
-        title: "Compare what's included",
-        feature: 'Feature',
-        priceLabel: 'Price',
-        rows: [
-          { label: 'Best for', values: ['Stable regimens', 'Changing regimens', 'Complex medication care'] },
-          { label: 'Secure messaging', values: ['Next business day', 'Same business day', 'Within 4 business hours'] },
-          { label: 'Direct prescriber coordination', values: ['no', 'yes', 'yes'] },
-          { label: 'In-home medication reviews', values: ['no', '2 per year', 'Monthly'] },
-          { label: 'Pillbox and organization review', values: ['no', 'yes', 'yes'] },
-          { label: 'Storage and expiration review', values: ['no', 'yes', 'yes'] },
-          { label: 'Device-technique education', values: ['no', 'yes', 'yes'] },
-          { label: 'Caregiver medication education', values: ['no', 'yes', 'yes'] },
-          { label: 'Quarterly deeper review', values: ['no', 'no', 'yes'] },
-          { label: 'Annual comprehensive review', values: ['Add-on', 'Add-on', 'Included'] },
-          { label: 'Deprescribing recommendations', values: ['no', 'Limited', 'yes'] },
-          { label: 'Care-circle coordination', values: ['no', 'Prescribers only', 'Family, pharmacy, prescribers, caregiver, nurse, or PT'] },
-          { label: 'Priority transition scheduling', values: ['no', 'no', 'yes'] },
-          { label: 'Additional home visits', values: ['Standalone rate', 'Subscriber rate', 'Subscriber rate'] }
-        ]
-      },
-      transitionDetail: {
-        title: 'Transition of Care — The First 14 Days',
-        subtitle: 'A structured post-hospital program, from intake call to closing report.',
-        days: [
-          { day: 'Day 1', label: 'Intake call' },
-          { day: 'Day 3', label: 'Follow-up' },
-          { day: 'Day 7', label: 'Follow-up' },
-          { day: 'Day 14', label: 'Closing call + report' }
-        ],
-        included: [
-          'Rapid family intake call',
-          'One in-home medication review',
-          'Three-source medication reconciliation — discharge, pre-admission, and pharmacy profile — with discrepancy documentation',
-          'Safety pass: duplicates, expired and discontinued medications, and high-risk review',
-          'Coordination with pharmacy and prescriber-ready SBAR',
-          'Stabilization Plan, Closing Report, and handoff to a monthly plan'
-        ],
-        standard: { name: 'Standard', price: '$650', oldPrice: '$1,050', note: 'Founding price — first 10 families. Regular price $1,050 after.', perk: '', cta: 'Book Standard' },
-        expedited: { name: 'Expedited', price: '$800', oldPrice: '$1,200', note: 'Founding price — first 10 families. Regular price $1,200 after.', perk: 'Priority intake call and priority in-home scheduling', cta: 'Book Expedited' }
+          name: 'Transition of care',
+          amount: '$650',
+          forWhom: 'For the first days at home after the hospital.',
+          includes: [
+            'Calls on days 1, 3, 7, and 14',
+            'One home visit',
+            'Compares the discharge list, the earlier medicines, and the pharmacy',
+            'Looks for duplicates, expired medicines, and higher-risk ones',
+            'A closing report and a plan for the family',
+          ],
+          cta: 'Reserve',
+        },
+        express: {
+          name: 'Expedited transition',
+          amount: '$850',
+          forWhom: 'For a discharge that cannot wait.',
+          includes: [
+            'The first call and the home visit are scheduled the same day',
+            'Calls on days 1, 3, 7, and 14',
+            'Compares the discharge list, the earlier medicines, and the pharmacy',
+            'Looks for duplicates, expired medicines, and higher-risk ones',
+            'A closing report and a plan for the family',
+          ],
+          cta: 'Reserve',
+        },
+        homeVisit: {
+          name: 'Home visit and audit',
+          amount: '$350',
+          forWhom: 'One visit to review the medications and the home.',
+          includes: [
+            'The pharmacist comes to the home at a time you agree on',
+            'An in-person medication review',
+            'Looks at interactions, duplicates, and what may no longer be needed',
+            'Checks fall risks',
+            'Checks storage, labels, and how the medicines are organized',
+          ],
+          cta: 'Reserve',
+        },
+        consultation: {
+          name: '1-hour consultation',
+          amount: '$70',
+          forWhom: 'One sitting, with the list and the questions.',
+          includes: [
+            'One hour with the pharmacist',
+            'Goes through the medications one by one',
+            'You leave with the questions answered',
+          ],
+          cta: 'Reserve',
+        },
       },
       b2b: {
-        title: 'Hospital & Senior Home Partnerships',
-        subtitle: 'Enterprise pricing for healthcare facilities',
+        title: 'For hospitals and homes',
+        subtitle: 'A pharmacist for a group of patients.',
         transition10: {
-          name: '10-Patient Transition Program', price: '$3,000', period: '/mo',
-          desc: 'Dedicated pharmacist support for up to 10 post-discharge patients per month: medication reconciliation, follow-ups on days 3, 7, and 14, and a monthly report for your team.',
-          cta: 'Inquire Now'
+          name: '10-patient transition', price: '$3,000', period: '/mo',
+          desc: 'Up to 10 patients leaving the hospital each month, with follow-up and a report.',
+          cta: 'Write to us',
         },
         review10: {
-          name: '10-Resident Medication Review', price: '$2,000', period: '/mo',
-          desc: 'Monthly comprehensive medication reviews for up to 10 long-term care residents. Interaction screening, deprescribing recommendations, and regulatory documentation.',
-          cta: 'Inquire Now'
+          name: '10-resident review', price: '$2,000', period: '/mo',
+          desc: 'A monthly medication review for up to 10 residents.',
+          cta: 'Write to us',
         },
-        custom: 'Contact us for custom enterprise pricing and volume discounts.',
-        cta: 'Contact for Enterprise'
+        custom: 'If the group is a different size, write and we will talk it through.',
+        cta: 'Write to us',
       },
-      guarantee: {
-        title: '30-Day Peace of Mind Guarantee',
-        desc: "Not satisfied after your first month? Request a full refund in writing within 30 days of your service start date. Subsequent months are non-refundable. We only succeed when your family truly benefits."
-      }
+      refund: refundCopy('en').refund,
     },
     trustSection: {
       title: 'Why Families Trust Us',
       independent: { title: 'Independent Practice', desc: "No insurance companies. No conflicts of interest. Clinical decisions based solely on your parent's needs." },
       licensed: { title: 'Licensed & Experienced', desc: 'Christian Portalatín is a Puerto Rico-licensed pharmacist with specialized training in medication therapy management, HIV care, and nuclear pharmacy. Former Nuclear Pharmacist at Cardinal Health PR. Currently serving at Centro Médico de Puerto Rico.' },
       diaspora: { title: 'Diaspora-Focused', desc: 'We speak your language—literally. English for you, Spanish for island providers. We understand the 1,000-mile worry.' },
-      guarantee: { title: '30-Day Peace of Mind Guarantee', desc: "Not satisfied after your first month? Request a full refund in writing within 30 days of your service start date. Subsequent months are non-refundable. We only succeed when your family truly benefits." }
     },
     scope: {
       title: "What We Do (And Don't Do)",
@@ -184,138 +197,149 @@ const translations = {
       subtitle: 'Tres pasos simples para obtener supervisión profesional de medicamentos para tus seres queridos',
       step1: { title: 'Tú Compartes', desc: 'Crea la lista de medicamentos de tu padre/madre usando nuestra herramienta gratuita y privada. No necesitas cuenta—todo se queda en tu dispositivo. Luego compártela con nosotros durante tu consulta.', cta: 'Crear Lista de Medicamentos', ctaSub: 'Gratis y privada. Sin descarga.' },
       step2: { title: 'Consulta Gratis 15 Min', desc: 'Agenda una videollamada gratuita de 15 minutos. Revisamos el historial de medicamentos de tu padre/madre, discutimos preocupaciones, y recomendamos el nivel de servicio adecuado. Sin compromiso.', cta: 'Agendar Consulta Gratis' },
-      step3: { title: 'Tú Descansas', desc: 'Elige el servicio que se ajuste a las necesidades y presupuesto de tu familia. Empieza pequeño con una consulta única, o obtén tranquilidad continua con una suscripción mensual. Nosotros nos encargamos del resto.', cta: 'Ver Servicios y Precios' },
+      step3: { title: 'Tú descansas', desc: 'Elige el servicio que le hace falta a tu familia. Empieza con una conversación, o deja que el farmacéutico mire los medicamentos cada mes.', cta: 'Ver los servicios' },
       serviceArea: 'Sirviendo familias en NY, FL, Chicago y más. Área de servicio principal: Metro San Juan, Bayamón, Carolina, Guaynabo.'
     },
     pricing: {
-      sectionTitle: 'Servicios y Precios',
-      sectionSubtitle: 'Precios claros y transparentes. Sin cargos ocultos. Sin seguro requerido.',
-      promoLabel: 'Primeras 10 familias',
-      regularLabel: 'Precio regular',
-      monthly: '/mes',
+      sectionTitle: 'Servicios',
+      sectionSubtitle: 'Elige el servicio que le hace falta a tu familia.',
+      startTitle: 'Para empezar',
+      startIntro: 'Una hora con el farmacéutico, o una visita a la casa.',
+      monthlyTitle: 'Cada mes',
+      monthlyIntro: 'Un farmacéutico sigue los medicamentos.',
+      transitionTitle: 'Después del hospital',
+      transitionIntro: 'Para los días que siguen al alta.',
+      perMonth: '/mes',
+      oneTimeLabel: 'pago único',
+      badges: {
+        founding: 'Precio fundador',
+        popular: 'Más elegido',
+        once: 'Pago único',
+        sameDay: 'Mismo día',
+      },
       subscriptions: {
-        title: 'Suscripciones Mensuales',
-        subtitle: 'Supervisión continua de medicamentos para tu familia',
         foundation: {
-          name: 'Fundación', badge: 'Monitoreo Remoto Solamente',
-          regular: '$169', promo: '$110', period: '/mes',
-          note: '$165 por 2 padres al precio promocional',
-          desc: 'Monitoreo profesional sin visitas a domicilio. Revisión mensual de medicamentos, coordinación con farmacia, y reportes familiares.',
-          bestFor: 'Ideal para: Regímenes simples, familias que visitan frecuentemente',
-          cta: 'Elegir Fundación'
+          name: 'Fundación',
+          amount: '$110',
+          period: '/mes',
+          forWhom: 'Para un tratamiento estable. El seguimiento es a distancia.',
+          includes: [
+            'Revisión de los medicamentos cada mes',
+            'Coordinación con la farmacia',
+            'Un informe para la familia',
+            'Respuesta al día siguiente laborable',
+          ],
+          cta: 'Empezar',
         },
         enhanced: {
-          name: 'Mejorado', badge: 'Cuidado Híbrido', popular: 'Más Popular',
-          regular: '$259', promo: '$195', period: '/mes',
-          desc: 'Supervisión remota + visitas a domicilio cuando sea clínicamente necesario. Todo lo de Fundación, más organización de medicamentos en casa y abogacía con prescriptores.',
-          bestFor: 'Ideal para: 5+ medicamentos, múltiples doctores, hospitalización reciente',
-          cta: 'Comenzar con Mejorado'
+          name: 'Mejorado',
+          amount: '$195',
+          period: '/mes',
+          forWhom: 'Para varios medicamentos, más de un médico, o una salida reciente del hospital.',
+          includes: [
+            'Revisión mensual, farmacia e informe a la familia',
+            'Respuesta el mismo día laborable',
+            'Dos visitas al año en la casa',
+            'Pastillero, almacenamiento y cómo usar los dispositivos',
+            'Habla con los médicos que recetan',
+          ],
+          cta: 'Empezar',
         },
         concierge: {
-          name: 'Concierge', badge: 'Disponibilidad Limitada',
-          regular: '$429', promo: '$325', period: '/mes',
-          desc: 'Abogacía de guante blanco para situaciones de alta complejidad. Acceso ilimitado, prioridad en agenda, y farmacéutico asignado dedicado.',
-          bestFor: 'Ideal para: 10+ medicamentos, múltiples especialistas, preocupaciones cognitivas',
-          spots: 'Solo 3 espacios disponibles hasta diciembre de 2026',
-          cta: 'Aplicar para Concierge'
-        }
+          name: 'Concierge',
+          amount: '$325',
+          period: '/mes',
+          forWhom: 'Para muchos medicamentos, varios especialistas, o preocupación por la memoria.',
+          includes: [
+            'El mismo farmacéutico, con respuesta en 4 horas laborables',
+            'Una visita en la casa cada mes',
+            'Una revisión más a fondo cada trimestre, y la revisión del año',
+            'Coordinación con la familia, la farmacia y los médicos',
+            'Agenda primero después de una hospitalización',
+          ],
+          spots: 'Hay 3 espacios hasta diciembre de 2026.',
+          cta: 'Empezar',
+        },
       },
       freeConsult: {
-        title: 'Empieza Aquí — Gratis',
-        subtitle: 'Sin compromiso. Sin tarjeta de crédito.',
-        name: 'Consulta de 15 Minutos',
-        price: 'GRATIS',
-        desc: 'Una videollamada rápida para entender tu situación, revisar tu lista de medicamentos, y recomendarte el siguiente paso adecuado. Perfecta para familias de la diáspora explorando opciones por primera vez.',
-        cta: 'Agendar Consulta Gratis'
+        line: 'Si todavía no sabes cuál servicio encaja, hay una conversación de 15 minutos. Es gratis y no pide tarjeta.',
+        cta: 'Reservar',
       },
       oneTime: {
-        title: 'Servicios Únicos',
-        subtitle: 'Paga una vez, obtén claridad inmediatamente',
-        consultation: {
-          name: 'Consulta de 1 Hora', price: '$70', oldPrice: '',
-          desc: 'Revisión de medicamentos uno-a-uno con un farmacéutico licenciado. Trae tu lista, tus preguntas, y tus preocupaciones.',
-          cta: 'Reservar Consulta'
-        },
-        audit: {
-          name: 'Auditoría de Seguridad', price: '$425', oldPrice: '',
-          desc: 'Evaluación integral de seguridad de medicamentos en el hogar. Revisamos cada receta, medicamento de venta libre, y suplemento en busca de interacciones, duplicados, y riesgos de caídas.',
-          cta: 'Reservar Auditoría'
-        },
         transition: {
-          name: 'Transición de Cuidado', price: '$650', oldPrice: '$1,050',
-          note: 'Precio introductorio por ahora — precio regular $1,050 después.',
-          desc: 'Reconciliación de medicamentos post-hospitalización. Coordinamos con instrucciones de alta, reconciliamos nuevas recetas, y aseguramos transiciones seguras a casa.',
-          cta: 'Reservar Transición'
-        }
-      },
-      compare: {
-        title: 'Compara lo que incluye',
-        feature: 'Característica',
-        priceLabel: 'Precio',
-        rows: [
-          { label: 'Ideal para', values: ['Regímenes estables', 'Regímenes cambiantes', 'Cuidado de medicamentos complejo'] },
-          { label: 'Mensajería segura', values: ['Siguiente día laborable', 'Mismo día laborable', 'Dentro de 4 horas laborables'] },
-          { label: 'Coordinación directa con prescriptores', values: ['no', 'yes', 'yes'] },
-          { label: 'Revisiones de medicamentos en casa', values: ['no', '2 al año', 'Mensual'] },
-          { label: 'Revisión de pastillero y organización', values: ['no', 'yes', 'yes'] },
-          { label: 'Revisión de almacenamiento y expiración', values: ['no', 'yes', 'yes'] },
-          { label: 'Educación en técnica de dispositivos', values: ['no', 'yes', 'yes'] },
-          { label: 'Educación de medicamentos para cuidadores', values: ['no', 'yes', 'yes'] },
-          { label: 'Revisión trimestral profunda', values: ['no', 'no', 'yes'] },
-          { label: 'Revisión anual comprehensiva', values: ['Complemento', 'Complemento', 'Incluida'] },
-          { label: 'Recomendaciones de desprescripción', values: ['no', 'Limitadas', 'yes'] },
-          { label: 'Coordinación del círculo de cuidado', values: ['no', 'Solo prescriptores', 'Familia, farmacia, prescriptores, cuidador, enfermera o PT'] },
-          { label: 'Agenda prioritaria de transiciones', values: ['no', 'no', 'yes'] },
-          { label: 'Visitas adicionales a casa', values: ['Tarifa independiente', 'Tarifa de suscriptor', 'Tarifa de suscriptor'] }
-        ]
-      },
-      transitionDetail: {
-        title: 'Transición de Cuidado — Los Primeros 14 Días',
-        subtitle: 'Un programa estructurado post-hospitalización, desde la llamada inicial hasta el informe de cierre.',
-        days: [
-          { day: 'Día 1', label: 'Llamada inicial' },
-          { day: 'Día 3', label: 'Seguimiento' },
-          { day: 'Día 7', label: 'Seguimiento' },
-          { day: 'Día 14', label: 'Llamada de cierre + informe' }
-        ],
-        included: [
-          'Llamada rápida de admisión familiar',
-          'Una revisión de medicamentos en casa',
-          'Reconciliación de medicamentos de tres fuentes — alta, pre-admisión y perfil de farmacia — con documentación de discrepancias',
-          'Revisión de seguridad: duplicados, medicamentos expirados y descontinuados, y revisión de alto riesgo',
-          'Coordinación con farmacia y SBAR listo para prescriptores',
-          'Plan de Estabilización, Informe de Cierre, y traspaso a un plan mensual'
-        ],
-        standard: { name: 'Estándar', price: '$650', oldPrice: '$1,050', note: 'Precio de fundador — primeras 10 familias. Precio regular $1,050 después.', perk: '', cta: 'Reservar Estándar' },
-        expedited: { name: 'Expedita', price: '$800', oldPrice: '$1,200', note: 'Precio de fundador — primeras 10 familias. Precio regular $1,200 después.', perk: 'Llamada inicial prioritaria y agenda prioritaria en casa', cta: 'Reservar Expedita' }
+          name: 'Transición de cuidado',
+          amount: '$650',
+          forWhom: 'Para los primeros días en la casa después del hospital.',
+          includes: [
+            'Llamadas los días 1, 3, 7 y 14',
+            'Una visita en la casa',
+            'Compara el alta, los medicamentos de antes y la farmacia',
+            'Busca duplicados, medicamentos vencidos y los de más riesgo',
+            'Un informe de cierre y un plan para la familia',
+          ],
+          cta: 'Reservar',
+        },
+        express: {
+          name: 'Transición expedita',
+          amount: '$850',
+          forWhom: 'Para un alta que no puede esperar.',
+          includes: [
+            'La primera llamada y la visita se agendan el mismo día',
+            'Llamadas los días 1, 3, 7 y 14',
+            'Compara el alta, los medicamentos de antes y la farmacia',
+            'Busca duplicados, medicamentos vencidos y los de más riesgo',
+            'Un informe de cierre y un plan para la familia',
+          ],
+          cta: 'Reservar',
+        },
+        homeVisit: {
+          name: 'Visita y auditoría en el hogar',
+          amount: '$350',
+          forWhom: 'Una visita para revisar los medicamentos y la casa.',
+          includes: [
+            'El farmacéutico va a la casa, en un horario que se acuerda',
+            'Revisión de los medicamentos en persona',
+            'Mira interacciones, duplicados y lo que ya no hace falta',
+            'Revisa el riesgo de caídas',
+            'Revisa cómo están guardados, las etiquetas y la organización',
+          ],
+          cta: 'Reservar',
+        },
+        consultation: {
+          name: 'Consulta de 1 hora',
+          amount: '$70',
+          forWhom: 'Para sentarte una vez, con la lista y las preguntas.',
+          includes: [
+            'Una hora con el farmacéutico',
+            'Repasa los medicamentos uno por uno',
+            'Sales con las dudas aclaradas',
+          ],
+          cta: 'Reservar',
+        },
       },
       b2b: {
-        title: 'Alianzas con Hospitales y Hogares de Ancianos',
-        subtitle: 'Precios empresariales para facilidades de salud',
+        title: 'Para hospitales y hogares',
+        subtitle: 'Un farmacéutico para un grupo de pacientes.',
         transition10: {
-          name: 'Programa de Transición para 10 Pacientes', price: '$3,000', period: '/mes',
-          desc: 'Apoyo farmacéutico dedicado para hasta 10 pacientes post-alta por mes: reconciliación de medicamentos, seguimiento los días 3, 7 y 14, e informe mensual para su equipo.',
-          cta: 'Consultar Ahora'
+          name: 'Transición para 10 pacientes', price: '$3,000', period: '/mes',
+          desc: 'Hasta 10 pacientes que salen del hospital cada mes, con seguimiento e informe.',
+          cta: 'Escribir',
         },
         review10: {
-          name: 'Revisión de Medicamentos para 10 Residentes', price: '$2,000', period: '/mes',
-          desc: 'Revisiones mensuales comprehensivas de medicamentos para hasta 10 residentes de cuidado largo. Detección de interacciones, recomendaciones de desprescripción, y documentación regulatoria.',
-          cta: 'Consultar Ahora'
+          name: 'Revisión para 10 residentes', price: '$2,000', period: '/mes',
+          desc: 'Revisión mensual de medicamentos para hasta 10 residentes.',
+          cta: 'Escribir',
         },
-        custom: 'Contáctenos para precios empresariales personalizados y descuentos por volumen.',
-        cta: 'Contactar para Empresas'
+        custom: 'Si el grupo es de otro tamaño, escribe y lo vemos.',
+        cta: 'Escribir',
       },
-      guarantee: {
-        title: 'Garantía de Tranquilidad de 30 Días',
-        desc: '¿No está satisfecho después del primer mes? Solicite un reembolso completo por escrito dentro de 30 días de su fecha de inicio. Los meses subsiguientes no son reembolsables.'
-      }
+      refund: refundCopy('es').refund,
     },
     trustSection: {
       title: 'Por Qué las Familias Confían en Nosotros',
       independent: { title: 'Práctica Independiente', desc: 'Sin compañías de seguros. Sin conflictos de interés. Decisiones clínicas basadas únicamente en las necesidades de tu padre/madre.' },
       licensed: { title: 'Licenciado y Experimentado', desc: 'Christian Portalatín es un farmacéutico licenciado en Puerto Rico con entrenamiento especializado en manejo de terapia de medicamentos, cuidado de VIH, y farmacia nuclear. Ex Farmacéutico Nuclear en Cardinal Health PR. Actualmente sirviendo en el Centro Médico de Puerto Rico.' },
       diaspora: { title: 'Enfocado en la Diáspora', desc: 'Hablamos tu idioma—literalmente. Inglés para ti, español para proveedores en la isla. Entendemos la preocupación de las 1,000 millas.' },
-      guarantee: { title: 'Garantía de Tranquilidad de 30 Días', desc: '¿No está satisfecho después del primer mes? Solicite un reembolso completo por escrito dentro de 30 días de su fecha de inicio. Los meses subsiguientes no son reembolsables.' }
     },
     scope: {
       title: 'Qué Hacemos (Y No Hacemos)',
@@ -327,6 +351,51 @@ const translations = {
     footer: { contact: 'Contacto', quickLinks: 'Enlaces Rápidos', legal: 'Legal', copyright: '© 2026 Lucesnegras LLC', license: 'Práctica de Farmacia Clínica Licenciada en Puerto Rico', creds: 'Servicios farmacéuticos profesionales por Christian Alexis Portalatín Cordero, Pharm.D. | Farmacéutico Licenciado en Puerto Rico y Florida' },
   }
 };
+
+function Pill({ children }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-3 py-1 font-body text-base"
+      style={{ backgroundColor: 'var(--sand)', color: 'var(--pine)' }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function PriceTag({ amount, period }) {
+  return (
+    <p className="flex items-baseline gap-2">
+      <span className="font-display text-4xl sm:text-5xl font-bold leading-none text-[#0F2E30]">{amount}</span>
+      <span className="font-body text-base text-[#0F2E30]">{period}</span>
+    </p>
+  );
+}
+
+function PlanCard({ badges, name, forWhom, prices, includes, note, children }) {
+  return (
+    <article className="p-6 sm:p-8 flex flex-col h-full" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
+      {badges.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {badges.map((label) => <Pill key={label}>{label}</Pill>)}
+        </div>
+      )}
+      <h3 className="font-display text-3xl font-medium text-[#0F2E30]">{name}</h3>
+      <p className="font-body text-base mt-2 leading-snug text-[#0F2E30]">{forWhom}</p>
+      <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">{prices}</div>
+      <ul className="mt-5 space-y-2">
+        {includes.map((item) => (
+          <li key={item} className="flex items-start gap-3 font-body text-base leading-snug text-[#0F2E30]">
+            <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--pine)' }} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+      {note && <p className="font-body text-base mt-3 text-[#0F2E30]">{note}</p>}
+      <div className="mt-auto pt-6 space-y-3">{children}</div>
+    </article>
+  );
+}
 
 const CALENDLY_URL = 'https://calendly.com/mifarmaceuticoenpr';
 
@@ -340,35 +409,64 @@ export default function LandingPage() {
   const [checkoutPlan, setCheckoutPlan] = useState(null);
   const t = translations[lang];
 
-  const checkoutSelection = checkoutPlan === 'foundation'
-    ? {
-        key: 'foundation',
-        mode: 'subscription',
-        name: t.pricing.subscriptions.foundation.name,
-        price: t.pricing.subscriptions.foundation.promo,
-        period: t.pricing.subscriptions.foundation.period,
-      }
-    : checkoutPlan === 'transition'
-      ? {
-          key: 'transition',
-          mode: 'payment',
-          name: `${t.pricing.oneTime.transition.name} (${t.pricing.transitionDetail.standard.name})`,
-          price: t.pricing.transitionDetail.standard.price,
-          period: '',
-        }
-      : null;
-
-  const renderCompareValue = (v) => {
-    if (v === 'yes') return <CheckCircle className="w-5 h-5 mx-auto" style={{ color: 'var(--pine)' }} strokeWidth={2.5} />;
-    if (v === 'no') return <span style={{ color: 'var(--muted-ink)' }}>—</span>;
-    return <span>{v}</span>;
+  const checkoutCatalog = {
+    foundation: {
+      key: 'foundation',
+      mode: 'subscription',
+      name: t.pricing.subscriptions.foundation.name,
+      price: t.pricing.subscriptions.foundation.amount,
+      period: t.pricing.subscriptions.foundation.period,
+    },
+    enhanced: {
+      key: 'enhanced',
+      mode: 'subscription',
+      name: t.pricing.subscriptions.enhanced.name,
+      price: t.pricing.subscriptions.enhanced.amount,
+      period: t.pricing.subscriptions.enhanced.period,
+    },
+    concierge: {
+      key: 'concierge',
+      mode: 'subscription',
+      name: t.pricing.subscriptions.concierge.name,
+      price: t.pricing.subscriptions.concierge.amount,
+      period: t.pricing.subscriptions.concierge.period,
+    },
+    consult: {
+      key: 'consult',
+      mode: 'payment',
+      name: t.pricing.oneTime.consultation.name,
+      price: t.pricing.oneTime.consultation.amount,
+      period: '',
+    },
+    homeVisit: {
+      key: 'homeVisit',
+      mode: 'payment',
+      name: t.pricing.oneTime.homeVisit.name,
+      price: t.pricing.oneTime.homeVisit.amount,
+      period: '',
+    },
+    transition: {
+      key: 'transition',
+      mode: 'payment',
+      name: t.pricing.oneTime.transition.name,
+      price: t.pricing.oneTime.transition.amount,
+      period: '',
+    },
+    transitionExpress: {
+      key: 'transitionExpress',
+      mode: 'payment',
+      name: t.pricing.oneTime.express.name,
+      price: t.pricing.oneTime.express.amount,
+      period: '',
+    },
   };
+  const checkoutSelection = checkoutCatalog[checkoutPlan] || null;
 
   const faqs = [
     { q: lang === 'en' ? "Do you visit my parent's home unannounced?" : "¿Visitas la casa de mi padre/madre sin anunciar?", a: lang === 'en' ? "Never. All visits are scheduled in advance with your parent (and you, if you'd like to join virtually). We respect their privacy and independence." : "Nunca. Todas las visitas se agendan con anticipación con tu padre/madre (y contigo, si deseas unirte virtualmente). Respetamos su privacidad e independencia." },
     { q: lang === 'en' ? "How do you communicate with my parent's doctor?" : "¿Cómo te comunicas con el médico de mi padre/madre?", a: lang === 'en' ? "We use SBAR (Situation-Background-Assessment-Recommendation) format to provide clear, clinical recommendations. We don't replace the physician—we support their care plan with medication expertise." : "Usamos el formato SBAR (Situación-Antecedentes-Evaluación-Recomendación) para proveer recomendaciones clínicas claras. No reemplazamos al médico—apoyamos su plan de cuidado con experiencia en medicamentos." },
     { q: lang === 'en' ? "What if my parent lives outside San Juan?" : "¿Qué pasa si mi padre/madre vive fuera de San Juan?", a: lang === 'en' ? "We serve the greater San Juan metro area (Bayamón, Carolina, Guaynabo, Trujillo Alto) at standard rates. We can travel to Dorado, Caguas, and Arecibo with a travel surcharge. For areas outside these, we recommend starting with our Remote Foundation tier." : "Servimos el área metropolitana de San Juan (Bayamón, Carolina, Guaynabo, Trujillo Alto) a tarifas estándar. Podemos viajar a Dorado, Caguas y Arecibo con tarifa de viaje adicional. Para áreas fuera de estas, recomendamos comenzar con nuestro nivel Fundación Remoto." },
-    { q: lang === 'en' ? 'How do I cancel a subscription?' : '¿Cómo cancelo una suscripción?', a: lang === 'en' ? "Subscriptions are month-to-month. Cancellation requires 30 days' written notice. Only the first month is refundable, and only if you request the refund in writing within 30 days of your service start date. Later months are not refundable." : 'Las suscripciones son mes a mes. La cancelación requiere aviso por escrito con 30 días de anticipación. Solo el primer mes es reembolsable, y solo si lo solicita por escrito dentro de los 30 días posteriores a la fecha de inicio del servicio. Los meses siguientes no son reembolsables.' },
+    { q: lang === 'en' ? 'How do I cancel a subscription?' : '¿Cómo cancelo una suscripción?', a: lang === 'en' ? "Subscriptions run month to month. You can cancel with 30 days' written notice." : 'Las suscripciones son de mes a mes. Puedes cancelar con un aviso por escrito de 30 días.' },
     { q: lang === 'en' ? "Do you accept insurance?" : "¿Aceptan seguro?", a: lang === 'en' ? "No, we operate on a cash-pay basis. This keeps us independent and ensures our clinical decisions are based solely on your parent's needs, without insurance company interference." : "No, operamos con pago en efectivo. Esto nos mantiene independientes y asegura que nuestras decisiones clínicas se basen únicamente en las necesidades de tu padre/madre, sin interferencia de compañías de seguros." },
     { q: lang === 'en' ? "How quickly can you start?" : "¿Qué tan rápido pueden empezar?", a: lang === 'en' ? "Most families can begin within 3-5 business days after the initial consultation. For urgent situations like hospital discharges, we offer expedited Transition of Care services." : "La mayoría de familias pueden comenzar dentro de 3-5 días hábiles después de la consulta inicial. Para situaciones urgentes como altas hospitalarias, ofrecemos servicios de Transición de Cuidado acelerados." }
   ];
@@ -395,7 +493,7 @@ export default function LandingPage() {
                 {Object.values(t.trust).map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--sage)' }} strokeWidth={2.5} />
-                    <span className="text-sm" style={{ color: 'var(--sage)' }}>{item}</span>
+                    <span className="text-base" style={{ color: 'var(--sage)' }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -417,9 +515,9 @@ export default function LandingPage() {
                 <h3 className="font-display text-2xl font-medium text-[#F4EFE6] mb-1">Christian Alexis Portalatín Cordero, Pharm.D.</h3>
                 <p className="font-body font-medium mb-4" style={{ color: 'var(--sage)' }}>Clinical Pharmacist</p>
                 <div className="p-3 mb-4 rounded-xl" style={{ backgroundColor: 'var(--flamboyan)' }}>
-                  <p className="text-sm font-semibold text-[#F4EFE6]">{t.hero.credCentro}</p>
+                  <p className="text-base font-semibold text-[#F4EFE6]">{t.hero.credCentro}</p>
                 </div>
-                <div className="text-left space-y-2 text-sm" style={{ color: 'var(--sage)' }}>
+                <div className="text-left space-y-2 text-base" style={{ color: 'var(--sage)' }}>
                   <p>✓ Puerto Rico & Florida Licensed Pharmacist</p>
                   <p>✓ Community and Hospital Pharmacy Experience</p>
                   <p>✓ Nova Southeastern University Pharm.D. (2020)</p>
@@ -474,7 +572,7 @@ export default function LandingPage() {
                         {item.t.cta}
                       </a>
                     )}
-                    <p className="text-sm mt-3 min-h-[1.25rem]" style={{ color: 'var(--muted-ink)' }}>{item.t.ctaSub || ''}</p>
+                    <p className="text-base mt-3 min-h-[1.25rem]" style={{ color: 'var(--muted-ink)' }}>{item.t.ctaSub || ''}</p>
                   </div>
                 </div>
               );
@@ -490,297 +588,130 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══ PRICING SECTION — COMPLETE OVERHAUL ═══ */}
-      <section id="services" className="py-20 px-6 sm:px-8" style={{ backgroundColor: 'var(--sand)' }}>
+      <section id="services" className="py-16 px-6 sm:px-8" style={{ backgroundColor: 'var(--sand)' }}>
         <div className="max-w-7xl mx-auto">
-
-          {/* Section header */}
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-medium text-[#0F2E30] mb-4">{t.pricing.sectionTitle}</h2>
-            <p className="text-xl" style={{ color: 'var(--muted-ink)' }}>{t.pricing.sectionSubtitle}</p>
+          <div className="max-w-3xl mb-8">
+            <h2 className="font-display text-4xl font-medium text-[#0F2E30] mb-3">{t.pricing.sectionTitle}</h2>
+            <p className="font-body text-xl text-[#0F2E30]">{t.pricing.sectionSubtitle}</p>
           </div>
 
-          {/* ─── FREE CONSULTATION — START HERE ─── */}
-          <div className="mb-20">
-            <div className="max-w-2xl mx-auto p-10 text-center relative overflow-hidden" style={{ backgroundColor: 'var(--pine)', borderRadius: '28px' }}>
-              <div className="absolute top-0 right-0 px-6 py-2 rounded-bl-2xl font-body font-bold text-sm text-[#F4EFE6]" style={{ backgroundColor: 'var(--flamboyan)' }}>
-                {lang === 'es' ? 'Recomendado' : 'Recommended'}
-              </div>
-              <h3 className="font-display text-3xl font-medium text-[#F4EFE6] mb-2">{t.pricing.freeConsult.title}</h3>
-              <p className="text-lg mb-8" style={{ color: 'var(--sage)' }}>{t.pricing.freeConsult.subtitle}</p>
+          <div className="mb-8 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
+            <p className="font-body text-base text-[#0F2E30]">{t.pricing.freeConsult.line}</p>
+            <button type="button" data-action="calendly" data-plan="free-consult" onClick={openCalendly} className="btn-capsule btn-capsule-primary shrink-0">
+              {t.pricing.freeConsult.cta}
+            </button>
+          </div>
 
-              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: 'var(--flamboyan)' }}>
-                <Calendar className="w-10 h-10 text-[#F4EFE6]" strokeWidth={2} />
-              </div>
-              <h4 className="font-display text-2xl font-medium text-[#F4EFE6] mb-3">{t.pricing.freeConsult.name}</h4>
-              <div className="mb-6">
-                <span className="font-display text-6xl font-medium" style={{ color: 'var(--flamboyan)' }}>{t.pricing.freeConsult.price}</span>
-              </div>
-              <p className="font-body mb-8 max-w-md mx-auto" style={{ color: 'var(--sage)' }}>{t.pricing.freeConsult.desc}</p>
-              <button type="button" data-action="calendly" data-plan="free-consult" onClick={openCalendly} className="btn-capsule inline-flex items-center gap-2 text-lg px-8 py-4" style={{ backgroundColor: 'var(--flamboyan)', color: 'var(--paper)' }}>
-                <Calendar className="w-5 h-5" strokeWidth={2.5} />
-                {t.pricing.freeConsult.cta}
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.startTitle}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.startIntro}</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-14">
+            {[
+              ['consult', t.pricing.oneTime.consultation],
+              ['homeVisit', t.pricing.oneTime.homeVisit],
+            ].map(([key, service]) => (
+              <PlanCard
+                key={key}
+                badges={[t.pricing.badges.once, t.pricing.badges.founding]}
+                name={service.name}
+                forWhom={service.forWhom}
+                prices={<PriceTag amount={service.amount} period={t.pricing.oneTimeLabel} />}
+                includes={service.includes}
+              >
+                <button type="button" data-action="checkout" data-plan={key} onClick={() => setCheckoutPlan(key)} className="btn-capsule btn-capsule-primary w-full">
+                  {service.cta}
+                </button>
+              </PlanCard>
+            ))}
+          </div>
+
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.monthlyTitle}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.monthlyIntro}</p>
+          <div className="grid lg:grid-cols-3 gap-6 mb-14">
+            <PlanCard
+              badges={[t.pricing.badges.founding]}
+              name={t.pricing.subscriptions.foundation.name}
+              forWhom={t.pricing.subscriptions.foundation.forWhom}
+              prices={<PriceTag amount={t.pricing.subscriptions.foundation.amount} period={t.pricing.perMonth} />}
+              includes={t.pricing.subscriptions.foundation.includes}
+            >
+              <button type="button" data-action="checkout" data-plan="foundation" onClick={() => setCheckoutPlan('foundation')} className="btn-capsule btn-capsule-primary w-full">
+                {t.pricing.subscriptions.foundation.cta}
               </button>
-            </div>
+            </PlanCard>
+            <PlanCard
+              badges={[t.pricing.badges.popular, t.pricing.badges.founding]}
+              name={t.pricing.subscriptions.enhanced.name}
+              forWhom={t.pricing.subscriptions.enhanced.forWhom}
+              prices={<PriceTag amount={t.pricing.subscriptions.enhanced.amount} period={t.pricing.perMonth} />}
+              includes={t.pricing.subscriptions.enhanced.includes}
+            >
+              <button type="button" data-action="checkout" data-plan="enhanced" onClick={() => setCheckoutPlan('enhanced')} className="btn-capsule btn-capsule-primary w-full">
+                {t.pricing.subscriptions.enhanced.cta}
+              </button>
+            </PlanCard>
+            <PlanCard
+              badges={[t.pricing.badges.founding]}
+              name={t.pricing.subscriptions.concierge.name}
+              forWhom={t.pricing.subscriptions.concierge.forWhom}
+              prices={<PriceTag amount={t.pricing.subscriptions.concierge.amount} period={t.pricing.perMonth} />}
+              includes={t.pricing.subscriptions.concierge.includes}
+              note={t.pricing.subscriptions.concierge.spots}
+            >
+              <button type="button" data-action="checkout" data-plan="concierge" onClick={() => setCheckoutPlan('concierge')} className="btn-capsule btn-capsule-primary w-full">
+                {t.pricing.subscriptions.concierge.cta}
+              </button>
+            </PlanCard>
           </div>
 
-          {/* ─── ONE-TIME SERVICES ─── */}
-          <div className="mb-20">
-            <div className="text-center mb-10">
-              <p className="font-body font-semibold text-sm uppercase tracking-widest mb-2" style={{ color: 'var(--flamboyan)' }}>{lang === 'es' ? 'Pago único' : 'One-time payment'}</p>
-              <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.oneTime.title}</h3>
-              <p className="text-lg" style={{ color: 'var(--muted-ink)' }}>{t.pricing.oneTime.subtitle}</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {[
-                { icon: Stethoscope, bg: 'var(--sage)', data: t.pricing.oneTime.consultation, plan: 'consultation' },
-                { icon: Clipboard, bg: 'var(--deep-pine)', data: t.pricing.oneTime.audit, plan: 'safetyAudit' },
-              ].map((service, i) => {
-                const Icon = service.icon;
-                return (
-                  <div key={i} className="p-8 flex flex-col transition hover:brightness-95" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: service.bg }}>
-                      <Icon className="w-8 h-8 text-[#F4EFE6]" strokeWidth={2} />
-                    </div>
-                    <h4 className="font-display text-2xl font-medium text-[#0F2E30] mb-3">{service.data.name}</h4>
-                    <div className="mb-2">
-                      {service.data.oldPrice && <span className="text-lg line-through mr-2" style={{ color: 'var(--muted-ink)' }}>{service.data.oldPrice}</span>}
-                      <span className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>{service.data.price}</span>
-                    </div>
-                    <p className="text-sm mb-4 min-h-[1.25rem]" style={{ color: 'var(--muted-ink)' }}>{service.data.note || ''}</p>
-                    <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{service.data.desc}</p>
-                    <button type="button" data-action="calendly" data-plan={service.plan} onClick={openCalendly} className="btn-capsule btn-capsule-primary w-full">
-                      {service.data.cta}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Transition of Care — 14-day program detail */}
-            <div className="mt-8 p-8 sm:p-10" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-              <h4 className="font-display text-2xl sm:text-3xl font-medium text-[#0F2E30] mb-2 text-center">{t.pricing.transitionDetail.title}</h4>
-              <p className="text-center mb-8" style={{ color: 'var(--muted-ink)' }}>{t.pricing.transitionDetail.subtitle}</p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-                {t.pricing.transitionDetail.days.map((d, i) => (
-                  <div key={i} className="text-center p-4" style={{ backgroundColor: 'var(--sand)', borderRadius: '20px' }}>
-                    <p className="font-body font-bold text-sm mb-1" style={{ color: 'var(--flamboyan)' }}>{d.day}</p>
-                    <p className="font-body text-sm" style={{ color: 'var(--pine)' }}>{d.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
-                {t.pricing.transitionDetail.included.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--sage)' }} strokeWidth={2.5} />
-                    <span className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="grid sm:grid-cols-2 gap-6">
-                {['standard', 'expedited'].map((key) => {
-                  const opt = t.pricing.transitionDetail[key];
-                  return (
-                    <div key={key} className="p-6 text-center flex flex-col" style={{ backgroundColor: 'var(--sand)', borderRadius: '20px' }}>
-                      <h5 className="font-display text-xl font-medium text-[#0F2E30] mb-2">{opt.name}</h5>
-                      <div className="mb-2">
-                        <span className="text-base line-through mr-2" style={{ color: 'var(--muted-ink)' }}>{opt.oldPrice}</span>
-                        <span className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>{opt.price}</span>
-                      </div>
-                      <p className="text-sm mb-2 flex-1" style={{ color: 'var(--muted-ink)' }}>{opt.note}</p>
-                      {opt.perk && <p className="text-sm font-semibold mb-2" style={{ color: 'var(--pine)' }}>{opt.perk}</p>}
-                      <button
-                        type="button"
-                        data-action={key === 'standard' ? 'checkout' : 'calendly'}
-                        data-plan={key === 'standard' ? 'transition' : 'transitionExpress'}
-                        onClick={() => (key === 'standard' ? setCheckoutPlan('transition') : openCalendly())}
-                        className="btn-capsule btn-capsule-primary w-full mt-4"
-                      >{opt.cta}</button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── SUBSCRIPTIONS ─── */}
-          <div className="mb-20">
-            <div className="text-center mb-10">
-              <p className="font-body font-semibold text-sm uppercase tracking-widest mb-2" style={{ color: 'var(--pine)' }}>{lang === 'es' ? 'Suscripción mensual' : 'Monthly subscription'}</p>
-              <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.subscriptions.title}</h3>
-              <p className="text-lg" style={{ color: 'var(--muted-ink)' }}>{t.pricing.subscriptions.subtitle}</p>
-            </div>
-
-            {/* Plans, pricing, features, and buy buttons — one table */}
-            <div>
-              <div className="hidden md:block overflow-x-auto p-2 sm:p-4" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-                <table className="w-full font-body text-sm" style={{ borderCollapse: 'collapse', minWidth: '640px' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: 'var(--pine)' }}>
-                      <th className="p-4 text-left font-semibold text-[#F4EFE6] align-bottom">{t.pricing.compare.feature}</th>
-                      {['foundation', 'enhanced', 'concierge'].map((key) => {
-                        const tier = t.pricing.subscriptions[key];
-                        return (
-                          <th key={key} className="p-4 text-center text-[#F4EFE6] align-bottom">
-                            {tier.popular && <span className="inline-block px-3 py-1 mb-2 rounded-full text-xs font-bold text-[#F4EFE6]" style={{ backgroundColor: 'var(--flamboyan)' }}>⭐ {tier.popular}</span>}
-                            <div className="font-display text-xl font-medium">{tier.name}</div>
-                            <div className="text-xs font-normal mt-1" style={{ color: 'var(--sage)' }}>{tier.badge}</div>
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* Pricing */}
-                    <tr style={{ backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--sand)' }}>
-                      <td className="p-4 font-semibold align-top" style={{ color: 'var(--pine)' }}>{t.pricing.compare.priceLabel}</td>
-                      {['foundation', 'enhanced', 'concierge'].map((key) => {
-                        const tier = t.pricing.subscriptions[key];
-                        return (
-                          <td key={key} className="p-4 text-center align-top">
-                            <div className="font-display text-3xl font-medium" style={{ color: 'var(--flamboyan)' }}>{tier.promo}<span className="font-body text-base" style={{ color: 'var(--muted-ink)' }}>{tier.period}</span></div>
-                            <div className="text-sm mt-1"><span className="line-through" style={{ color: 'var(--muted-ink)' }}>{tier.regular}{t.pricing.monthly}</span></div>
-                            <div className="mt-2"><span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--flamboyan-light)', color: 'var(--flamboyan)' }}>{t.pricing.promoLabel}</span></div>
-                            {tier.note && <p className="text-xs mt-2" style={{ color: 'var(--muted-ink)' }}>{tier.note}</p>}
-                            {tier.spots && <p className="text-xs font-semibold mt-2" style={{ color: 'var(--muted-ink)' }}>⚠️ {tier.spots}</p>}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {/* Buy buttons */}
-                    <tr style={{ backgroundColor: 'var(--sand)', borderBottom: '1px solid var(--sand)' }}>
-                      <td className="p-4"></td>
-                      {['foundation', 'enhanced', 'concierge'].map((key) => {
-                        const tier = t.pricing.subscriptions[key];
-                        return (
-                          <td key={key} className="p-4 text-center">
-                            <button
-                              type="button"
-                              data-action={key === 'foundation' ? 'checkout' : 'calendly'}
-                              data-plan={key}
-                              onClick={() => (key === 'foundation' ? setCheckoutPlan('foundation') : openCalendly())}
-                              className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]"
-                            >{tier.cta}</button>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {t.pricing.compare.rows.map((row, i) => (
-                      <tr key={i} style={{ backgroundColor: i % 2 ? 'var(--sand)' : 'var(--paper)', borderBottom: '1px solid var(--sand)' }}>
-                        <td className="p-4 font-semibold" style={{ color: 'var(--pine)' }}>{row.label}</td>
-                        {row.values.map((v, j) => (
-                          <td key={j} className="p-4 text-center" style={{ color: 'var(--muted-ink)' }}>{renderCompareValue(v)}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile: one card per tier, same content */}
-              <div className="md:hidden space-y-6">
-                {['foundation', 'enhanced', 'concierge'].map((key, tierIndex) => {
-                  const tier = t.pricing.subscriptions[key];
-                  return (
-                    <div key={key} className="overflow-hidden" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-                      <div className="p-6 text-center" style={{ backgroundColor: 'var(--pine)' }}>
-                        {tier.popular && <span className="inline-block px-3 py-1 mb-2 rounded-full text-xs font-bold text-[#F4EFE6]" style={{ backgroundColor: 'var(--flamboyan)' }}>⭐ {tier.popular}</span>}
-                        <h4 className="font-display text-2xl font-medium text-[#F4EFE6]">{tier.name}</h4>
-                        <p className="text-sm mt-1" style={{ color: 'var(--sage)' }}>{tier.badge}</p>
-                      </div>
-                      <div className="p-6">
-                        <div className="text-center mb-4">
-                          <div className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>{tier.promo}<span className="font-body text-lg" style={{ color: 'var(--muted-ink)' }}>{tier.period}</span></div>
-                          <div className="text-sm mt-1"><span className="line-through" style={{ color: 'var(--muted-ink)' }}>{tier.regular}{t.pricing.monthly}</span></div>
-                          <div className="mt-2"><span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--flamboyan-light)', color: 'var(--flamboyan)' }}>{t.pricing.promoLabel}</span></div>
-                          {tier.note && <p className="text-xs mt-2" style={{ color: 'var(--muted-ink)' }}>{tier.note}</p>}
-                          {tier.spots && <p className="text-xs font-semibold mt-2" style={{ color: 'var(--muted-ink)' }}>⚠️ {tier.spots}</p>}
-                        </div>
-                        <button
-                          type="button"
-                          data-action={key === 'foundation' ? 'checkout' : 'calendly'}
-                          data-plan={key}
-                          onClick={() => (key === 'foundation' ? setCheckoutPlan('foundation') : openCalendly())}
-                          className="btn-capsule btn-capsule-primary w-full text-sm px-4 py-3 leading-tight min-h-[3rem]"
-                        >{tier.cta}</button>
-                        <ul className="mt-6 space-y-3">
-                          {t.pricing.compare.rows.map((row, i) => (
-                            <li key={i} className="flex items-start justify-between gap-4 text-sm">
-                              <span className="font-semibold" style={{ color: 'var(--pine)' }}>{row.label}</span>
-                              <span className="text-right flex-shrink-0 max-w-[45%]" style={{ color: 'var(--muted-ink)' }}>{renderCompareValue(row.values[tierIndex])}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── B2B / ENTERPRISE ─── */}
-          <div className="mb-16">
-            <div className="text-center mb-10">
-              <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.b2b.title}</h3>
-              <p className="text-lg" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.subtitle}</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {/* 10-Patient Transition */}
-              <div className="p-8 flex flex-col" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px', border: '2px solid var(--deep-pine)' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'var(--pine)' }}>
-                  <Building2 className="w-8 h-8 text-[#F4EFE6]" strokeWidth={2} />
-                </div>
-                <h4 className="font-display text-2xl font-medium text-[#0F2E30] mb-3">{t.pricing.b2b.transition10.name}</h4>
-                <div className="mb-4">
-                  <span className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>{t.pricing.b2b.transition10.price}</span>
-                  <span className="font-body text-xl" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.transition10.period}</span>
-                </div>
-                <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.transition10.desc}</p>
-                <button type="button" data-action="calendly" data-plan="b2b-transition" onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
-                  {t.pricing.b2b.transition10.cta}
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.transitionTitle}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.transitionIntro}</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-14">
+            {[
+              ['transition', t.pricing.oneTime.transition, [t.pricing.badges.once, t.pricing.badges.founding]],
+              ['transitionExpress', t.pricing.oneTime.express, [t.pricing.badges.sameDay, t.pricing.badges.founding]],
+            ].map(([key, service, badges]) => (
+              <PlanCard
+                key={key}
+                badges={badges}
+                name={service.name}
+                forWhom={service.forWhom}
+                prices={<PriceTag amount={service.amount} period={t.pricing.oneTimeLabel} />}
+                includes={service.includes}
+              >
+                <button type="button" data-action="checkout" data-plan={key} onClick={() => setCheckoutPlan(key)} className="btn-capsule btn-capsule-primary w-full">
+                  {service.cta}
                 </button>
-              </div>
+              </PlanCard>
+            ))}
+          </div>
 
-              {/* 10-Resident Review */}
-              <div className="p-8 flex flex-col" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px', border: '2px solid var(--deep-pine)' }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'var(--deep-pine)' }}>
-                  <Users className="w-8 h-8 text-[#F4EFE6]" strokeWidth={2} />
+          <h3 className="font-display text-3xl font-medium text-[#0F2E30] mb-2">{t.pricing.b2b.title}</h3>
+          <p className="font-body text-base mb-6 text-[#0F2E30]">{t.pricing.b2b.subtitle}</p>
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {[
+              ['b2b-review', t.pricing.b2b.review10],
+              ['b2b-transition', t.pricing.b2b.transition10],
+            ].map(([plan, item]) => (
+              <article key={plan} className="p-6 sm:p-8 flex flex-col" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
+                <h4 className="font-display text-3xl font-medium text-[#0F2E30]">{item.name}</h4>
+                <p className="font-body text-base mt-2 text-[#0F2E30]">{item.desc}</p>
+                <div className="mt-4 mb-6">
+                  <PriceTag amount={item.price} period={item.period} />
                 </div>
-                <h4 className="font-display text-2xl font-medium text-[#0F2E30] mb-3">{t.pricing.b2b.review10.name}</h4>
-                <div className="mb-4">
-                  <span className="font-display text-4xl font-medium" style={{ color: 'var(--flamboyan)' }}>{t.pricing.b2b.review10.price}</span>
-                  <span className="font-body text-xl" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.review10.period}</span>
-                </div>
-                <p className="font-body mb-6 flex-1" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.review10.desc}</p>
-                <button type="button" data-action="calendly" data-plan="b2b-review" onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full">
-                  {t.pricing.b2b.review10.cta}
+                <button type="button" data-action="calendly" data-plan={plan} onClick={openCalendly} className="btn-capsule btn-capsule-outline w-full mt-auto">
+                  {item.cta}
                 </button>
-              </div>
-            </div>
-
-            {/* Custom enterprise CTA */}
-            <div className="text-center p-8" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-              <p className="font-body text-lg mb-4" style={{ color: 'var(--muted-ink)' }}>{t.pricing.b2b.custom}</p>
-              <a href="mailto:boticarxpr@outlook.com" className="btn-capsule inline-flex items-center gap-2" style={{ backgroundColor: 'var(--pine)', color: 'var(--paper)' }}>
-                <Mail className="w-5 h-5" strokeWidth={2.5} />
-                {t.pricing.b2b.cta}
-                <ArrowUpRight className="w-4 h-4" strokeWidth={2.5} />
-              </a>
-            </div>
+              </article>
+            ))}
           </div>
+          <p className="font-body text-base mb-4 text-[#0F2E30]">{t.pricing.b2b.custom}</p>
+          <a href="mailto:portalatin@mifarmaceuticopr.com" className="btn-capsule inline-flex items-center gap-2 mb-10" style={{ backgroundColor: 'var(--pine)', color: 'var(--paper)' }}>
+            <Mail className="w-5 h-5" strokeWidth={2.5} />
+            {t.pricing.b2b.cta}
+          </a>
 
-          {/* Guarantee */}
-          <div className="p-8 text-center max-w-3xl mx-auto" style={{ backgroundColor: 'var(--paper)', borderRadius: '28px' }}>
-            <Shield className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--sage)' }} strokeWidth={2} />
-            <h3 className="font-display text-2xl font-medium text-[#0F2E30] mb-2">{t.pricing.guarantee.title}</h3>
-            <p className="font-body" style={{ color: 'var(--muted-ink)' }}>{t.pricing.guarantee.desc}</p>
-          </div>
+          {/* PENDING LEGAL REVIEW by Natalie Ramos. See src/lib/refundPolicy.js. Stated once on this page. */}
+          <p className="font-body text-base max-w-3xl text-[#0F2E30]">{t.pricing.refund}</p>
         </div>
       </section>
 
@@ -788,12 +719,11 @@ export default function LandingPage() {
       <section className="py-20 px-6 sm:px-8" style={{ backgroundColor: 'var(--sand)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16"><h2 className="font-display text-4xl font-medium text-[#0F2E30]">{t.trustSection.title}</h2></div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {[
               { icon: Shield, t: t.trustSection.independent, bg: 'var(--pine)' },
               { icon: Award, t: t.trustSection.licensed, bg: 'var(--deep-pine)' },
               { icon: Globe, t: t.trustSection.diaspora, bg: 'var(--sage)' },
-              { icon: Star, t: t.trustSection.guarantee, bg: 'var(--flamboyan)' },
             ].map((item, i) => {
               const Icon = item.icon;
               return (
@@ -879,26 +809,29 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <h4 className="font-display text-lg font-medium text-[#F4EFE6] mb-4">{t.footer.contact}</h4>
-              <div className="space-y-2 font-body text-sm" style={{ color: 'var(--sage)' }}>
+              <div className="space-y-2 font-body text-base" style={{ color: 'var(--sage)' }}>
                 <p className="flex items-center gap-2"><Phone className="w-4 h-4" strokeWidth={2.5} />(787) 667-6560</p>
-                <p className="flex items-center gap-2"><Mail className="w-4 h-4" strokeWidth={2.5} />boticarxpr@outlook.com</p>
+                <p className="flex items-center gap-2"><Mail className="w-4 h-4" strokeWidth={2.5} />portalatin@mifarmaceuticopr.com</p>
               </div>
             </div>
             <div>
               <h4 className="font-display text-lg font-medium text-[#F4EFE6] mb-4">{t.footer.quickLinks}</h4>
-              <div className="space-y-2 font-body text-sm" style={{ color: 'var(--sage)' }}>
+              <div className="space-y-2 font-body text-base" style={{ color: 'var(--sage)' }}>
                 <a href="/#how-it-works" className="block hover:text-[#F4EFE6] transition">{t.howItWorks.title}</a>
                 <a href="/#services" className="block hover:text-[#F4EFE6] transition">{t.pricing.sectionTitle}</a>
               </div>
             </div>
             <div>
               <h4 className="font-display text-lg font-medium text-[#F4EFE6] mb-4">{t.footer.legal}</h4>
-              <p className="font-body text-sm" style={{ color: 'var(--sage)' }}>{t.footer.license}</p>
+              <p className="font-body text-base mb-2" style={{ color: 'var(--sage)' }}>{t.footer.license}</p>
+              <Link to="/acuerdo-de-servicio" className="font-body text-base block hover:text-[#F4EFE6] transition" style={{ color: 'var(--sage)' }}>
+                {lang === 'es' ? 'Acuerdo de servicio' : 'Service agreement'}
+              </Link>
             </div>
           </div>
           <div className="border-t pt-8 text-center" style={{ borderColor: 'var(--pine)' }}>
-            <p className="font-body text-sm mb-2" style={{ color: 'var(--sage)' }}>{t.footer.copyright}</p>
-            <p className="font-body text-xs" style={{ color: 'var(--muted-ink)' }}>{t.footer.creds}</p>
+            <p className="font-body text-base mb-2" style={{ color: 'var(--sage)' }}>{t.footer.copyright}</p>
+            <p className="font-body text-base" style={{ color: 'var(--sage)' }}>{t.footer.creds}</p>
           </div>
         </div>
       </footer>
