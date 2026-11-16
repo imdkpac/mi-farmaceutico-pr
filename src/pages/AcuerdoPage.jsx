@@ -58,7 +58,7 @@ export default function AcuerdoPage() {
           Mi Farmacéutico en PR · Lucesnegras LLC
         </p>
         <p className="font-body text-base mb-1" style={{ color: 'var(--muted-ink)' }}>
-          Lucesnegras LLC, haciendo negocios como Mi Farmacéutico en PR · (787) 667-6560 · portalatin@mifarmaceuticopr.com · mi-farmaceutico-pr.vercel.app
+          Lucesnegras LLC, haciendo negocios como Mi Farmacéutico en PR · (787) 667-6560 · portalatin@mifarmaceuticopr.com · www.mifarmaceuticopr.com
         </p>
         <p className="font-body text-base mb-8" style={{ color: 'var(--muted-ink)' }}>
           Documento SA-002 · Revisión 2 · Sustituye todas las versiones anteriores

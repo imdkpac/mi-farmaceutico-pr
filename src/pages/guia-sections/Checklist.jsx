@@ -148,7 +148,7 @@ export default function Checklist() {
 
       {/* Print-only footer */}
       <div className="hidden print:block mt-8 text-center">
-        <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>mifarmaceuticoenpr.com · (787) 667-6560</p>
+        <p className="font-body text-sm" style={{ color: 'var(--muted-ink)' }}>www.mifarmaceuticopr.com · (787) 667-6560</p>
       </div>
     </div>
   );
