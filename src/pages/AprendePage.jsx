@@ -69,7 +69,7 @@ export default function AprendePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex overflow-x-auto gap-3 mb-10 pb-1">
+        <div className="flex max-w-full min-w-0 overflow-x-auto overscroll-x-contain gap-3 mb-10 pb-1">
           {sections.map((section) => {
             const Icon = section.icon;
             const isActive = activeTab === section.id;

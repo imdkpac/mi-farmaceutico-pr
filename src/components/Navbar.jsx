@@ -115,7 +115,7 @@ export default function Navbar() {
           className="lg:hidden border-t-2"
           style={{ backgroundColor: 'var(--paper)', borderColor: 'var(--sand)' }}
         >
-          <div className="flex overflow-x-auto px-3 py-3 gap-2">
+          <div className="flex max-w-full min-w-0 overflow-x-auto overscroll-x-contain px-3 py-3 gap-2">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}

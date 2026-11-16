@@ -146,7 +146,7 @@ export default function HomePage() {
               {/* Giant touch button */}
               <a
                 href="/builder.html"
-                className="group relative block w-full max-w-lg mx-auto text-center font-body font-bold rounded-3xl transition-all duration-200 hover:brightness-105 active:scale-[0.98]"
+                className="group relative block w-full max-w-lg mx-auto text-center font-body font-bold rounded-3xl transition-all duration-200 hover:brightness-105 active:scale-[0.98] max-[1100px]:overflow-hidden"
                 style={{
                   backgroundColor: 'var(--flamboyan)',
                   color: 'var(--paper)',

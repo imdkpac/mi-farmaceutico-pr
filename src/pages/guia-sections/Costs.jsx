@@ -67,7 +67,7 @@ export default function Costs() {
 
       {/* Controls */}
       <div className="p-5" style={{ backgroundColor: 'var(--sand)', borderRadius: '28px' }}>
-        <div className="flex flex-wrap gap-3 mb-4">
+        <div className="flex min-w-0 max-w-full flex-wrap gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--muted-ink)' }} />
             <input
@@ -82,7 +82,7 @@ export default function Costs() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="px-5 py-3 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-3 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allCategories}</option>
@@ -136,7 +136,7 @@ export default function Costs() {
       {filtered.length === 0 ? (
         <div className="text-center py-12 font-body" style={{ color: 'var(--muted-ink)' }}>{t.noResults}</div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="max-w-full min-w-0 overflow-x-auto overscroll-x-contain">
           <table className="w-full text-left" style={{ borderRadius: '28px', overflow: 'hidden' }}>
             <thead>
               <tr style={{ backgroundColor: 'var(--pine)' }}>

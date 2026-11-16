@@ -139,11 +139,11 @@ export default function NursingHomes() {
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           />
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex min-w-0 max-w-full flex-wrap gap-3">
           <select
             value={tipoFilter}
             onChange={(e) => setTipoFilter(e.target.value)}
-            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allTypes}</option>
@@ -152,7 +152,7 @@ export default function NursingHomes() {
           <select
             value={duracionFilter}
             onChange={(e) => setDuracionFilter(e.target.value)}
-            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allDurations}</option>
@@ -161,7 +161,7 @@ export default function NursingHomes() {
           <select
             value={costoFilter}
             onChange={(e) => setCostoFilter(e.target.value)}
-            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allCosts}</option>
