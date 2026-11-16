@@ -168,11 +168,11 @@ export default function Hospitals() {
           />
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex min-w-0 max-w-full flex-wrap gap-3">
           <select
             value={regionFilter}
             onChange={(e) => setRegionFilter(e.target.value)}
-            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allRegions}</option>
@@ -184,7 +184,7 @@ export default function Hospitals() {
           <select
             value={tipoFilter}
             onChange={(e) => setTipoFilter(e.target.value)}
-            className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+            className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
             style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
           >
             <option value="">{t.allTypes}</option>
@@ -197,7 +197,7 @@ export default function Hospitals() {
             <select
               value={specFilter}
               onChange={(e) => setSpecFilter(e.target.value)}
-              className="px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
+              className="max-w-full min-w-0 px-5 py-2.5 rounded-full font-body text-base focus:outline-none"
               style={{ backgroundColor: 'var(--paper)', color: 'var(--pine)' }}
             >
               <option value="">{t.allSpecs}</option>

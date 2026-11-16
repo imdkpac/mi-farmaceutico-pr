@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Cree su lista de medicamentos gratis y privada. Mi Farmacéutico en PR.">
 <title>Mi Lista de Medicamentos — Mi Farmacéutico en PR</title>
@@ -34,13 +34,16 @@
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-bottom: calc(var(--action-bar-height) + env(safe-area-inset-bottom) + 16px); }
+html { scroll-behavior: smooth; scroll-padding-bottom: calc(var(--action-bar-height) + env(safe-area-inset-bottom) + 16px); overflow-x: hidden; }
+@supports (overflow-x: clip) { html { overflow-x: clip; } }
 body {
   font-family: var(--font-body); background: var(--pine); color: var(--paper);
   font-size: 20px; line-height: 1.5; min-height: 100vh; min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   display: flex; flex-direction: column;
+  overflow-x: hidden; max-width: 100%;
 }
+@supports (overflow-x: clip) { body { overflow-x: clip; } }
 
 /* ─── TOP BAR ─── */
 .topbar {

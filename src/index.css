@@ -21,6 +21,32 @@
     background-color: var(--paper);
     color: var(--pine);
     -webkit-font-smoothing: antialiased;
+    /* Keep the page from sliding sideways. `hidden` is the fallback;
+       `clip` does not create a scroll container, so sticky headers still stick. */
+    overflow-x: hidden;
+  }
+
+  @supports (overflow-x: clip) {
+    html {
+      overflow-x: clip;
+    }
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  @supports (overflow-x: clip) {
+    body {
+      overflow-x: clip;
+    }
+  }
+
+  /* Native menus size themselves to the longest option and can be wider than a phone. */
+  select {
+    max-width: 100%;
+    min-width: 0;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
