@@ -1,0 +1,32 @@
+{
+  "id": "/quest/",
+  "name": "Client Quest",
+  "short_name": "Quest",
+  "description": "Private outreach tracker for Mi Farmacéutico en PR.",
+  "start_url": "/quest/",
+  "scope": "/quest/",
+  "display": "standalone",
+  "background_color": "#F4EFE6",
+  "theme_color": "#0F2E30",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/quest/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/quest/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/quest/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
